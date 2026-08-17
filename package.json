@@ -1,0 +1,43 @@
+{
+  "name": "night-bites",
+  "version": "1.0.0",
+  "description": "NIGHT BITES — offline restaurant POS (Kurdish / Arabic / English)",
+  "author": "NIGHT BITES",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win --publish never"
+  },
+  "dependencies": {
+    "compression": "^1.7.5",
+    "express": "^4.21.2",
+    "electron-updater": "^6.3.9"
+  },
+  "devDependencies": {
+    "electron": "^31.7.7",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.nightbites.pos",
+    "productName": "NIGHT BITES",
+    "artifactName": "NIGHT-BITES-Setup-${version}.${ext}",
+    "files": [ "main.js", "preload.js", "server/**/*", "app/**/*", "build/icon.ico" ],
+    "directories": { "output": "release", "buildResources": "build" },
+    "win": {
+      "target": [ { "target": "nsis", "arch": [ "x64" ] } ],
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "NIGHT BITES"
+    },
+    "publish": [
+      { "provider": "generic", "url": "https://lightstudio.space/bite-burger/updates/" }
+    ]
+  }
+}
