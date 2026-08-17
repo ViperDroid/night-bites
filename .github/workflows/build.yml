@@ -1,0 +1,21 @@
+name: Build Windows EXE
+on:
+  push: { branches: [ main ] }
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm install --no-audit --no-fund
+      - run: npm run dist
+      - shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path out | Out-Null
+          Copy-Item release/*.exe out/ -Force
+          if (Test-Path release/latest.yml) { Copy-Item release/latest.yml out/ -Force }
+          Get-ChildItem release/*.blockmap -EA SilentlyContinue | Copy-Item -Destination out/ -Force
+      - uses: actions/upload-artifact@v4
+        with: { name: night-bites-windows, path: out/*, retention-days: 7, if-no-files-found: error }
