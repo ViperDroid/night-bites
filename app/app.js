@@ -30,6 +30,33 @@
       details: 'Details', hide: 'Hide', unit_price: 'Unit price', lang_label: 'Language', line_total: 'Total', order_details: 'Order items',
       r_thanks: 'Thank you! · See you again',
       need_items: 'Add at least one item first',
+      order_saved: 'Order saved',
+      receipt: 'Receipt', print_receipt: 'Print receipt', close: 'Close', printing: 'Printing…', printed: 'Printed', print_failed: 'Print failed',
+      show_preview: 'Show receipt preview', show_preview_hint: 'When off, the receipt prints directly with no popup — faster for a busy cashier.',
+      preview_on: 'On', preview_off: 'Off',
+      printers_zones: 'Printers & Zones', pz_hint: 'Scan for printers, register them, then route each food category to its printer.',
+      desktop_only: 'Available in the desktop app.',
+      scan: 'Scan for printers', scanning: 'Scanning…', rescan: 'Scan again',
+      scan_note: 'Finds USB / installed printers and network printers (port 9100) on this network.',
+      found_printers: 'Found', registered_printers: 'Registered printers',
+      no_found: 'Nothing yet — tap “Scan for printers”.', no_registered: 'No printers registered yet.',
+      kind_system: 'USB / installed', kind_network: 'Network',
+      register: 'Register', added: 'Added', remove: 'Remove', test: 'Test',
+      zones_title: 'Print zones', zones_hint: 'A zone sends the chosen food categories to one printer.',
+      add_zone: 'Add zone', no_zones: 'No zones yet.', zone_name: 'Zone name',
+      zone_type: 'Type', ztype_customer: 'Customer receipt (whole order)', ztype_items: 'Kitchen ticket (chosen categories)',
+      zone_printer: 'Printer', zone_cats: 'Food categories', pick: 'Choose…',
+      station: 'Station', test_ticket: 'TEST TICKET',
+      network: 'Network', your_pc: 'This PC', subnet: 'Subnet', gateway: 'Router (gateway)',
+      add_manually: 'Add manually', ip_address: 'IP address', port: 'Port', printer_name: 'Name (optional)',
+      add: 'Add', checking: 'Checking…', reachable: 'Reachable ✓', not_reachable: 'No answer — added anyway',
+      manual_hint: 'Enter the printer IP (e.g. 192.168.1.50) and port (usually 9100).', bad_ip: 'Enter a valid IP, e.g. 192.168.1.50',
+      help_title: 'How to connect a printer (quick guide)',
+      help_1: 'Plug the printer into the SAME router as this PC (a LAN cable is the most reliable).',
+      help_2: 'Print its network settings: turn the printer OFF, hold the FEED button, turn it ON — it prints its current IP.',
+      help_3: 'The printer IP must be on your subnet — the same first three numbers as “This PC”. Example: PC 192.168.1.20 → printer 192.168.1.50.',
+      help_4: 'To change the IP: open the printer’s current IP in a web browser, or use its “Net Config / Printer Setup” tool over USB — set a static IP, gateway = the Router shown above, port 9100.',
+      help_5: 'Come back here → Scan (or Add manually) → Test. Then make a zone for it.',
     },
     ku: {
       _dir: 'rtl', _name: 'کوردی',
@@ -55,6 +82,33 @@
       details: 'وردەکاری', hide: 'شاردنەوە', unit_price: 'نرخی یەکە', lang_label: 'زمان', line_total: 'کۆ', order_details: 'خواردنەکانی داواکاری',
       r_thanks: 'سوپاس! · دووبارە بەخێربێیتەوە',
       need_items: 'سەرەتا خواردنێک زیاد بکە',
+      order_saved: 'داواکاری پاشەکەوتکرا',
+      receipt: 'وەسڵ', print_receipt: 'چاپی وەسڵ', close: 'داخستن', printing: 'چاپکردن…', printed: 'چاپکرا', print_failed: 'چاپکردن سەرکەوتوو نەبوو',
+      show_preview: 'پیشاندانی وەسڵ پێش چاپ', show_preview_hint: 'ئەگەر ناچالاک بێت، وەسڵ ڕاستەوخۆ چاپدەکرێت بەبێ پیشاندان — خێراترە بۆ کاشێر.',
+      preview_on: 'چالاک', preview_off: 'ناچالاک',
+      printers_zones: 'پرینتەرەکان و زۆنەکان', pz_hint: 'گەڕان بۆ پرینتەر، تۆمارکردنیان، پاشان هەر جۆرێکی خواردن بنێرە بۆ پرینتەرەکەی.',
+      desktop_only: 'تەنها لە بەرنامەی دیسکتۆپدا بەردەستە.',
+      scan: 'گەڕان بۆ پرینتەر', scanning: 'گەڕان…', rescan: 'دووبارە گەڕان',
+      scan_note: 'پرینتەری USB و پرینتەری ناو تۆڕ (پۆرت 9100) دەدۆزێتەوە.',
+      found_printers: 'دۆزراوە', registered_printers: 'پرینتەرە تۆمارکراوەکان',
+      no_found: 'هێشتا هیچ — کرتە لە «گەڕان بۆ پرینتەر» بکە.', no_registered: 'هێشتا هیچ پرینتەرێک تۆمار نەکراوە.',
+      kind_system: 'USB / دامەزراو', kind_network: 'تۆڕ',
+      register: 'تۆمارکردن', added: 'زیادکرا', remove: 'لابردن', test: 'تاقیکردن',
+      zones_title: 'زۆنەکانی چاپ', zones_hint: 'زۆنێک جۆرە دیاریکراوەکانی خواردن دەنێرێت بۆ پرینتەرێک.',
+      add_zone: 'زیادکردنی زۆن', no_zones: 'هێشتا زۆن نییە.', zone_name: 'ناوی زۆن',
+      zone_type: 'جۆر', ztype_customer: 'وەسڵی کڕیار (هەموو داواکاری)', ztype_items: 'وەسڵی چێشتخانە (جۆرە دیاریکراوەکان)',
+      zone_printer: 'پرینتەر', zone_cats: 'جۆرەکانی خواردن', pick: 'هەڵبژێرە…',
+      station: 'بەش', test_ticket: 'وەسڵی تاقیکردن',
+      network: 'تۆڕ', your_pc: 'ئەم کۆمپیوتەرە', subnet: 'ساب‌نێت', gateway: 'ڕووتەر (گەیت‌وەی)',
+      add_manually: 'زیادکردن بە دەستی', ip_address: 'ناونیشانی IP', port: 'پۆرت', printer_name: 'ناو (ئارەزوومەندانە)',
+      add: 'زیادکردن', checking: 'پشکنین…', reachable: 'بەردەستە ✓', not_reachable: 'وەڵامی نەدایەوە — بەهەرحاڵ زیادکرا',
+      manual_hint: 'ناونیشانی IP ی پرینتەر بنووسە (بۆ نموونە 192.168.1.50) و پۆرت (زۆرجار 9100).', bad_ip: 'IP ی دروست بنووسە، بۆ نموونە 192.168.1.50',
+      help_title: 'چۆن پرینتەر پەیوەست بکەیت (ڕێنمایی خێرا)',
+      help_1: 'پرینتەرەکە بە هەمان ڕووتەری ئەم کۆمپیوتەرەوە ببەستە (کێبڵی LAN باشترینە).',
+      help_2: 'ڕێکخستنی تۆڕی چاپ بکە: پرینتەرەکە بکوژێنەوە، دووگمەی FEED دابگرە، بیکەرەوە — IP ی ئێستای چاپ دەکات.',
+      help_3: 'IP ی پرینتەر دەبێت لەسەر هەمان ساب‌نێت بێت — هەمان سێ ژمارەی یەکەمی «ئەم کۆمپیوتەرە». نموونە: کۆمپیوتەر 192.168.1.20 ← پرینتەر 192.168.1.50.',
+      help_4: 'بۆ گۆڕینی IP: IP ی ئێستای پرینتەر لە وێبگەڕدا بکەرەوە، یان بە ئامرازی «Net Config / Printer Setup» لەڕێی USB — IP ی جێگیر دابنێ، گەیت‌وەی = ڕووتەرەکەی سەرەوە، پۆرت 9100.',
+      help_5: 'بگەڕێوە بۆ ئێرە ← گەڕان (یان زیادکردن بە دەستی) ← تاقیکردن. پاشان زۆنێکی بۆ دروستبکە.',
     },
     ar: {
       _dir: 'rtl', _name: 'العربية',
@@ -80,6 +134,33 @@
       details: 'التفاصيل', hide: 'إخفاء', unit_price: 'سعر الوحدة', lang_label: 'اللغة', line_total: 'الإجمالي', order_details: 'أصناف الطلب',
       r_thanks: 'شكراً! · نراكم مجدداً',
       need_items: 'أضف صنفاً واحداً على الأقل',
+      order_saved: 'تم حفظ الطلب',
+      receipt: 'الإيصال', print_receipt: 'طباعة الإيصال', close: 'إغلاق', printing: 'جارٍ الطباعة…', printed: 'تمت الطباعة', print_failed: 'فشلت الطباعة',
+      show_preview: 'إظهار معاينة الإيصال', show_preview_hint: 'عند الإيقاف، يُطبع الإيصال مباشرة دون نافذة — أسرع لأمين الصندوق.',
+      preview_on: 'مُفعّل', preview_off: 'مُطفأ',
+      printers_zones: 'الطابعات والمناطق', pz_hint: 'ابحث عن الطابعات، سجّلها، ثم وجّه كل فئة طعام إلى طابعتها.',
+      desktop_only: 'متاح في تطبيق سطح المكتب.',
+      scan: 'البحث عن الطابعات', scanning: 'جارٍ البحث…', rescan: 'إعادة البحث',
+      scan_note: 'يعثر على طابعات USB والطابعات الشبكية (منفذ 9100) على هذه الشبكة.',
+      found_printers: 'تم العثور', registered_printers: 'الطابعات المسجّلة',
+      no_found: 'لا شيء بعد — اضغط «البحث عن الطابعات».', no_registered: 'لم تُسجّل أي طابعة بعد.',
+      kind_system: 'USB / مثبّتة', kind_network: 'شبكة',
+      register: 'تسجيل', added: 'أُضيفت', remove: 'إزالة', test: 'اختبار',
+      zones_title: 'مناطق الطباعة', zones_hint: 'المنطقة ترسل فئات الطعام المختارة إلى طابعة واحدة.',
+      add_zone: 'إضافة منطقة', no_zones: 'لا مناطق بعد.', zone_name: 'اسم المنطقة',
+      zone_type: 'النوع', ztype_customer: 'إيصال الزبون (الطلب كامل)', ztype_items: 'تذكرة المطبخ (الفئات المختارة)',
+      zone_printer: 'الطابعة', zone_cats: 'فئات الطعام', pick: 'اختر…',
+      station: 'القسم', test_ticket: 'تذكرة اختبار',
+      network: 'الشبكة', your_pc: 'هذا الجهاز', subnet: 'الشبكة الفرعية', gateway: 'الراوتر (البوابة)',
+      add_manually: 'إضافة يدوياً', ip_address: 'عنوان IP', port: 'المنفذ', printer_name: 'الاسم (اختياري)',
+      add: 'إضافة', checking: 'جارٍ الفحص…', reachable: 'متصلة ✓', not_reachable: 'لا استجابة — أُضيفت على أي حال',
+      manual_hint: 'أدخل IP الطابعة (مثل 192.168.1.50) والمنفذ (عادة 9100).', bad_ip: 'أدخل IP صحيحاً، مثل 192.168.1.50',
+      help_title: 'كيفية توصيل الطابعة (دليل سريع)',
+      help_1: 'صِل الطابعة بنفس راوتر هذا الجهاز (كابل LAN هو الأكثر موثوقية).',
+      help_2: 'اطبع إعدادات الشبكة: أطفئ الطابعة، اضغط مطولاً زر FEED، ثم شغّلها — ستطبع IP الحالي.',
+      help_3: 'يجب أن يكون IP الطابعة على شبكتك الفرعية — نفس الأرقام الثلاثة الأولى لـ«هذا الجهاز». مثال: الجهاز 192.168.1.20 ← الطابعة 192.168.1.50.',
+      help_4: 'لتغيير IP: افتح IP الحالي للطابعة في المتصفح، أو استخدم أداة «Net Config / Printer Setup» عبر USB — عيّن IP ثابتاً، البوابة = الراوتر أعلاه، والمنفذ 9100.',
+      help_5: 'عُد إلى هنا ← بحث (أو إضافة يدوياً) ← اختبار. ثم أنشئ له منطقة.',
     },
   };
 
@@ -92,6 +173,7 @@
     view: 'pos',
     foods: [],
     settings: {},
+    printerCfg: { printers: [], zones: [] },
     cart: [],          // [{ id, name, price, qty }]
     cat: 'all',
     sidebarOpen: false,
@@ -206,6 +288,7 @@
 
   function renderApp() {
     applyDir(); app.textContent = '';
+    if (state.view === 'kitchen') state.view = 'pos';   // kitchen display hidden for now
     var name = (state.user && (state.user.display_name || state.user.username)) || '';
 
     var sidebar = el('aside', { class: 'sidebar' + (state.sidebarOpen ? ' open' : '') }, [
@@ -219,7 +302,6 @@
         el('div', { class: 'sb-sec', text: t('sec_sale') }),
         navItem('pos', '', t('nav_pos')),
         navItem('orders', '', t('nav_orders')),
-        navItem('kitchen', '', t('nav_kitchen')),
         el('div', { class: 'sb-sec', text: t('sec_manage') }),
         navItem('foods', '', t('nav_foods')),
         navItem('settings', '', t('nav_settings')),
@@ -386,14 +468,16 @@
       cartEl.appendChild(grip); cartEl.appendChild(head); cartEl.appendChild(bodyC); cartEl.appendChild(foot);
     }
 
-    // both buttons save then print (a receipt must reflect a real, saved order).
-    function checkout() {
+    // both buttons save (a receipt must reflect a real, saved order). Green also
+    // fires the kitchen/station tickets; gray prints just the customer receipt.
+    function checkout(withStations) {
       if (!state.cart.length) { toast(t('need_items'), 'bad'); return; }
       var payload = { lang: state.lang, items: state.cart.map(function (c) { return { food_id: c.id, qty: c.qty }; }) };
       api('/orders', { method: 'POST', body: JSON.stringify(payload) })
         .then(function (d) {
+          if (withStations) routeStations(d.order);
           printOrder(d.order);
-          toast(t('sent_kitchen') + ' · #' + d.order.order_no, 'ok');
+          toast(t('order_saved') + ' · #' + d.order.order_no, 'ok');
           state.cart = []; state.cartOpen = false; drawGrid(); drawCart(); cartEl.classList.remove('open');
         })
         .catch(function (e) { if (e.status === 401) return logout(); toast(e.message || 'Error', 'bad'); });
@@ -471,6 +555,7 @@
       var body = { name_ku: f.name_ku.value, name_ar: f.name_ar.value, name_en: f.name_en.value,
         category: f.category.value, price: f.price.value, is_active: activeChk.checked };
       if (!body.name_ku && !body.name_ar && !body.name_en) { errBox.textContent = t('name_ku'); errBox.style.display = ''; return; }
+      if (!body.category) { errBox.textContent = t('category'); errBox.style.display = ''; return; }
       saveBtn.disabled = true;
       var req = editing ? api('/foods/' + editing.id, { method: 'PUT', body: JSON.stringify(body) })
                         : api('/foods', { method: 'POST', body: JSON.stringify(body) });
@@ -624,6 +709,14 @@
       } }));
     });
 
+    var chosenPrev = { on: String(s.show_preview == null ? '1' : s.show_preview) !== '0' };
+    var prevSeg = el('div', { class: 'seg' });
+    [['1', t('preview_on')], ['0', t('preview_off')]].forEach(function (o) {
+      prevSeg.appendChild(el('button', { class: 'seg-b' + ((chosenPrev.on ? '1' : '0') === o[0] ? ' on' : ''), text: o[1], onclick: function () {
+        chosenPrev.on = o[0] === '1'; Array.prototype.forEach.call(prevSeg.children, function (b) { b.classList.remove('on'); }); this.classList.add('on');
+      } }));
+    });
+
     var resetT = el('input', { class: 'input', type: 'time', value: (s.reset_time || '00:00'), dir: 'ltr' });
     var phone = el('textarea', { class: 'textarea', dir: 'ltr', style: 'min-height:96px', placeholder: '0750 947 1000' });
     phone.value = (s.phones || s.phone || '');
@@ -637,6 +730,7 @@
       var pl = phone.value.split(/\r?\n/).map(function (x) { return x.trim(); }).filter(Boolean);
       api('/settings', { method: 'PUT', body: JSON.stringify({
         print_width: chosen.w, reset_time: resetT.value || '00:00', phones: phone.value, phone: pl[0] || '',
+        show_preview: chosenPrev.on ? '1' : '0',
         business_name_ku: nk.value, business_name_ar: na.value, business_name_en: ne.value,
       }) }).then(function (d) { state.settings = d.settings; toast(t('saved'), 'ok'); saveBtn.disabled = false; renderApp(); })
         .catch(function (e) { if (e.status === 401) return logout(); toast(e.message, 'bad'); saveBtn.disabled = false; });
@@ -650,6 +744,10 @@
         el('label', { text: t('reset_time') }), resetT,
         el('div', { class: 'hint', style: 'margin:6px 0 0', text: t('reset_time_hint') }),
       ]),
+      el('div', { class: 'field', style: 'margin-top:18px' }, [
+        el('label', { text: t('show_preview') }), prevSeg,
+        el('div', { class: 'hint', style: 'margin:6px 0 0', text: t('show_preview_hint') }),
+      ]),
     ]));
     host.appendChild(el('div', { class: 'panel' }, [
       el('h2', { text: t('business') }),
@@ -661,6 +759,8 @@
       ]),
       el('div', { style: 'margin-top:6px' }, [saveBtn]),
     ]));
+
+    renderPrintersPanel(host);
 
     // App version (desktop only) + manual update check
     var verEl = el('div', { class: 'hint', style: 'text-align:center;margin-top:18px;font-weight:700', text: 'NIGHT BITES' });
@@ -679,17 +779,228 @@
     }
   }
 
+  /* ------------------------------ PRINTERS & ZONES ------------------------------ */
+  function renderPrintersPanel(host) {
+    var panel = el('div', { class: 'panel' });
+    host.appendChild(panel);
+    if (!(window.nb && window.nb.listPrinters)) {
+      panel.appendChild(el('h2', { text: t('printers_zones') }));
+      panel.appendChild(el('p', { class: 'hint', style: 'margin:8px 0 0', text: t('desktop_only') }));
+      return;
+    }
+
+    function clone(o) { return JSON.parse(JSON.stringify(o)); }
+    function uid() { return 'id' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+    var cfg = { printers: printers().map(clone), zones: zones().map(clone) };
+    var found = [];
+    var scanning = false;
+    var netinfo = null;
+    var adding = false;   // guards register/addManual/addZone against double-clicks
+    function validIp(s) {
+      var m = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(String(s || '').trim());
+      return !!m && m.slice(1).every(function (o) { return +o >= 0 && +o <= 255; });
+    }
+
+    // NOTE: do NOT reassign `cfg` here. The zone/printer cards close over cfg's
+    // objects; replacing them would orphan the handlers and lose the next edit.
+    // The server preserves our client ids, so cfg and state stay in sync.
+    function persist() {
+      return api('/printers', { method: 'PUT', body: JSON.stringify({ printers: cfg.printers, zones: cfg.zones }) })
+        .then(function (d) { state.printerCfg = { printers: d.printers || [], zones: d.zones || [] }; })
+        .catch(function (e) { if (e.status === 401) return logout(); toast(e.message || 'Error', 'bad'); });
+    }
+    function isRegistered(f) {
+      return cfg.printers.some(function (p) {
+        return f.kind === 'network' ? (p.kind === 'network' && p.host === f.host && (p.port || 9100) === (f.port || 9100))
+                                    : (p.kind === 'system' && p.device === f.device);
+      });
+    }
+    function doScan() {
+      scanning = true; redraw();
+      var pSys = window.nb.listPrinters ? window.nb.listPrinters() : Promise.resolve([]);
+      var pNet = window.nb.scanNetwork ? window.nb.scanNetwork() : Promise.resolve([]);
+      Promise.all([pSys.catch(function () { return []; }), pNet.catch(function () { return []; })]).then(function (r) {
+        var sys = (r[0] || []).map(function (p) { return { kind: 'system', name: p.displayName || p.name, device: p.name }; });
+        var netw = (r[1] || []).map(function (n) { return { kind: 'network', name: n.host + ':' + n.port, host: n.host, port: n.port }; });
+        found = sys.concat(netw);
+        scanning = false; redraw();
+      });
+    }
+    function register(f) {
+      if (adding) return; adding = true;
+      cfg.printers.push({ id: uid(), name: f.name || f.device || f.host, kind: f.kind, device: f.device || '', host: f.host || '', port: f.port || 9100 });
+      persist().then(function () { adding = false; redraw(); });
+    }
+    function addManual(host, port, name) {
+      host = String(host || '').trim();
+      if (!validIp(host)) { toast(t('bad_ip'), 'bad'); return; }
+      if (adding) return; adding = true;
+      port = parseInt(port, 10) || 9100;
+      var doAdd = function (reach) {
+        cfg.printers.push({ id: uid(), name: (name || '').trim() || (host + ':' + port), kind: 'network', device: '', host: host, port: port });
+        persist().then(function () { adding = false; toast(reach ? t('reachable') : t('not_reachable'), reach ? 'ok' : 'bad'); redraw(); });
+      };
+      if (window.nb.probePrinter) {
+        toast(t('checking'), 'ok');
+        window.nb.probePrinter(host, port).then(function (r) { doAdd(r && r.ok); }).catch(function () { doAdd(false); });
+      } else doAdd(true);
+    }
+    function removePrinter(id) {
+      cfg.printers = cfg.printers.filter(function (p) { return p.id !== id; });
+      cfg.zones.forEach(function (z) { if (z.printer_id === id) z.printer_id = ''; });
+      persist().then(redraw);
+    }
+    function testPrint(p) {
+      var order = { order_no: 'TEST', lang: state.lang, created_at: new Date().toISOString(),
+        items: [{ name: t('test_ticket'), qty: 1, line_total: 0, category: 'burgers' }], total: 0 };
+      toast(t('printing'), 'ok');
+      sendTo(p, customerTicketHTML(order, p.kind === 'network')).then(function (rr) { toast(rr && rr.ok ? t('printed') : t('print_failed'), rr && rr.ok ? 'ok' : 'bad'); });
+    }
+    function addZone() {
+      if (adding) return; adding = true;
+      cfg.zones.push({ id: uid(), name: t('station') + ' ' + (cfg.zones.length + 1), type: 'items',
+        printer_id: (cfg.printers[0] && cfg.printers[0].id) || '', categories: [] });
+      persist().then(function () { adding = false; redraw(); });
+    }
+    function removeZone(id) { cfg.zones = cfg.zones.filter(function (z) { return z.id !== id; }); persist().then(redraw); }
+
+    function prRow(p, isFound) {
+      var kids = [
+        el('span', { class: 'pr-kind ' + p.kind, text: p.kind === 'network' ? t('kind_network') : t('kind_system') }),
+        el('div', { class: 'pr-name' }, [
+          el('strong', { text: p.name }),
+          el('span', { class: 'pr-sub', dir: 'ltr', text: p.kind === 'network' ? (p.host + ':' + p.port) : (p.device || '') }),
+        ]),
+      ];
+      if (isFound) {
+        kids.push(isRegistered(p) ? el('span', { class: 'pr-added', text: t('added') })
+          : el('button', { class: 'btn-ghost', text: t('register'), onclick: function () { register(p); } }));
+      } else {
+        kids.push(el('div', { class: 'rowbtns' }, [
+          el('button', { class: 'btn-ghost', text: t('test'), onclick: function () { testPrint(p); } }),
+          el('button', { class: 'btn-ghost danger', text: t('remove'), onclick: function () { removePrinter(p.id); } }),
+        ]));
+      }
+      return el('div', { class: 'pr-row' }, kids);
+    }
+
+    function zoneCard(z) {
+      var nameI = el('input', { class: 'input', value: z.name || '' });
+      nameI.onchange = function () { z.name = nameI.value; persist(); };
+      var typeS = el('select', { class: 'input' });
+      [['items', t('ztype_items')], ['customer', t('ztype_customer')]].forEach(function (o) {
+        var opt = el('option', { value: o[0], text: o[1] }); if (z.type === o[0]) opt.selected = true; typeS.appendChild(opt);
+      });
+      var prS = el('select', { class: 'input' });
+      prS.appendChild(el('option', { value: '', text: t('pick') }));
+      cfg.printers.forEach(function (p) { var opt = el('option', { value: p.id, text: p.name }); if (z.printer_id === p.id) opt.selected = true; prS.appendChild(opt); });
+      prS.onchange = function () { z.printer_id = prS.value; persist(); };
+      var catsWrap = el('div', { class: 'zcats' });
+      CATS.concat(['other']).forEach(function (c) {
+        var chk = el('input', { type: 'checkbox' }); chk.checked = (z.categories || []).indexOf(c) >= 0;
+        chk.onchange = function () {
+          z.categories = z.categories || [];
+          if (chk.checked) { if (z.categories.indexOf(c) < 0) z.categories.push(c); }
+          else z.categories = z.categories.filter(function (x) { return x !== c; });
+          persist();
+        };
+        catsWrap.appendChild(el('label', { class: 'zchk' }, [chk, el('span', { text: t('cat_' + c) })]));
+      });
+      var catsField = el('div', { class: 'field', style: 'margin-top:10px' }, [el('label', { text: t('zone_cats') }), catsWrap]);
+      function syncCats() { catsField.style.display = (typeS.value === 'customer') ? 'none' : ''; }
+      typeS.onchange = function () { z.type = typeS.value; syncCats(); persist(); };
+      syncCats();
+      return el('div', { class: 'zone-card' }, [
+        el('div', { class: 'zone-top' }, [
+          el('div', { class: 'field', style: 'flex:1;margin:0' }, [el('label', { text: t('zone_name') }), nameI]),
+          el('button', { class: 'btn-ghost danger zone-x', text: t('remove'), onclick: function () { removeZone(z.id); } }),
+        ]),
+        el('div', { class: 'row2' }, [
+          el('div', { class: 'field' }, [el('label', { text: t('zone_type') }), typeS]),
+          el('div', { class: 'field' }, [el('label', { text: t('zone_printer') }), prS]),
+        ]),
+        catsField,
+      ]);
+    }
+
+    function redraw() {
+      panel.textContent = '';
+      panel.appendChild(el('div', { class: 'ph-head' }, [
+        el('h2', { text: t('printers_zones') }),
+        el('button', { class: 'btn', disabled: scanning ? 'disabled' : undefined, onclick: doScan }, [scanning ? t('scanning') : t('scan')]),
+      ]));
+      panel.appendChild(el('p', { class: 'hint', text: t('pz_hint') }));
+
+      var pc = netinfo && netinfo.interfaces && netinfo.interfaces[0];
+      var gw = (netinfo && netinfo.gateway) || (pc && pc.guessGateway) || '';
+      panel.appendChild(el('div', { class: 'net-card' }, [
+        el('div', { class: 'net-cell' }, [el('span', { class: 'net-k', text: t('your_pc') }), el('span', { class: 'net-v', dir: 'ltr', text: pc ? pc.ip : '—' })]),
+        el('div', { class: 'net-cell' }, [el('span', { class: 'net-k', text: t('subnet') }), el('span', { class: 'net-v', dir: 'ltr', text: pc ? (pc.network + '/' + pc.cidr) : '—' })]),
+        el('div', { class: 'net-cell' }, [el('span', { class: 'net-k', text: t('gateway') }), el('span', { class: 'net-v', dir: 'ltr', text: gw || '—' })]),
+      ]));
+
+      if (scanning) { panel.appendChild(el('p', { class: 'hint', text: t('scanning') })); }
+      else if (found.length) {
+        var fl = el('div', { class: 'pr-list' });
+        found.forEach(function (f) { fl.appendChild(prRow(f, true)); });
+        panel.appendChild(el('div', { class: 'pr-block' }, [el('div', { class: 'pr-h', text: t('found_printers') + ' · ' + found.length }), fl]));
+      } else {
+        panel.appendChild(el('p', { class: 'hint', text: t('scan_note') }));
+      }
+
+      // manual add (by IP) — for printers you already know the address of
+      var ipI = el('input', { class: 'input', dir: 'ltr', placeholder: '192.168.1.50' });
+      var portI = el('input', { class: 'input', dir: 'ltr', type: 'number', value: '9100' });
+      var nameI = el('input', { class: 'input', placeholder: t('printer_name') });
+      panel.appendChild(el('div', { class: 'pr-h', style: 'margin-top:16px', text: t('add_manually') }));
+      panel.appendChild(el('div', { class: 'manual-add' }, [
+        el('div', { class: 'ma-fields' }, [
+          el('div', { class: 'field ma-ip' }, [el('label', { text: t('ip_address') }), ipI]),
+          el('div', { class: 'field ma-port' }, [el('label', { text: t('port') }), portI]),
+          el('div', { class: 'field ma-name' }, [el('label', { text: t('printer_name') }), nameI]),
+        ]),
+        el('button', { class: 'btn ma-btn', text: t('add'), onclick: function () { addManual(ipI.value, portI.value, nameI.value); } }),
+      ]));
+      panel.appendChild(el('div', { class: 'hint', style: 'margin:6px 0 0', text: t('manual_hint') }));
+
+      panel.appendChild(el('div', { class: 'pr-h', style: 'margin-top:18px', text: t('registered_printers') }));
+      if (!cfg.printers.length) panel.appendChild(el('p', { class: 'hint', text: t('no_registered') }));
+      else { var rl = el('div', { class: 'pr-list' }); cfg.printers.forEach(function (p) { rl.appendChild(prRow(p, false)); }); panel.appendChild(rl); }
+
+      panel.appendChild(el('div', { class: 'pr-head2' }, [
+        el('div', {}, [el('div', { class: 'pr-h', text: t('zones_title') }), el('div', { class: 'hint', style: 'margin:2px 0 0', text: t('zones_hint') })]),
+        el('button', { class: 'btn-ghost', disabled: cfg.printers.length ? undefined : 'disabled', text: t('add_zone'), onclick: addZone }),
+      ]));
+      if (!cfg.zones.length) panel.appendChild(el('p', { class: 'hint', text: t('no_zones') }));
+      else cfg.zones.forEach(function (z) { panel.appendChild(zoneCard(z)); });
+
+      // how-to guide (collapsible)
+      panel.appendChild(el('details', { class: 'help' }, [
+        el('summary', { text: t('help_title') }),
+        el('ol', { class: 'help-list' }, [
+          el('li', { text: t('help_1') }), el('li', { text: t('help_2') }), el('li', { text: t('help_3') }),
+          el('li', { text: t('help_4') }), el('li', { text: t('help_5') }),
+        ]),
+      ]));
+    }
+
+    if (window.nb.networkInfo) window.nb.networkInfo().then(function (ni) { netinfo = ni; redraw(); }).catch(function () {});
+    redraw();
+  }
+
   /* ------------------------------ PRINT ------------------------------ */
-  function printOrder(order) {
+  function bizName(lang) {
+    var s = state.settings;
+    return lang === 'ar' ? (s.business_name_ar || 'نايت بايتس') : lang === 'en' ? (s.business_name_en || 'NIGHT BITES') : (s.business_name_ku || 'نایت بایتس');
+  }
+  function orderDate(order) { var d = new Date(String(order.created_at).replace(' ', 'T')); return isNaN(d) ? String(order.created_at) : d.toLocaleString('en-GB'); }
+
+  // On-screen receipt element (used for the preview popup and the browser-print fallback).
+  function buildReceiptEl(order) {
     var lang = order.lang || state.lang;
     var L = I18N[lang] || I18N.ku;
-    var s = state.settings;
-    var bname = lang === 'ar' ? (s.business_name_ar || 'نايت بايتس') : lang === 'en' ? (s.business_name_en || 'NIGHT BITES') : (s.business_name_ku || 'نایت بایتس');
-    var cur = s.currency || 'IQD';
-    var width = s.print_width === '58' ? '58mm' : '80mm';
-    var d = new Date(String(order.created_at).replace(' ', 'T'));
-    var dateStr = isNaN(d) ? String(order.created_at) : d.toLocaleString('en-GB');
-
+    var cur = state.settings.currency || 'IQD';
+    var width = state.settings.print_width === '58' ? '58mm' : '80mm';
     var tbody = el('tbody');
     (order.items || []).forEach(function (it) {
       tbody.appendChild(el('tr', {}, [
@@ -698,12 +1009,11 @@
         el('td', { class: 'num', text: money(it.line_total) }),
       ]));
     });
-
-    var rcpt = el('div', { class: 'rcpt', dir: L._dir, style: '--pw:' + width }, [
-      el('div', { class: 'r-brand', text: bname }),
+    return el('div', { class: 'rcpt', dir: L._dir, style: '--pw:' + width }, [
+      el('div', { class: 'r-brand', text: bizName(lang) }),
       el('div', { class: 'r-rule' }),
       el('div', { class: 'r-no', text: L.order + ' #' + order.order_no }),
-      el('div', { class: 'r-meta' }, [el('span', { text: dateStr }), el('span', { dir: 'ltr', text: '#' + order.order_no })]),
+      el('div', { class: 'r-meta' }, [el('span', { text: orderDate(order) }), el('span', { dir: 'ltr', text: '#' + order.order_no })]),
       el('div', { class: 'r-rule' }),
       el('table', {}, [
         el('thead', {}, [el('tr', {}, [
@@ -719,17 +1029,151 @@
       el('div', { class: 'r-thanks', text: L.r_thanks }),
       el('div', { class: 'r-phone', dir: 'ltr' }, phoneList().map(function (ph) { return el('div', { text: ph }); })),
     ]);
-
+  }
+  function printViaBrowser(order) {
     printRoot.textContent = '';
-    printRoot.appendChild(rcpt);
+    printRoot.appendChild(buildReceiptEl(order));
     setTimeout(function () { window.print(); }, 80);
+  }
+
+  /* ---- printer / zone helpers ---- */
+  function printers() { return (state.printerCfg && state.printerCfg.printers) || []; }
+  function zones() { return (state.printerCfg && state.printerCfg.zones) || []; }
+  function printerById(id) { return printers().filter(function (p) { return p.id === id; })[0] || null; }
+  function customerZone() { return zones().filter(function (z) { return z.type === 'customer' && printerById(z.printer_id); })[0] || null; }
+  function targetFor(p) { return p.kind === 'network' ? { kind: 'network', host: p.host, port: p.port || 9100 } : { kind: 'system', device: p.device }; }
+  function widthMm() { return state.settings.print_width === '58' ? 58 : 80; }
+
+  /* ---- self-contained HTML tickets for silent printing ---- */
+  function escHtml(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function ticketStyle(net, dots) {
+    var b = net ? (dots / 576) : 1;
+    var u = net ? 'px' : 'pt';
+    var sz = net
+      ? { pad: Math.round(16 * b) + 'px ' + Math.round(12 * b) + 'px', brand: Math.round(40 * b), no: Math.round(30 * b), meta: Math.round(19 * b), th: Math.round(19 * b), td: Math.round(23 * b), tlbl: Math.round(26 * b), tval: Math.round(34 * b), phone: Math.round(26 * b), thanks: Math.round(22 * b), kq: Math.round(34 * b), kn: Math.round(30 * b), station: Math.round(26 * b) }
+      : { pad: '4mm 3mm 6mm', brand: 20, no: 12, meta: 8.5, th: 8, td: 9.5, tlbl: 11, tval: 15, phone: 11, thanks: 10, kq: 14, kn: 14, station: 11 };
+    var w = net ? ('width:' + dots + 'px;') : ('width:' + (dots === 384 ? '58mm' : '80mm') + ';');
+    var gap = net ? '8px' : '2.5mm';
+    return '<style>'
+      + '*{margin:0;padding:0;box-sizing:border-box;}'
+      + 'body{background:#fff;color:#000;font-family:"Segoe UI",Tahoma,Arial,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact;}'
+      + '.t{' + w + 'padding:' + sz.pad + ';line-height:1.4;}'
+      + '.brand{text-align:center;font-size:' + sz.brand + u + ';font-weight:900;letter-spacing:.02em;}'
+      + '.station{text-align:center;font-size:' + sz.station + u + ';font-weight:900;margin-top:' + (net ? '3px' : '.6mm') + ';}'
+      + '.rule{border-top:1px dashed #000;margin:' + gap + ' 0;}'
+      + '.rule.solid{border-top:2px solid #000;}'
+      + '.no{text-align:center;font-size:' + sz.no + u + ';font-weight:900;margin:' + (net ? '4px' : '1mm') + ' 0;}'
+      + '.meta{display:flex;justify-content:space-between;font-size:' + sz.meta + u + ';font-weight:700;}'
+      + 'table{width:100%;border-collapse:collapse;}'
+      + 'th{font-size:' + sz.th + u + ';font-weight:800;border-bottom:1px solid #000;padding:' + (net ? '4px 0' : '1mm 0') + ';text-align:start;}'
+      + 'td{font-size:' + sz.td + u + ';padding:' + (net ? '4px 0' : '1.2mm 0') + ';vertical-align:top;}'
+      + '.mid{text-align:center;}.num{text-align:end;}'
+      + '.iname{font-weight:700;}'
+      + '.total{display:flex;justify-content:space-between;align-items:baseline;font-weight:900;margin-top:' + (net ? '8px' : '2mm') + ';}'
+      + '.tlbl{font-size:' + sz.tlbl + u + ';}.tval{font-size:' + sz.tval + u + ';}'
+      + '.thanks{text-align:center;font-size:' + sz.thanks + u + ';font-weight:800;margin-top:' + (net ? '8px' : '2mm') + ';}'
+      + '.phone{text-align:center;font-weight:900;font-size:' + sz.phone + u + ';margin-top:' + (net ? '6px' : '1.5mm') + ';letter-spacing:.03em;}'
+      + '.krow{display:flex;align-items:center;gap:' + (net ? '10px' : '3mm') + ';padding:' + (net ? '7px 0' : '2mm 0') + ';border-bottom:1px dashed #000;}'
+      + '.kq{min-width:' + (net ? Math.round(48 * b) + 'px' : '10mm') + ';font-size:' + sz.kq + u + ';font-weight:900;}'
+      + '.kn{font-size:' + sz.kn + u + ';font-weight:800;}'
+      + '</style>';
+  }
+  function ticketDoc(inner, net, dots, dir) {
+    return '<!DOCTYPE html><html dir="' + (dir || 'rtl') + '"><head><meta charset="utf-8">' + ticketStyle(net, dots)
+      + '</head><body><div class="t">' + inner + '</div></body></html>';
+  }
+  function customerTicketHTML(order, net) {
+    var lang = order.lang || state.lang; var L = I18N[lang] || I18N.ku;
+    var cur = state.settings.currency || 'IQD';
+    var dots = widthMm() === 58 ? 384 : 576;
+    var rows = (order.items || []).map(function (it) {
+      return '<tr><td class="iname">' + escHtml(it.name) + '</td><td class="mid">×' + escHtml(it.qty) + '</td><td class="num">' + escHtml(money(it.line_total)) + '</td></tr>';
+    }).join('');
+    var phones = phoneList().map(function (p) { return '<div>' + escHtml(p) + '</div>'; }).join('');
+    var inner = '<div class="brand">' + escHtml(bizName(lang)) + '</div><div class="rule"></div>'
+      + '<div class="no">' + escHtml(L.order) + ' #' + escHtml(order.order_no) + '</div>'
+      + '<div class="meta"><span>' + escHtml(orderDate(order)) + '</span><span dir="ltr">#' + escHtml(order.order_no) + '</span></div>'
+      + '<div class="rule"></div>'
+      + '<table><thead><tr><th>' + escHtml(L.item) + '</th><th class="mid">' + escHtml(L.qty) + '</th><th class="num">' + escHtml(L.total) + '</th></tr></thead><tbody>' + rows + '</tbody></table>'
+      + '<div class="rule solid"></div>'
+      + '<div class="total"><span class="tlbl">' + escHtml(L.total) + '</span><span class="tval">' + escHtml(money(order.total)) + ' ' + escHtml(cur) + '</span></div>'
+      + '<div class="thanks">' + escHtml(L.r_thanks) + '</div>'
+      + '<div class="phone" dir="ltr">' + phones + '</div>';
+    return ticketDoc(inner, net, dots, L._dir);
+  }
+  function kitchenTicketHTML(order, items, station, net) {
+    var lang = order.lang || state.lang; var L = I18N[lang] || I18N.ku;
+    var dots = widthMm() === 58 ? 384 : 576;
+    var rows = (items || []).map(function (it) {
+      return '<div class="krow"><span class="kq">×' + escHtml(it.qty) + '</span><span class="kn">' + escHtml(it.name) + '</span></div>';
+    }).join('');
+    var inner = '<div class="brand">#' + escHtml(order.order_no) + '</div>'
+      + (station ? '<div class="station">' + escHtml(station) + '</div>' : '')
+      + '<div class="meta"><span>' + escHtml(orderDate(order)) + '</span><span dir="ltr">#' + escHtml(order.order_no) + '</span></div>'
+      + '<div class="rule"></div>' + rows;
+    return ticketDoc(inner, net, dots, L._dir);
+  }
+
+  /* ---- routing ---- */
+  function sendTo(printer, html) {
+    if (!(window.nb && window.nb.printTicket && printer)) return Promise.resolve({ ok: false });
+    return window.nb.printTicket(html, targetFor(printer), widthMm()).catch(function () { return { ok: false }; });
+  }
+  // Kitchen/station tickets — silent, one per zone that has matching items.
+  function routeStations(order) {
+    if (!(window.nb && window.nb.printTicket)) return;
+    zones().forEach(function (z) {
+      if (z.type === 'customer') return;
+      var p = printerById(z.printer_id); if (!p) return;
+      var items = (order.items || []).filter(function (it) { return (z.categories || []).indexOf(it.category || 'other') >= 0; });
+      if (!items.length) return;
+      sendTo(p, kitchenTicketHTML(order, items, z.name, p.kind === 'network'));
+    });
+  }
+  // Customer receipt — to the customer-zone printer if set, else the browser
+  // printer. If the zone print fails (offline printer, no bridge) fall back to
+  // the browser print so a receipt ALWAYS comes out — never nothing.
+  function printCustomerDirect(order) {
+    var z = (window.nb && window.nb.printTicket) ? customerZone() : null;
+    if (z) {
+      var p = printerById(z.printer_id);
+      sendTo(p, customerTicketHTML(order, p.kind === 'network')).then(function (r) {
+        if (r && r.ok) { toast(t('printed'), 'ok'); }
+        else { toast(t('print_failed'), 'bad'); printViaBrowser(order); }
+      });
+      return;
+    }
+    printViaBrowser(order);
+  }
+  // Entry point wherever a customer receipt is wanted. Honours the preview toggle.
+  function printOrder(order) {
+    var showPrev = String(state.settings.show_preview == null ? '1' : state.settings.show_preview) !== '0';
+    if (showPrev) showReceiptPreview(order);
+    else printCustomerDirect(order);
+  }
+  function showReceiptPreview(order) {
+    var lang = order.lang || state.lang; var L = I18N[lang] || I18N.ku;
+    var bg = el('div', { class: 'modal-bg', onclick: function (e) { if (e.target === bg) close(); } });
+    function close() { if (bg.parentNode) document.body.removeChild(bg); }
+    var printBtn = el('button', { class: 'btn green', text: t('print_receipt') });
+    printBtn.onclick = function () { printCustomerDirect(order); close(); };
+    bg.appendChild(el('div', { class: 'modal receipt-modal' }, [
+      el('div', { class: 'rm-title' }, [el('h3', { text: t('receipt') }), el('span', { class: 'rm-no', dir: 'ltr', text: '#' + order.order_no })]),
+      el('div', { class: 'preview-paper', dir: L._dir }, [buildReceiptEl(order)]),
+      el('div', { class: 'modal-actions' }, [
+        el('button', { class: 'btn gray', text: t('close'), onclick: close }),
+        printBtn,
+      ]),
+    ]));
+    document.body.appendChild(bg);
   }
 
   /* ------------------------------ BOOT ------------------------------ */
   function boot() {
     Promise.all([
       api('/foods').then(function (d) { state.foods = d.foods || []; }),
-      api('/settings').then(function (d) { state.settings = d.settings || {}; if (d.settings && d.settings.print_width) {/* keep */} }),
+      api('/settings').then(function (d) { state.settings = d.settings || {}; }),
+      api('/printers').then(function (d) { state.printerCfg = { printers: d.printers || [], zones: d.zones || [] }; }).catch(function () {}),
     ]).then(function () { state.view = 'pos'; renderApp(); })
       .catch(function () { state.view = 'pos'; renderApp(); });
   }

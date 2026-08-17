@@ -20,7 +20,7 @@ function createServer(opts) {
     order_items: [],
     settings: {
       print_width: '80', phone: '0750 947 1000', phones: '0750 947 1000',
-      currency: 'IQD', reset_time: '00:00',
+      currency: 'IQD', reset_time: '00:00', show_preview: '1',
       business_name_ku: 'نایت بایتس', business_name_ar: 'نايت بايتس', business_name_en: 'NIGHT BITES',
     },
     printers: [],   // registered: { id, name, device, kind }
@@ -89,11 +89,12 @@ function createServer(opts) {
   app.post('/api/logout', auth, (req, res) => { const m = (req.headers.authorization || '').match(/^Bearer\s+(.+)$/i); if (m) tokens.delete(m[1]); res.json({ ok: true }); });
 
   // ---- settings ----
-  const ALLOWED = new Set(['print_width', 'business_name_ku', 'business_name_ar', 'business_name_en', 'phone', 'phones', 'currency', 'reset_time']);
+  const ALLOWED = new Set(['print_width', 'business_name_ku', 'business_name_ar', 'business_name_en', 'phone', 'phones', 'currency', 'reset_time', 'show_preview']);
   app.get('/api/settings', auth, (_q, r) => r.json({ settings: db.settings }));
   app.put('/api/settings', auth, wrap((req, res) => {
     Object.keys(req.body || {}).forEach((k) => { if (ALLOWED.has(k)) db.settings[k] = String(req.body[k] == null ? '' : req.body[k]).slice(0, 500); });
     if (!['58', '80'].includes(db.settings.print_width)) db.settings.print_width = '80';
+    db.settings.show_preview = (db.settings.show_preview === '0') ? '0' : '1';
     save(); res.json({ settings: db.settings });
   }));
 
@@ -168,13 +169,25 @@ function createServer(opts) {
     save(); res.status(201).json({ order: shapeOrder(order, true) });
   }));
   app.post('/api/orders/:id/done', auth, wrap((req, res) => { const o = db.orders.find((x) => x.id === (parseInt(req.params.id, 10) || 0)); if (!o) return res.status(404).json({ error: 'Not found' }); o.kitchen_status = 'done'; save(); res.json({ ok: true }); }));
-  app.get('/api/kitchen', auth, (_q, res) => { res.json({ orders: db.orders.filter((o) => (o.kitchen_status || 'new') === 'new').sort((a, b) => a.id - b.id).slice(0, 60).map((o) => shapeOrder(o, true)) }); });
+  app.get('/api/kitchen', auth, (_q, res) => { const b = boundary(); res.json({ orders: db.orders.filter((o) => (o.kitchen_status || 'new') === 'new' && new Date(o.created_at).getTime() >= b).sort((a, b) => a.id - b.id).slice(0, 60).map((o) => shapeOrder(o, true)) }); });
 
   // ---- printers & zones (config stored here; actual printing is in main via IPC) ----
+  const str = (v, n) => String(v == null ? '' : v).slice(0, n || 80);
+  const shapePrinter = (p) => ({
+    id: str(p && p.id, 40) || ('p' + (++db.seq.food)),
+    name: str(p && p.name, 80), kind: (p && p.kind === 'network') ? 'network' : 'system',
+    device: str(p && p.device, 160), host: str(p && p.host, 60), port: Math.max(1, Math.min(65535, num((p && p.port) || 9100))),
+  });
+  const shapeZone = (z) => ({
+    id: str(z && z.id, 40) || ('z' + (++db.seq.food)),
+    name: str(z && z.name, 80), type: (z && z.type === 'customer') ? 'customer' : 'items',
+    printer_id: str(z && z.printer_id, 40),
+    categories: Array.isArray(z && z.categories) ? z.categories.map((c) => str(c, 40)).filter(Boolean).slice(0, 12) : [],
+  });
   app.get('/api/printers', auth, (_q, res) => res.json({ printers: db.printers, zones: db.zones }));
   app.put('/api/printers', auth, wrap((req, res) => {
-    if (Array.isArray(req.body && req.body.printers)) db.printers = req.body.printers.slice(0, 20);
-    if (Array.isArray(req.body && req.body.zones)) db.zones = req.body.zones.slice(0, 20);
+    if (Array.isArray(req.body && req.body.printers)) db.printers = req.body.printers.slice(0, 20).map(shapePrinter);
+    if (Array.isArray(req.body && req.body.zones)) db.zones = req.body.zones.slice(0, 20).map(shapeZone);
     save(); res.json({ printers: db.printers, zones: db.zones });
   }));
 
