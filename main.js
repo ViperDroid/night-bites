@@ -109,12 +109,14 @@ ipcMain.handle('probe-printer', async (_e, payload) => {
 ipcMain.handle('scan-network-printers', async (_e, payload) => {
   const ports = (payload && Array.isArray(payload.ports) && payload.ports.length)
     ? payload.ports.map((p) => parseInt(p, 10)).filter(Boolean)
-    : [9100, 9101, 9102];
+    : [9100];                                  // 9100 = the standard raw ESC/POS port (fast path)
   const hosts = subnetHosts();
   const targets = [];
   hosts.forEach((h) => ports.forEach((p) => targets.push({ host: h, port: p })));
   const hits = {};   // host -> smallest answering port
-  await pool(targets, 64, (t) => probe(t.host, t.port, 350).then((ok) => {
+  // fire the whole /24 at once (254 sockets) with a short timeout: a live printer
+  // answers in a few ms, dead hosts drop after the timeout → full scan in <1s.
+  await pool(targets, 300, (t) => probe(t.host, t.port, 250).then((ok) => {
     if (ok && (hits[t.host] === undefined || t.port < hits[t.host])) hits[t.host] = t.port;
   }));
   const found = Object.keys(hits).map((host) => ({ host, port: hits[host] }));

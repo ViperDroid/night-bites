@@ -410,6 +410,30 @@ button { font-family: inherit; }
 .preview-paper .r-phone { text-align: center; font-weight: 900; font-size: 15px; margin-top: 6px; letter-spacing: .03em; }
 .preview-paper td, .preview-paper th, .preview-paper .iname, .preview-paper .r-no, .preview-paper .r-brand,
 .preview-paper .r-meta span, .preview-paper .r-total span { unicode-bidi: isolate; }
+.preview-paper .r-sub { text-align: center; font-weight: 800; font-size: 13px; margin-top: 3px; }
+.preview-paper .r-sec { font-weight: 900; margin: 10px 0 3px; font-size: 13px; }
+.preview-paper .r-line { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; padding: 2px 0; }
+.preview-paper .r-line.big { font-weight: 900; font-size: 19px; }
+.preview-paper .r-line span { unicode-bidi: isolate; }
+.preview-paper .r-line span:last-child { font-weight: 800; }
+
+/* ---- reports page ---- */
+.rep-tabs { margin-top: 14px; flex-wrap: wrap; }
+.rep-custom { display: flex; align-items: flex-end; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+.rep-custom .field { margin: 0; }
+.rep-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+.rep-panel h2 { margin-bottom: 10px; }
+.rep-row { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 12px; padding: 9px 0; }
+.rep-row + .rep-row { border-top: 1px dashed var(--line-soft); }
+.rep-name { font-weight: 700; font-size: 14px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rep-qty { color: var(--muted); font-weight: 800; font-size: 13px; }
+.rep-tot { font-weight: 900; color: var(--price); white-space: nowrap; }
+.rep-chart { display: flex; align-items: flex-end; gap: 10px; margin-top: 12px; overflow-x: auto; padding-bottom: 4px; min-height: 160px; }
+.rep-bar-wrap { display: flex; flex-direction: column; align-items: center; gap: 5px; flex: 0 0 auto; min-width: 44px; }
+.rep-bar-val { font-size: 10.5px; font-weight: 800; color: var(--price); font-variant-numeric: tabular-nums; }
+.rep-bar { width: 30px; height: 110px; display: flex; align-items: flex-end; background: var(--bg-2); border-radius: 8px; overflow: hidden; }
+.rep-bar-fill { width: 100%; background: linear-gradient(180deg, var(--accent), var(--accent-2)); border-radius: 8px 8px 0 0; }
+.rep-bar-lbl { font-size: 10.5px; color: var(--faint); font-variant-numeric: tabular-nums; }
 
 /* ============================= RESPONSIVE ============================= */
 @media (max-width: 1000px) {
@@ -432,6 +456,7 @@ button { font-family: inherit; }
   .stats { grid-template-columns: 1fr 1fr; }
   .row2, .row3 { grid-template-columns: 1fr; }
   .net-card { grid-template-columns: 1fr; }
+  .rep-cols { grid-template-columns: 1fr; }
   .manual-add { flex-direction: column; align-items: stretch; }
   .manual-add .ma-fields { grid-template-columns: 1fr 1fr; }
   .manual-add .ma-name { grid-column: 1 / -1; }
@@ -480,4 +505,11 @@ button { font-family: inherit; }
   .rcpt .r-thanks { text-align: center; font-size: 10pt; font-weight: 800; margin-top: 2mm; }
   /* bidi: keep Kurdish/Arabic names and Latin numbers from merging */
   .rcpt td, .rcpt th, .rcpt .iname, .rcpt .r-no, .rcpt .r-brand, .rcpt .r-meta span, .rcpt .r-total span { unicode-bidi: isolate; }
+  /* sales report ticket */
+  .rcpt .r-sub { text-align: center; font-weight: 800; font-size: 9pt; margin-top: .5mm; }
+  .rcpt .r-sec { font-weight: 900; text-align: start; margin: 1.5mm 0 .5mm; font-size: 9pt; }
+  .rcpt .r-line { display: flex; justify-content: space-between; gap: 2mm; font-size: 9.5pt; padding: .6mm 0; }
+  .rcpt .r-line.big { font-weight: 900; font-size: 13pt; }
+  .rcpt .r-line span { unicode-bidi: isolate; }
+  .rcpt .r-line span:last-child { font-weight: 800; }
 }

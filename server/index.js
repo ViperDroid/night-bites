@@ -13,7 +13,7 @@ function createServer(opts) {
   const APP_DIR = opts.appDir;
 
   // ---- JSON store ----
-  const SECTIONS = ['pos', 'orders', 'foods', 'settings'];
+  const SECTIONS = ['pos', 'orders', 'reports', 'foods', 'settings'];
   const DEFAULT = {
     users: [{ id: 1, username: 'admin', pass: hash('admin'), display_name: 'Admin', role: 'admin', sections: SECTIONS.slice(), is_active: true }],
     foods: seedFoods(),
@@ -233,6 +233,64 @@ function createServer(opts) {
     const b = boundary(); const today = db.orders.filter((o) => new Date(o.created_at).getTime() >= b);
     res.json({ total: db.orders.length, today: today.length, today_sales: today.reduce((s, o) => s + num(o.total), 0) });
   });
+
+  // ---- sales reports / analytics ----
+  const dayKey = (d) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  app.get('/api/reports', auth, requireSection('reports'), wrap((req, res) => {
+    const q = req.query || {};
+    const now = new Date();
+    let start, end, label = String(q.range || 'today');
+    if (q.from || q.to) {
+      label = 'custom';
+      const sf = q.from ? new Date(String(q.from) + 'T00:00:00') : null;
+      const st = q.to ? new Date(String(q.to) + 'T23:59:59.999') : null;
+      end = (st && !isNaN(st)) ? st : now;
+      // missing/invalid 'from' → that single 'to' day (never all-history via epoch)
+      start = (sf && !isNaN(sf)) ? sf : new Date(end.getFullYear(), end.getMonth(), end.getDate(), 0, 0, 0, 0);
+      if (start.getTime() > end.getTime()) { const tmp = start; start = end; end = tmp; }   // swap a reversed range
+    } else if (q.range === 'month') {
+      start = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0); end = now;
+    } else if (q.range === 'week') {
+      start = new Date(now); start.setDate(now.getDate() - 6); start.setHours(0, 0, 0, 0); end = now;
+    } else { start = new Date(boundary()); end = now; label = 'today'; }
+
+    const s = start.getTime(), e = end.getTime();
+    const orders = db.orders.filter((o) => { const t = new Date(o.created_at).getTime(); return t >= s && t <= e; });
+    const oids = new Set(orders.map((o) => o.id));
+    const items = db.order_items.filter((i) => oids.has(i.order_id));
+    const totalSales = orders.reduce((a, o) => a + num(o.total), 0);
+    const count = orders.length;
+    const itemsSold = items.reduce((a, i) => a + num(i.qty), 0);
+
+    const catMap = {};
+    items.forEach((i) => { const c = i.category || 'other'; (catMap[c] = catMap[c] || { qty: 0, total: 0 }); catMap[c].qty += num(i.qty); catMap[c].total += num(i.line_total); });
+    const byCategory = Object.keys(catMap).map((c) => ({ category: c, qty: catMap[c].qty, total: money(catMap[c].total) })).sort((a, b) => b.total - a.total);
+
+    // key by food_id (language-stable) so the same food ordered in ku/ar/en isn't split
+    const itemMap = {};
+    items.forEach((i) => { const k = String(i.food_id || i.name); (itemMap[k] = itemMap[k] || { name: i.name || '', qty: 0, total: 0 }); if (!itemMap[k].name && i.name) itemMap[k].name = i.name; itemMap[k].qty += num(i.qty); itemMap[k].total += num(i.line_total); });
+    const topItems = Object.keys(itemMap).map((k) => itemMap[k]).sort((a, b) => b.qty - a.qty).slice(0, 10).map((x) => ({ name: x.name, qty: x.qty, total: money(x.total) }));
+
+    // contiguous days (fill zero-sale days) so the chart isn't misleading or vanishing
+    const dayMap = {};
+    orders.forEach((o) => { const k = dayKey(new Date(o.created_at)); (dayMap[k] = dayMap[k] || { count: 0, total: 0 }); dayMap[k].count += 1; dayMap[k].total += num(o.total); });
+    const byDay = [];
+    const cur = new Date(start); cur.setHours(0, 0, 0, 0);
+    const endDay = new Date(end); endDay.setHours(0, 0, 0, 0);
+    for (let g = 0; cur.getTime() <= endDay.getTime() && g < 400; g++) {
+      const k = dayKey(cur); const v = dayMap[k] || { count: 0, total: 0 };
+      byDay.push({ day: k, count: v.count, total: money(v.total) });
+      cur.setDate(cur.getDate() + 1);
+    }
+
+    res.json({
+      label, from: start.toISOString(), to: end.toISOString(),
+      total_sales: money(totalSales), orders: count, items_sold: itemsSold,
+      avg_order: money(count ? totalSales / count : 0),
+      by_category: byCategory, top_items: topItems, by_day: byDay,
+      currency: db.settings.currency || 'IQD',
+    });
+  }));
   app.get('/api/orders/:id', auth, (req, res) => { const o = db.orders.find((x) => x.id === (parseInt(req.params.id, 10) || 0)); if (!o) return res.status(404).json({ error: 'Not found' }); res.json({ order: shapeOrder(o, true) }); });
   app.post('/api/orders', auth, requireSection('pos'), wrap((req, res) => {
     const body = req.body || {}; const lang = ['ku', 'ar', 'en'].includes(body.lang) ? body.lang : 'ku';

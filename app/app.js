@@ -66,6 +66,12 @@
       can_see: 'Can see these sections', pw_keep: 'Leave blank to keep the current password', account_active: 'Account active',
       you_tag: 'you', username_req: 'Username: 2–32 chars — letters, numbers, . _ -', pw_req: 'Password must be at least 3 characters',
       no_access: 'No access yet — ask an admin to grant you a section.',
+      nav_reports: 'Reports',
+      rng_today: 'Today', rng_week: 'Last 7 days', rng_month: 'This month', rng_custom: 'Custom',
+      rep_from: 'From', rep_to: 'To', rep_apply: 'Show',
+      rep_total_sales: 'Total sales', rep_orders: 'Orders', rep_items: 'Items sold', rep_avg: 'Avg order',
+      rep_by_category: 'Sales by category', rep_top_items: 'Top items', rep_by_day: 'Daily sales',
+      rep_print: 'Print total', rep_title: 'Sales Report', rep_none: 'No sales in this range.',
     },
     ku: {
       _dir: 'rtl', _name: 'کوردی',
@@ -127,6 +133,12 @@
       can_see: 'دەتوانێت ئەم بەشانە ببینێت', pw_keep: 'بەتاڵی بهێڵەرەوە بۆ هێشتنەوەی وشەی نهێنی', account_active: 'هەژمار چالاک',
       you_tag: 'تۆ', username_req: 'ناوی بەکارهێنەر: ٢–٣٢ پیت — پیت، ژمارە، . _ -', pw_req: 'وشەی نهێنی دەبێت لانیکەم ٣ پیت بێت',
       no_access: 'هێشتا دەستپێگەیشتنت نییە — داوا لە بەڕێوەبەر بکە بەشێکت پێبدات.',
+      nav_reports: 'ڕاپۆرت',
+      rng_today: 'ئەمڕۆ', rng_week: '٧ ڕۆژی ڕابردوو', rng_month: 'ئەم مانگە', rng_custom: 'دیاریکراو',
+      rep_from: 'لە', rep_to: 'بۆ', rep_apply: 'پیشاندان',
+      rep_total_sales: 'کۆی فرۆشتن', rep_orders: 'داواکارییەکان', rep_items: 'خواردنی فرۆشراو', rep_avg: 'ناوەندی داواکاری',
+      rep_by_category: 'فرۆشتن بەپێی جۆر', rep_top_items: 'زۆرترین فرۆشراو', rep_by_day: 'فرۆشتنی ڕۆژانە',
+      rep_print: 'چاپی کۆ', rep_title: 'ڕاپۆرتی فرۆشتن', rep_none: 'هیچ فرۆشتنێک لەم ماوەیەدا نییە.',
     },
     ar: {
       _dir: 'rtl', _name: 'العربية',
@@ -188,6 +200,12 @@
       can_see: 'يمكنه رؤية هذه الأقسام', pw_keep: 'اتركه فارغاً للإبقاء على كلمة المرور الحالية', account_active: 'الحساب مفعّل',
       you_tag: 'أنت', username_req: 'اسم المستخدم: 2–32 حرفاً — أحرف وأرقام و . _ -', pw_req: 'كلمة المرور 3 أحرف على الأقل',
       no_access: 'لا صلاحية بعد — اطلب من المدير منحك قسماً.',
+      nav_reports: 'التقارير',
+      rng_today: 'اليوم', rng_week: 'آخر 7 أيام', rng_month: 'هذا الشهر', rng_custom: 'مخصص',
+      rep_from: 'من', rep_to: 'إلى', rep_apply: 'عرض',
+      rep_total_sales: 'إجمالي المبيعات', rep_orders: 'الطلبات', rep_items: 'الأصناف المباعة', rep_avg: 'متوسط الطلب',
+      rep_by_category: 'المبيعات حسب الفئة', rep_top_items: 'الأكثر مبيعاً', rep_by_day: 'المبيعات اليومية',
+      rep_print: 'طباعة الإجمالي', rep_title: 'تقرير المبيعات', rep_none: 'لا مبيعات في هذه الفترة.',
     },
   };
 
@@ -200,6 +218,7 @@
     if (!c) return t('cat_other');
     return (state.lang === 'ar' ? (c.name_ar || c.name_ku || c.name_en) : state.lang === 'en' ? (c.name_en || c.name_ku || c.name_ar) : (c.name_ku || c.name_ar || c.name_en)) || c.id;
   }
+  var SECTIONS = ['pos', 'orders', 'reports', 'foods', 'settings'];
   // section access: admin sees everything; staff only its granted sections
   function canSee(section) {
     var u = state.user || {};
@@ -336,7 +355,7 @@
     applyDir(); app.textContent = '';
     if (state.view === 'kitchen') state.view = 'pos';   // kitchen display hidden for now
     // section access: admin sees all; staff sees only its granted sections
-    var allowed = ['pos', 'orders', 'foods', 'settings'].filter(canSee);
+    var allowed = SECTIONS.filter(canSee);
     if (!allowed.length) state.view = null;                 // no sections granted → no access
     else if (!canSee(state.view)) state.view = allowed[0];
     var name = (state.user && (state.user.display_name || state.user.username)) || '';
@@ -353,6 +372,7 @@
         var sale = [];
         if (canSee('pos')) sale.push(navItem('pos', '', t('nav_pos')));
         if (canSee('orders')) sale.push(navItem('orders', '', t('nav_orders')));
+        if (canSee('reports')) sale.push(navItem('reports', '', t('nav_reports')));
         if (sale.length) { items.push(el('div', { class: 'sb-sec', text: t('sec_sale') })); items = items.concat(sale); }
         var manage = [];
         if (canSee('foods')) manage.push(navItem('foods', '', t('nav_foods')));
@@ -377,7 +397,7 @@
     tick(); clearInterval(window._clk); window._clk = setInterval(tick, 1000 * 20);
     clearInterval(window._kpoll); window._kpoll = null;
 
-    var titles = { pos: t('nav_pos'), orders: t('nav_orders'), kitchen: t('nav_kitchen'), foods: t('nav_foods'), settings: t('nav_settings') };
+    var titles = { pos: t('nav_pos'), orders: t('nav_orders'), reports: t('nav_reports'), kitchen: t('nav_kitchen'), foods: t('nav_foods'), settings: t('nav_settings') };
     var body = el('div', { class: 'wrap' });
     var main = el('div', { class: 'main' }, [
       el('header', { class: 'topbar' }, [
@@ -393,6 +413,7 @@
     if (state.view === 'pos') renderPOS(main, body);
     else if (state.view === 'foods') renderFoods(body);
     else if (state.view === 'orders') renderOrders(body);
+    else if (state.view === 'reports') renderReports(body);
     else if (state.view === 'settings') renderSettings(body);
     else body.appendChild(el('div', { class: 'empty' }, [el('h3', { text: t('no_access') })]));
   }
@@ -711,6 +732,92 @@
     load();
   }
 
+  /* ------------------------------ REPORTS ------------------------------ */
+  function renderReports(host) {
+    var range = 'today';
+    var cur = state.settings.currency || 'IQD';
+    var data = null;
+    var fromI = el('input', { class: 'input', type: 'date', dir: 'ltr' });
+    var toI = el('input', { class: 'input', type: 'date', dir: 'ltr' });
+    var body = el('div');
+    var printBtn = el('button', { class: 'btn gray', text: t('rep_print'), onclick: function () { if (data && data.orders) printReport(data); } });
+
+    var tabs = el('div', { class: 'seg rep-tabs' });
+    [['today', t('rng_today')], ['week', t('rng_week')], ['month', t('rng_month')], ['custom', t('rng_custom')]].forEach(function (o) {
+      tabs.appendChild(el('button', { class: 'seg-b' + (range === o[0] ? ' on' : ''), text: o[1], onclick: function () {
+        range = o[0]; Array.prototype.forEach.call(tabs.children, function (b) { b.classList.remove('on'); }); this.classList.add('on');
+        customRow.style.display = range === 'custom' ? '' : 'none';
+        if (range !== 'custom') load();
+      } }));
+    });
+    var customRow = el('div', { class: 'rep-custom', style: 'display:none' }, [
+      el('div', { class: 'field' }, [el('label', { text: t('rep_from') }), fromI]),
+      el('div', { class: 'field' }, [el('label', { text: t('rep_to') }), toI]),
+      el('button', { class: 'btn', text: t('rep_apply'), onclick: function () { load(); } }),
+    ]);
+
+    function money2(n) { return money(n) + ' ' + cur; }
+    function load() {
+      if (range === 'custom' && !fromI.value && !toI.value) return;   // wait for a date
+      var qs = range === 'custom'
+        ? ('from=' + encodeURIComponent(fromI.value || '') + '&to=' + encodeURIComponent(toI.value || ''))
+        : ('range=' + range);
+      body.textContent = ''; body.appendChild(el('div', { class: 'od-loading', text: '…' }));
+      api('/reports?' + qs).then(function (d) { data = d; draw(d); })
+        .catch(function (e) { if (e.status === 401) return logout(); toast(e.message, 'bad'); });
+    }
+    function statTile(k, v, gold) {
+      return el('div', { class: 'stat' }, [el('div', { class: 'k', text: k }), el('div', { class: 'v' + (gold ? ' gold' : ''), dir: 'ltr', text: v })]);
+    }
+    function panelList(title, rows) {
+      var box = el('div', { class: 'panel rep-panel' }, [el('h2', { text: title })]);
+      if (!rows.length) { box.appendChild(el('p', { class: 'hint', style: 'margin:8px 0 0', text: '—' })); return box; }
+      rows.forEach(function (r) {
+        box.appendChild(el('div', { class: 'rep-row' }, [
+          el('span', { class: 'rep-name', dir: 'auto', text: r.name || '—' }),
+          el('span', { class: 'rep-qty', dir: 'ltr', text: '×' + r.qty }),
+          el('span', { class: 'rep-tot', dir: 'ltr', text: money(r.total) + ' ' + cur }),
+        ]));
+      });
+      return box;
+    }
+    function dayChart(days) {
+      var max = days.reduce(function (m, d) { return Math.max(m, Number(d.total) || 0); }, 0) || 1;
+      var chart = el('div', { class: 'rep-chart' });
+      days.forEach(function (d) {
+        var pct = Math.max(2, Math.round((Number(d.total) || 0) / max * 100));
+        chart.appendChild(el('div', { class: 'rep-bar-wrap' }, [
+          el('div', { class: 'rep-bar-val', dir: 'ltr', text: money(d.total) }),
+          el('div', { class: 'rep-bar' }, [el('div', { class: 'rep-bar-fill', style: 'height:' + pct + '%' })]),
+          el('div', { class: 'rep-bar-lbl', dir: 'ltr', text: String(d.day).slice(5) }),
+        ]));
+      });
+      return el('div', { class: 'panel' }, [el('h2', { text: t('rep_by_day') }), chart]);
+    }
+    function draw(d) {
+      body.textContent = '';
+      body.appendChild(el('div', { class: 'stats' }, [
+        statTile(t('rep_total_sales'), money2(d.total_sales), true),
+        statTile(t('rep_orders'), String(d.orders)),
+        statTile(t('rep_items'), String(d.items_sold)),
+        statTile(t('rep_avg'), money2(d.avg_order)),
+      ]));
+      if (!d.orders) { body.appendChild(el('div', { class: 'empty' }, [el('h3', { text: t('rep_none') })])); return; }
+      body.appendChild(el('div', { class: 'rep-cols' }, [
+        panelList(t('rep_by_category'), (d.by_category || []).map(function (c) { return { name: catName(c.category), qty: c.qty, total: c.total }; })),
+        panelList(t('rep_top_items'), d.top_items || []),
+      ]));
+      if ((d.by_day || []).length > 1) body.appendChild(dayChart(d.by_day));
+    }
+
+    host.appendChild(el('div', { class: 'panel' }, [
+      el('div', { class: 'ph-head' }, [el('h2', { text: t('rep_title') }), printBtn]),
+      tabs, customRow,
+    ]));
+    host.appendChild(body);
+    load();
+  }
+
   /* ------------------------------ KITCHEN ------------------------------ */
   function renderKitchen(host) {
     var board = el('div', { class: 'kds' });
@@ -857,7 +964,7 @@
       var box = el('div', { class: 'pr-list' });
       users.forEach(function (u) {
         var me = state.user && state.user.id === u.id;
-        var secs = u.role === 'admin' ? ['pos', 'orders', 'foods', 'settings'] : (u.sections || []);
+        var secs = u.role === 'admin' ? SECTIONS.slice() : (u.sections || []);
         var secLabel = secs.map(function (s) { return t('nav_' + s); }).join(', ') || '—';
         box.appendChild(el('div', { class: 'pr-row' + (u.is_active ? '' : ' off') }, [
           el('span', { class: 'pr-kind ' + (u.role === 'admin' ? 'network' : 'system'), text: u.role === 'admin' ? t('role_admin') : t('role_staff') }),
@@ -888,7 +995,7 @@
       });
       var secChks = {};
       var secWrap = el('div', { class: 'zcats' });
-      ['pos', 'orders', 'foods', 'settings'].forEach(function (s) {
+      SECTIONS.forEach(function (s) {
         var chk = el('input', { type: 'checkbox' }); chk.checked = editing ? ((editing.sections || []).indexOf(s) >= 0) : (s === 'pos');
         secChks[s] = chk;
         secWrap.appendChild(el('label', { class: 'zchk' }, [chk, el('span', { text: t('nav_' + s) })]));
@@ -903,7 +1010,7 @@
       var bg = el('div', { class: 'modal-bg', onclick: function (e) { if (e.target === bg) document.body.removeChild(bg); } });
       var saveBtn = el('button', { class: 'btn', text: t('save') });
       saveBtn.onclick = function () {
-        var sections = ['pos', 'orders', 'foods', 'settings'].filter(function (s) { return secChks[s].checked; });
+        var sections = SECTIONS.filter(function (s) { return secChks[s].checked; });
         var body = { display_name: dname.value, role: roleS.value, sections: sections, is_active: activeChk.checked };
         if (!editing) { body.username = uname.value; body.password = pw.value; }
         else if (pw.value) body.password = pw.value;
@@ -1408,6 +1515,96 @@
         el('button', { class: 'btn gray', text: t('close'), onclick: close }),
         printBtn,
       ]),
+    ]));
+    document.body.appendChild(bg);
+  }
+
+  /* ---- sales report thermal print ---- */
+  function reportRangeLabel(d) {
+    return d.label === 'today' ? t('rng_today') : d.label === 'week' ? t('rng_week') : d.label === 'month' ? t('rng_month') : t('rng_custom');
+  }
+  function reportDateRange(d) {
+    var f = new Date(d.from), tt = new Date(d.to);
+    return (isNaN(f) ? '' : f.toLocaleDateString('en-GB')) + ' — ' + (isNaN(tt) ? '' : tt.toLocaleDateString('en-GB'));
+  }
+  function buildReportEl(d) {
+    var lang = state.lang; var L = I18N[lang] || I18N.ku;
+    var cur = d.currency || state.settings.currency || 'IQD';
+    var width = state.settings.print_width === '58' ? '58mm' : '80mm';
+    function line(label, val, big) {
+      return el('div', { class: 'r-line' + (big ? ' big' : '') }, [el('span', { dir: 'auto', text: label }), el('span', { dir: 'ltr', text: val })]);
+    }
+    var kids = [
+      el('div', { class: 'r-brand', dir: 'auto', text: bizName(lang) }),
+      el('div', { class: 'r-sub', text: t('rep_title') + ' · ' + reportRangeLabel(d) }),
+      el('div', { class: 'r-meta' }, [el('span', { dir: 'ltr', text: reportDateRange(d) })]),
+      el('div', { class: 'r-rule solid' }),
+      line(t('rep_total_sales'), money(d.total_sales) + ' ' + cur, true),
+      line(t('rep_orders'), String(d.orders)),
+      line(t('rep_items'), String(d.items_sold)),
+      line(t('rep_avg'), money(d.avg_order) + ' ' + cur),
+    ];
+    if ((d.by_category || []).length) {
+      kids.push(el('div', { class: 'r-rule' }), el('div', { class: 'r-sec', text: t('rep_by_category') }));
+      d.by_category.forEach(function (c) { kids.push(line(catName(c.category) + ' ×' + c.qty, money(c.total) + ' ' + cur)); });
+    }
+    if ((d.top_items || []).length) {
+      kids.push(el('div', { class: 'r-rule' }), el('div', { class: 'r-sec', text: t('rep_top_items') }));
+      d.top_items.slice(0, 8).forEach(function (it) { kids.push(line((it.name || '') + ' ×' + it.qty, money(it.total) + ' ' + cur)); });
+    }
+    kids.push(el('div', { class: 'r-rule' }), el('div', { class: 'r-phone', dir: 'ltr' }, phoneList().map(function (ph) { return el('div', { text: ph }); })));
+    return el('div', { class: 'rcpt', dir: L._dir, style: '--pw:' + width }, kids);
+  }
+  function reportTicketHTML(d, net) {
+    var lang = state.lang; var L = I18N[lang] || I18N.ku;
+    var cur = d.currency || state.settings.currency || 'IQD';
+    var dots = widthMm() === 58 ? 384 : 576;
+    var b = net ? (dots / 576) : 1; var u = net ? 'px' : 'pt';
+    var sz = function (n) { return net ? Math.round(n * b) + 'px' : n + 'pt'; };
+    var line = function (l, v, big) { return '<div class="rl' + (big ? ' big' : '') + '"><span dir="auto">' + escHtml(l) + '</span><span dir="ltr">' + escHtml(v) + '</span></div>'; };
+    var inner = '<div class="brand" dir="auto">' + escHtml(bizName(lang)) + '</div>'
+      + '<div class="rsub">' + escHtml(t('rep_title') + ' · ' + reportRangeLabel(d)) + '</div>'
+      + '<div class="meta"><span dir="ltr">' + escHtml(reportDateRange(d)) + '</span></div>'
+      + '<div class="rule solid"></div>'
+      + line(t('rep_total_sales'), money(d.total_sales) + ' ' + cur, true)
+      + line(t('rep_orders'), String(d.orders)) + line(t('rep_items'), String(d.items_sold))
+      + line(t('rep_avg'), money(d.avg_order) + ' ' + cur);
+    if ((d.by_category || []).length) { inner += '<div class="rule"></div><div class="rs">' + escHtml(t('rep_by_category')) + '</div>'; d.by_category.forEach(function (c) { inner += line(catName(c.category) + ' ×' + c.qty, money(c.total) + ' ' + cur); }); }
+    if ((d.top_items || []).length) { inner += '<div class="rule"></div><div class="rs">' + escHtml(t('rep_top_items')) + '</div>'; d.top_items.slice(0, 8).forEach(function (it) { inner += line((it.name || '') + ' ×' + it.qty, money(it.total) + ' ' + cur); }); }
+    inner += '<div class="rule"></div><div class="phone" dir="ltr">' + phoneList().map(function (p) { return '<div>' + escHtml(p) + '</div>'; }).join('') + '</div>';
+    var extra = '<style>'
+      + '.rsub{text-align:center;font-weight:800;font-size:' + sz(11) + ';margin-top:' + (net ? '3px' : '.5mm') + ';}'
+      + '.rs{font-weight:900;text-align:start;margin:' + (net ? '8px 0 3px' : '1.5mm 0 .5mm') + ';font-size:' + sz(9.5) + ';}'
+      + '.rl{display:flex;justify-content:space-between;gap:8px;padding:' + (net ? '3px 0' : '.6mm 0') + ';font-size:' + sz(9.5) + ';}'
+      + '.rl span{unicode-bidi:isolate;}.rl span:last-child{font-weight:800;}'
+      + '.rl.big{font-weight:900;font-size:' + sz(14) + ';}'
+      + '</style>';
+    return ticketDoc(inner, net, dots, L._dir).replace('</head>', extra + '</head>');
+  }
+  function printReportBrowser(d) { printRoot.textContent = ''; printRoot.appendChild(buildReportEl(d)); setTimeout(function () { window.print(); }, 80); }
+  function printReportDirect(d) {
+    var z = (window.nb && window.nb.printTicket) ? customerZone() : null;
+    if (z) {
+      var p = printerById(z.printer_id);
+      sendTo(p, reportTicketHTML(d, p.kind === 'network')).then(function (r) {
+        if (r && r.ok) { toast(t('printed'), 'ok'); } else { toast(t('print_failed'), 'bad'); printReportBrowser(d); }
+      });
+      return;
+    }
+    printReportBrowser(d);
+  }
+  function printReport(d) {
+    var showPrev = String(state.settings.show_preview == null ? '1' : state.settings.show_preview) !== '0';
+    if (!showPrev) { printReportDirect(d); return; }
+    var lang = state.lang; var L = I18N[lang] || I18N.ku;
+    var bg = el('div', { class: 'modal-bg', onclick: function (e) { if (e.target === bg) close(); } });
+    function close() { if (bg.parentNode) document.body.removeChild(bg); }
+    var printBtn = el('button', { class: 'btn green', text: t('rep_print') });
+    printBtn.onclick = function () { printReportDirect(d); close(); };
+    bg.appendChild(el('div', { class: 'modal receipt-modal' }, [
+      el('div', { class: 'rm-title' }, [el('h3', { text: t('rep_title') })]),
+      el('div', { class: 'preview-paper', dir: L._dir }, [buildReportEl(d)]),
+      el('div', { class: 'modal-actions' }, [el('button', { class: 'btn gray', text: t('close'), onclick: close }), printBtn]),
     ]));
     document.body.appendChild(bg);
   }
