@@ -9,7 +9,7 @@ const { createServer } = require('./server');
 let win = null;
 let serverInfo = null;
 const gotLock = app.requestSingleInstanceLock();
-if (!gotLock) { app.quit(); }
+if (!gotLock) { app.quit(); return; }
 
 async function start() {
   serverInfo = await createServer({

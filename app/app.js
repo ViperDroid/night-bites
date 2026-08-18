@@ -203,6 +203,7 @@
   // section access: admin sees everything; staff only its granted sections
   function canSee(section) {
     var u = state.user || {};
+    if (!section) return false;
     if (u.role === 'admin') return true;
     return (u.sections || []).indexOf(section) >= 0;
   }
@@ -373,7 +374,7 @@
       onclick: function () { state.sidebarOpen = false; renderApp(); } });
 
     var clock = el('div', { class: 'clock' });
-    function tick() { var d = new Date(); clock.textContent = d.toLocaleDateString(state.lang === 'en' ? 'en-GB' : 'en-GB') + '  ·  ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }); }
+    function tick() { var d = new Date(); clock.textContent = d.toLocaleDateString('en-GB') + '  ·  ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }); }
     tick(); clearInterval(window._clk); window._clk = setInterval(tick, 1000 * 20);
     clearInterval(window._kpoll); window._kpoll = null;
 
@@ -524,8 +525,11 @@
 
     // both buttons save (a receipt must reflect a real, saved order). Green also
     // fires the kitchen/station tickets; gray prints just the customer receipt.
+    var placing = false;   // guards against double-taps creating duplicate orders
     function checkout(withStations) {
+      if (placing) return;
       if (!state.cart.length) { toast(t('need_items'), 'bad'); return; }
+      placing = true;
       var payload = { lang: state.lang, items: state.cart.map(function (c) { return { food_id: c.id, qty: c.qty }; }) };
       api('/orders', { method: 'POST', body: JSON.stringify(payload) })
         .then(function (d) {
@@ -534,7 +538,20 @@
           toast(t('order_saved') + ' · #' + d.order.order_no, 'ok');
           state.cart = []; state.cartOpen = false; drawGrid(); drawCart(); cartEl.classList.remove('open');
         })
-        .catch(function (e) { if (e.status === 401) return logout(); toast(e.message || 'Error', 'bad'); });
+        .catch(function (e) {
+          if (e.status === 401) return logout();
+          // a food was removed since it was added — refresh the menu and drop stale cart lines
+          if (e.status === 409) {
+            api('/foods').then(function (d) {
+              state.foods = d.foods || [];
+              var live = {}; state.foods.forEach(function (f) { live[f.id] = true; });
+              state.cart = state.cart.filter(function (c) { return live[c.id]; });
+              drawGrid(); drawCart();
+            }).catch(function () {});
+          }
+          toast(e.message || 'Error', 'bad');
+        })
+        .then(function () { placing = false; });
     }
 
     menuWrap.appendChild(catBar); menuWrap.appendChild(grid);
@@ -947,7 +964,7 @@
     var list = (state.categories || []).map(clone);
     function persist() {
       return api('/categories', { method: 'PUT', body: JSON.stringify({ categories: list }) })
-        .then(function (d) { state.categories = d.categories || []; })
+        .then(function (d) { state.categories = d.categories || []; list = state.categories.map(clone); })
         .catch(function (e) { if (e.status === 401) return logout(); toast(e.message || 'Error', 'bad'); });
     }
     // after a category change: sync printers/zones (server cascade may have edited
@@ -1366,10 +1383,14 @@
   // Kitchen/station tickets — silent, one per zone that has matching items.
   function routeStations(order) {
     if (!(window.nb && window.nb.printTicket)) return;
+    // a food whose category was later deleted keeps a dangling id — treat it as
+    // 'other' (matching how it displays) so an 'Other' zone still gets the ticket.
+    var known = {}; cats().forEach(function (c) { known[c.id] = true; });
+    var catOf = function (it) { var c = it.category || 'other'; return known[c] ? c : 'other'; };
     zones().forEach(function (z) {
       if (z.type === 'customer') return;
       var p = printerById(z.printer_id); if (!p) return;
-      var items = (order.items || []).filter(function (it) { return (z.categories || []).indexOf(it.category || 'other') >= 0; });
+      var items = (order.items || []).filter(function (it) { return (z.categories || []).indexOf(catOf(it)) >= 0; });
       if (!items.length) return;
       sendTo(p, kitchenTicketHTML(order, items, z.name, p.kind === 'network'));
     });

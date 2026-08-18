@@ -84,6 +84,8 @@ function createServer(opts) {
 
   // ---- sessions (in-memory) ----
   const tokens = new Map();   // token -> userId
+  const loginFails = new Map();          // uname -> { n, until } — brute-force guard
+  const LOGIN_MAX = 8, LOGIN_LOCK_MS = 60 * 1000;
   const SEC = new Set(SECTIONS);
   const shapeUser = (u) => ({
     id: u.id, username: u.username, display_name: u.display_name || u.username,
@@ -113,8 +115,19 @@ function createServer(opts) {
   app.post('/api/login', wrap((req, res) => {
     const { username, password } = req.body || {};
     const uname = String(username || '').trim().toLowerCase();
+    const now = Date.now();
+    if (loginFails.size > 5000) { for (const [k, v] of loginFails) if (!v || v.until <= now) loginFails.delete(k); }   // bound memory; keep active lockouts
+    const rec = loginFails.get(uname);
+    if (rec && rec.until > now) return res.status(429).json({ error: 'Too many attempts — wait a minute and try again' });
     const u = db.users.find((x) => x.username === uname && x.is_active !== false);
-    if (!u || !verify(String(password || ''), u.pass)) return res.status(401).json({ error: 'Invalid username or password' });
+    if (!u || !verify(String(password || ''), u.pass)) {
+      const r = rec || { n: 0, until: 0 };
+      r.n = (r.n || 0) + 1;
+      if (r.n >= LOGIN_MAX) { r.n = 0; r.until = now + LOGIN_LOCK_MS; }
+      loginFails.set(uname, r);
+      return res.status(401).json({ error: 'Invalid username or password' });
+    }
+    loginFails.delete(uname);
     const tok = crypto.randomBytes(24).toString('hex'); tokens.set(tok, u.id);
     res.json({ token: tok, user: shapeUser(u) });
   }));
@@ -180,6 +193,7 @@ function createServer(opts) {
     Object.keys(req.body || {}).forEach((k) => { if (ALLOWED.has(k)) db.settings[k] = String(req.body[k] == null ? '' : req.body[k]).slice(0, 500); });
     if (!['58', '80'].includes(db.settings.print_width)) db.settings.print_width = '80';
     db.settings.show_preview = (db.settings.show_preview === '0') ? '0' : '1';
+    if (!/^([01]?\d|2[0-3]):[0-5]\d$/.test(db.settings.reset_time || '')) db.settings.reset_time = '00:00';
     save(); res.json({ settings: db.settings });
   }));
 
@@ -191,7 +205,7 @@ function createServer(opts) {
     return {
       name_ku: String((b && b.name_ku) || '').trim().slice(0, 160), name_ar: String((b && b.name_ar) || '').trim().slice(0, 160),
       name_en: String((b && b.name_en) || '').trim().slice(0, 160), category: String((b && b.category) || '').trim().slice(0, 60),
-      price: money(b && b.price), is_active: (b && b.is_active === false) ? false : true, sort_order: Math.round(num(b && b.sort_order)),
+      price: Math.max(0, money(b && b.price)), is_active: (b && b.is_active === false) ? false : true, sort_order: Math.round(num(b && b.sort_order)),
     };
   }
   app.post('/api/foods', auth, requireSection('foods'), wrap((req, res) => {
@@ -224,26 +238,29 @@ function createServer(opts) {
     if (now < b) b.setDate(b.getDate() - 1);
     return b.getTime();
   }
-  app.get('/api/orders', auth, (req, res) => {
+  app.get('/api/orders', auth, requireSection('orders'), (req, res) => {
     const lim = Math.min(Math.max(parseInt(req.query.limit, 10) || 50, 1), 200);
     const rows = db.orders.slice().sort((a, b) => b.id - a.id).slice(0, lim);
     res.json({ orders: rows.map((o) => shapeOrder(o, false)), total: db.orders.length });
   });
-  app.get('/api/orders/stats', auth, (_q, res) => {
+  app.get('/api/orders/stats', auth, requireSection('orders'), (_q, res) => {
     const b = boundary(); const today = db.orders.filter((o) => new Date(o.created_at).getTime() >= b);
     res.json({ total: db.orders.length, today: today.length, today_sales: today.reduce((s, o) => s + num(o.total), 0) });
   });
-  app.get('/api/orders/:id', auth, (req, res) => { const o = db.orders.find((x) => x.id === (parseInt(req.params.id, 10) || 0)); if (!o) return res.status(404).json({ error: 'Not found' }); res.json({ order: shapeOrder(o, true) }); });
+  app.get('/api/orders/:id', auth, requireSection('orders'), (req, res) => { const o = db.orders.find((x) => x.id === (parseInt(req.params.id, 10) || 0)); if (!o) return res.status(404).json({ error: 'Not found' }); res.json({ order: shapeOrder(o, true) }); });
   app.post('/api/orders', auth, requireSection('pos'), wrap((req, res) => {
     const body = req.body || {}; const lang = ['ku', 'ar', 'en'].includes(body.lang) ? body.lang : 'ku';
     const nameFor = (f) => lang === 'ar' ? (f.name_ar || f.name_ku || f.name_en) : lang === 'en' ? (f.name_en || f.name_ku || f.name_ar) : (f.name_ku || f.name_ar || f.name_en);
+    const requested = Array.isArray(body.items) ? body.items : [];
     const items = [];
-    (Array.isArray(body.items) ? body.items : []).forEach((it) => {
-      const f = db.foods.find((x) => x.id === (parseInt(it && it.food_id, 10) || 0)); if (!f) return;
-      const qty = Math.max(1, Math.round(num(it.qty))); const price = money(f.price);
+    requested.forEach((it) => {
+      const f = db.foods.find((x) => x.id === (parseInt(it && it.food_id, 10) || 0) && x.is_active !== false); if (!f) return;
+      const qty = Math.min(9999, Math.max(1, Math.round(num(it.qty)))); const price = money(f.price);
       items.push({ food_id: f.id, name: String(nameFor(f)).slice(0, 160), price, qty, line_total: money(price * qty), category: f.category || '' });
     });
-    if (!items.length) return res.status(400).json({ error: 'Add at least one item' });
+    if (!requested.length) return res.status(400).json({ error: 'Add at least one item' });
+    // a requested food that no longer exists would silently vanish from the order (undercharge) — reject instead
+    if (items.length !== requested.length) return res.status(409).json({ error: 'Some items are no longer available — reload and try again' });
     const total = money(items.reduce((s, i) => s + i.line_total, 0));
     const count = items.reduce((s, i) => s + i.qty, 0);
     const b = boundary(); const order_no = db.orders.filter((o) => new Date(o.created_at).getTime() >= b).length + 1;
@@ -251,9 +268,11 @@ function createServer(opts) {
     const order = { id, order_no, lang, total, item_count: count, kitchen_status: 'new', created_at };
     db.orders.push(order);
     items.forEach((it) => db.order_items.push(Object.assign({ id: db.order_items.length ? db.order_items[db.order_items.length - 1].id + 1 : 1, order_id: id }, it)));
-    save(); res.status(201).json({ order: shapeOrder(order, true) });
+    // roll the in-memory push back if the disk write fails, so a 500 + cashier retry can't duplicate the order
+    try { save(); } catch (e) { db.orders.pop(); db.order_items.splice(-items.length, items.length); db.seq.order--; throw e; }
+    res.status(201).json({ order: shapeOrder(order, true) });
   }));
-  app.post('/api/orders/:id/done', auth, wrap((req, res) => { const o = db.orders.find((x) => x.id === (parseInt(req.params.id, 10) || 0)); if (!o) return res.status(404).json({ error: 'Not found' }); o.kitchen_status = 'done'; save(); res.json({ ok: true }); }));
+  app.post('/api/orders/:id/done', auth, requireSection('orders'), wrap((req, res) => { const o = db.orders.find((x) => x.id === (parseInt(req.params.id, 10) || 0)); if (!o) return res.status(404).json({ error: 'Not found' }); o.kitchen_status = 'done'; save(); res.json({ ok: true }); }));
   app.get('/api/kitchen', auth, (_q, res) => { const b = boundary(); res.json({ orders: db.orders.filter((o) => (o.kitchen_status || 'new') === 'new' && new Date(o.created_at).getTime() >= b).sort((a, b) => a.id - b.id).slice(0, 60).map((o) => shapeOrder(o, true)) }); });
 
   // ---- printers & zones (config stored here; actual printing is in main via IPC) ----
@@ -295,6 +314,7 @@ function createServer(opts) {
 
   // ---- static frontend ----
   app.use(express.static(APP_DIR, { index: 'index.html' }));
+  app.use('/api', (_q, res) => res.status(404).json({ error: 'Not found' }));   // unknown API path → JSON 404, never the SPA shell
   app.get('*', (_q, res) => res.sendFile(path.join(APP_DIR, 'index.html')));
 
   return new Promise((resolve) => {
