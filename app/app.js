@@ -57,6 +57,15 @@
       help_3: 'The printer IP must be on your subnet — the same first three numbers as “This PC”. Example: PC 192.168.1.20 → printer 192.168.1.50.',
       help_4: 'To change the IP: open the printer’s current IP in a web browser, or use its “Net Config / Printer Setup” tool over USB — set a static IP, gateway = the Router shown above, port 9100.',
       help_5: 'Come back here → Scan (or Add manually) → Test. Then make a zone for it.',
+      manage_categories: 'Categories', cat_hint: 'Add your own food categories, then assign foods to them.',
+      add_category: 'Add category', edit_category: 'Edit category', del_category: 'Delete this category? Foods keep their name but lose this category.',
+      cat_name_req: 'Enter a category name', no_categories: 'No categories yet — add one.',
+      manage_users: 'Users & access', users_hint: 'Create a login for each cashier and pick what they can see.',
+      add_user: 'Add user', edit_user: 'Edit user', del_user: 'Delete this user?',
+      disp_name: 'Name', role: 'Role', role_admin: 'Admin — full access', role_staff: 'Cashier — limited',
+      can_see: 'Can see these sections', pw_keep: 'Leave blank to keep the current password', account_active: 'Account active',
+      you_tag: 'you', username_req: 'Username: 2–32 chars — letters, numbers, . _ -', pw_req: 'Password must be at least 3 characters',
+      no_access: 'No access yet — ask an admin to grant you a section.',
     },
     ku: {
       _dir: 'rtl', _name: 'کوردی',
@@ -109,6 +118,15 @@
       help_3: 'IP ی پرینتەر دەبێت لەسەر هەمان ساب‌نێت بێت — هەمان سێ ژمارەی یەکەمی «ئەم کۆمپیوتەرە». نموونە: کۆمپیوتەر 192.168.1.20 ← پرینتەر 192.168.1.50.',
       help_4: 'بۆ گۆڕینی IP: IP ی ئێستای پرینتەر لە وێبگەڕدا بکەرەوە، یان بە ئامرازی «Net Config / Printer Setup» لەڕێی USB — IP ی جێگیر دابنێ، گەیت‌وەی = ڕووتەرەکەی سەرەوە، پۆرت 9100.',
       help_5: 'بگەڕێوە بۆ ئێرە ← گەڕان (یان زیادکردن بە دەستی) ← تاقیکردن. پاشان زۆنێکی بۆ دروستبکە.',
+      manage_categories: 'جۆرەکان', cat_hint: 'جۆری خواردنی خۆت زیاد بکە، پاشان خواردنەکانیان بۆ دیاری بکە.',
+      add_category: 'زیادکردنی جۆر', edit_category: 'دەستکاری جۆر', del_category: 'ئەم جۆرە بسڕێتەوە؟ خواردنەکان ناویان دەمێنێت بەڵام ئەم جۆرەیان نامێنێت.',
+      cat_name_req: 'ناوی جۆر بنووسە', no_categories: 'هێشتا جۆر نییە — یەکێک زیاد بکە.',
+      manage_users: 'بەکارهێنەران و دەسەڵات', users_hint: 'بۆ هەر کاشێرێک هەژمارێک دروستبکە و دیاری بکە چی دەبینێت.',
+      add_user: 'زیادکردنی بەکارهێنەر', edit_user: 'دەستکاری بەکارهێنەر', del_user: 'ئەم بەکارهێنەرە بسڕێتەوە؟',
+      disp_name: 'ناو', role: 'ڕۆڵ', role_admin: 'بەڕێوەبەر — دەسەڵاتی تەواو', role_staff: 'کاشێر — سنووردار',
+      can_see: 'دەتوانێت ئەم بەشانە ببینێت', pw_keep: 'بەتاڵی بهێڵەرەوە بۆ هێشتنەوەی وشەی نهێنی', account_active: 'هەژمار چالاک',
+      you_tag: 'تۆ', username_req: 'ناوی بەکارهێنەر: ٢–٣٢ پیت — پیت، ژمارە، . _ -', pw_req: 'وشەی نهێنی دەبێت لانیکەم ٣ پیت بێت',
+      no_access: 'هێشتا دەستپێگەیشتنت نییە — داوا لە بەڕێوەبەر بکە بەشێکت پێبدات.',
     },
     ar: {
       _dir: 'rtl', _name: 'العربية',
@@ -161,10 +179,37 @@
       help_3: 'يجب أن يكون IP الطابعة على شبكتك الفرعية — نفس الأرقام الثلاثة الأولى لـ«هذا الجهاز». مثال: الجهاز 192.168.1.20 ← الطابعة 192.168.1.50.',
       help_4: 'لتغيير IP: افتح IP الحالي للطابعة في المتصفح، أو استخدم أداة «Net Config / Printer Setup» عبر USB — عيّن IP ثابتاً، البوابة = الراوتر أعلاه، والمنفذ 9100.',
       help_5: 'عُد إلى هنا ← بحث (أو إضافة يدوياً) ← اختبار. ثم أنشئ له منطقة.',
+      manage_categories: 'الفئات', cat_hint: 'أضف فئات الطعام الخاصة بك، ثم عيّن الأصناف لها.',
+      add_category: 'إضافة فئة', edit_category: 'تعديل فئة', del_category: 'حذف هذه الفئة؟ تحتفظ الأصناف بأسمائها لكن تفقد هذه الفئة.',
+      cat_name_req: 'أدخل اسم الفئة', no_categories: 'لا فئات بعد — أضف واحدة.',
+      manage_users: 'المستخدمون والصلاحيات', users_hint: 'أنشئ حساباً لكل أمين صندوق واختر ما يمكنه رؤيته.',
+      add_user: 'إضافة مستخدم', edit_user: 'تعديل مستخدم', del_user: 'حذف هذا المستخدم؟',
+      disp_name: 'الاسم', role: 'الدور', role_admin: 'مدير — صلاحية كاملة', role_staff: 'أمين صندوق — محدود',
+      can_see: 'يمكنه رؤية هذه الأقسام', pw_keep: 'اتركه فارغاً للإبقاء على كلمة المرور الحالية', account_active: 'الحساب مفعّل',
+      you_tag: 'أنت', username_req: 'اسم المستخدم: 2–32 حرفاً — أحرف وأرقام و . _ -', pw_req: 'كلمة المرور 3 أحرف على الأقل',
+      no_access: 'لا صلاحية بعد — اطلب من المدير منحك قسماً.',
     },
   };
 
-  var CATS = ['burgers', 'sandwiches', 'sides'];
+  // Categories are user-managed (loaded from /api/categories). These read the live
+  // list from state so POS tabs, the food modal, and zones all stay in sync.
+  function cats() { return (state.categories || []).slice().sort(function (a, b) { return (a.sort_order - b.sort_order) || 0; }); }
+  function catName(slug) {
+    if (slug === 'other') return t('cat_other');
+    var c = (state.categories || []).filter(function (x) { return x.id === slug; })[0];
+    if (!c) return t('cat_other');
+    return (state.lang === 'ar' ? (c.name_ar || c.name_ku || c.name_en) : state.lang === 'en' ? (c.name_en || c.name_ku || c.name_ar) : (c.name_ku || c.name_ar || c.name_en)) || c.id;
+  }
+  // section access: admin sees everything; staff only its granted sections
+  function canSee(section) {
+    var u = state.user || {};
+    if (u.role === 'admin') return true;
+    return (u.sections || []).indexOf(section) >= 0;
+  }
+  function isAdmin() { return (state.user || {}).role === 'admin'; }
+  // set by the printers/zones panel so the categories panel can refresh zone
+  // checkboxes in place (avoids a full renderApp that would drop unsaved form edits)
+  var _zonesReload = null;
 
   var state = {
     token: localStorage.getItem(TOKEN_KEY) || null,
@@ -172,6 +217,7 @@
     lang: localStorage.getItem(LANG_KEY) || 'ku',
     view: 'pos',
     foods: [],
+    categories: [],
     settings: {},
     printerCfg: { printers: [], zones: [] },
     cart: [],          // [{ id, name, price, qty }]
@@ -289,6 +335,10 @@
   function renderApp() {
     applyDir(); app.textContent = '';
     if (state.view === 'kitchen') state.view = 'pos';   // kitchen display hidden for now
+    // section access: admin sees all; staff sees only its granted sections
+    var allowed = ['pos', 'orders', 'foods', 'settings'].filter(canSee);
+    if (!allowed.length) state.view = null;                 // no sections granted → no access
+    else if (!canSee(state.view)) state.view = allowed[0];
     var name = (state.user && (state.user.display_name || state.user.username)) || '';
 
     var sidebar = el('aside', { class: 'sidebar' + (state.sidebarOpen ? ' open' : '') }, [
@@ -298,14 +348,18 @@
           el('div', { class: 'name' }, ['NIGHT ', el('span', { class: 'b2', text: 'BITES' })]),
         ]),
       ]),
-      el('nav', { class: 'sb-nav' }, [
-        el('div', { class: 'sb-sec', text: t('sec_sale') }),
-        navItem('pos', '', t('nav_pos')),
-        navItem('orders', '', t('nav_orders')),
-        el('div', { class: 'sb-sec', text: t('sec_manage') }),
-        navItem('foods', '', t('nav_foods')),
-        navItem('settings', '', t('nav_settings')),
-      ]),
+      el('nav', { class: 'sb-nav' }, (function () {
+        var items = [];
+        var sale = [];
+        if (canSee('pos')) sale.push(navItem('pos', '', t('nav_pos')));
+        if (canSee('orders')) sale.push(navItem('orders', '', t('nav_orders')));
+        if (sale.length) { items.push(el('div', { class: 'sb-sec', text: t('sec_sale') })); items = items.concat(sale); }
+        var manage = [];
+        if (canSee('foods')) manage.push(navItem('foods', '', t('nav_foods')));
+        if (canSee('settings')) manage.push(navItem('settings', '', t('nav_settings')));
+        if (manage.length) { items.push(el('div', { class: 'sb-sec', text: t('sec_manage') })); items = items.concat(manage); }
+        return items;
+      })()),
       el('div', { class: 'sb-foot' }, [
         el('div', { class: 'langsel' }, ['ku', 'ar', 'en'].map(function (l) {
           return el('button', { class: state.lang === l ? 'on' : '', text: I18N[l]._name, onclick: function () { setLang(l); } });
@@ -339,8 +393,8 @@
     if (state.view === 'pos') renderPOS(main, body);
     else if (state.view === 'foods') renderFoods(body);
     else if (state.view === 'orders') renderOrders(body);
-    else if (state.view === 'kitchen') renderKitchen(body);
-    else renderSettings(body);
+    else if (state.view === 'settings') renderSettings(body);
+    else body.appendChild(el('div', { class: 'empty' }, [el('h3', { text: t('no_access') })]));
   }
 
   /* ------------------------------ POS ------------------------------ */
@@ -363,10 +417,10 @@
 
     function drawCats() {
       catBar.textContent = '';
-      var cats = ['all'].concat(CATS);
-      cats.forEach(function (c) {
-        catBar.appendChild(el('button', { class: 'cat-b' + (state.cat === c ? ' on' : ''),
-          text: t('cat_' + c), onclick: function () { if (arrange) return; state.cat = c; drawCats(); drawGrid(); } }));
+      var tabs = [{ id: 'all', name: t('cat_all') }].concat(cats().map(function (c) { return { id: c.id, name: catName(c.id) }; }));
+      tabs.forEach(function (tb) {
+        catBar.appendChild(el('button', { class: 'cat-b' + (state.cat === tb.id ? ' on' : ''),
+          text: tb.name, onclick: function () { if (arrange) return; state.cat = tb.id; drawCats(); drawGrid(); } }));
       });
       catBar.appendChild(el('button', { class: 'cat-b arrange-b' + (arrange ? ' on' : ''),
         text: arrange ? t('arrange_done') : t('arrange'),
@@ -505,7 +559,7 @@
             el('div', { style: 'font-weight:800', text: foodName(f) }),
             el('div', { style: 'font-size:12px;color:var(--faint)', text: [f.name_ku, f.name_ar, f.name_en].filter(Boolean).join(' · ') }),
           ]),
-          el('td', { 'data-l': t('category') }, [el('span', { style: 'color:var(--muted)', text: f.category ? t('cat_' + f.category) : '—' })]),
+          el('td', { 'data-l': t('category') }, [el('span', { style: 'color:var(--muted)', text: f.category ? catName(f.category) : '—' })]),
           el('td', { 'data-l': t('th_price') }, [el('span', { class: 'fmoney', text: money(f.price) })]),
           el('td', { 'data-l': t('th_status') }, [el('span', { class: 'pill ' + (f.is_active ? 'on' : 'off'), text: f.is_active ? t('active') : '—' })]),
           el('td', {}, [el('div', { class: 'rowbtns' }, [
@@ -541,7 +595,10 @@
       category: el('select', { class: 'input' }),
       price: el('input', { class: 'input', type: 'number', min: '0', step: '250', value: editing ? editing.price : '' }),
     };
-    [['', '—']].concat(CATS.map(function (c) { return [c, t('cat_' + c)]; })).forEach(function (o) {
+    var catOpts = [['', '—']].concat(cats().map(function (c) { return [c.id, catName(c.id)]; }));
+    // keep an existing food's category selectable even if that category was removed
+    if (editing && editing.category && !cats().some(function (c) { return c.id === editing.category; })) catOpts.push([editing.category, editing.category]);
+    catOpts.forEach(function (o) {
       var opt = el('option', { value: o[0], text: o[1] });
       if (editing && editing.category === o[0]) opt.selected = true;
       f.category.appendChild(opt);
@@ -555,7 +612,7 @@
       var body = { name_ku: f.name_ku.value, name_ar: f.name_ar.value, name_en: f.name_en.value,
         category: f.category.value, price: f.price.value, is_active: activeChk.checked };
       if (!body.name_ku && !body.name_ar && !body.name_en) { errBox.textContent = t('name_ku'); errBox.style.display = ''; return; }
-      if (!body.category) { errBox.textContent = t('category'); errBox.style.display = ''; return; }
+      // category is optional — an empty category routes/displays as 'other' everywhere
       saveBtn.disabled = true;
       var req = editing ? api('/foods/' + editing.id, { method: 'PUT', body: JSON.stringify(body) })
                         : api('/foods', { method: 'POST', body: JSON.stringify(body) });
@@ -760,6 +817,8 @@
       el('div', { style: 'margin-top:6px' }, [saveBtn]),
     ]));
 
+    if (isAdmin()) renderUsersPanel(host);
+    renderCategoriesPanel(host);
     renderPrintersPanel(host);
 
     // App version (desktop only) + manual update check
@@ -777,6 +836,187 @@
         } });
       host.appendChild(upBtn);
     }
+  }
+
+  /* ------------------------------ USERS & ACCESS ------------------------------ */
+  function renderUsersPanel(host) {
+    var panel = el('div', { class: 'panel' });
+    host.appendChild(panel);
+    var users = [];
+    function load() {
+      api('/users').then(function (d) { users = d.users || []; draw(); })
+        .catch(function (e) { if (e.status === 401) return logout(); if (e.status === 403) { if (panel.parentNode) panel.parentNode.removeChild(panel); return; } toast(e.message, 'bad'); });
+    }
+    function draw() {
+      panel.textContent = '';
+      panel.appendChild(el('div', { class: 'ph-head' }, [
+        el('h2', { text: t('manage_users') }),
+        el('button', { class: 'btn', onclick: function () { userModal(null); } }, [t('add_user')]),
+      ]));
+      panel.appendChild(el('p', { class: 'hint', text: t('users_hint') }));
+      var box = el('div', { class: 'pr-list' });
+      users.forEach(function (u) {
+        var me = state.user && state.user.id === u.id;
+        var secs = u.role === 'admin' ? ['pos', 'orders', 'foods', 'settings'] : (u.sections || []);
+        var secLabel = secs.map(function (s) { return t('nav_' + s); }).join(', ') || '—';
+        box.appendChild(el('div', { class: 'pr-row' + (u.is_active ? '' : ' off') }, [
+          el('span', { class: 'pr-kind ' + (u.role === 'admin' ? 'network' : 'system'), text: u.role === 'admin' ? t('role_admin') : t('role_staff') }),
+          el('div', { class: 'pr-name' }, [
+            el('strong', {}, [(u.display_name || u.username), me ? el('span', { class: 'you-tag', text: ' · ' + t('you_tag') }) : null]),
+            el('span', { class: 'pr-sub', dir: 'ltr', text: '@' + u.username + '  ·  ' + secLabel }),
+          ]),
+          el('div', { class: 'rowbtns' }, [
+            el('button', { class: 'btn-ghost', text: t('edit'), onclick: function () { userModal(u); } }),
+            me ? null : el('button', { class: 'btn-ghost danger', text: t('del'), onclick: function () {
+              if (!confirm(t('del_user'))) return;
+              api('/users/' + u.id, { method: 'DELETE' }).then(function () { toast(t('saved'), 'ok'); load(); })
+                .catch(function (e) { if (e.status === 401) return logout(); toast(e.message, 'bad'); });
+            } }),
+          ]),
+        ]));
+      });
+      panel.appendChild(box);
+    }
+    function userModal(editing) {
+      var uname = el('input', { class: 'input', dir: 'ltr', autocapitalize: 'none', value: editing ? editing.username : '' });
+      if (editing) uname.disabled = true;
+      var pw = el('input', { class: 'input', type: 'password', dir: 'ltr', autocomplete: 'new-password' });
+      var dname = el('input', { class: 'input', value: editing ? (editing.display_name || '') : '' });
+      var roleS = el('select', { class: 'input' });
+      [['staff', t('role_staff')], ['admin', t('role_admin')]].forEach(function (o) {
+        var opt = el('option', { value: o[0], text: o[1] }); if ((editing ? editing.role : 'staff') === o[0]) opt.selected = true; roleS.appendChild(opt);
+      });
+      var secChks = {};
+      var secWrap = el('div', { class: 'zcats' });
+      ['pos', 'orders', 'foods', 'settings'].forEach(function (s) {
+        var chk = el('input', { type: 'checkbox' }); chk.checked = editing ? ((editing.sections || []).indexOf(s) >= 0) : (s === 'pos');
+        secChks[s] = chk;
+        secWrap.appendChild(el('label', { class: 'zchk' }, [chk, el('span', { text: t('nav_' + s) })]));
+      });
+      var secField = el('div', { class: 'field', style: 'margin-top:10px' }, [el('label', { text: t('can_see') }), secWrap]);
+      function syncRole() { secField.style.display = roleS.value === 'admin' ? 'none' : ''; }
+      roleS.onchange = syncRole; syncRole();
+      var activeChk = el('input', { type: 'checkbox' }); activeChk.checked = editing ? editing.is_active : true;
+      var editingSelf = editing && state.user && editing.id === state.user.id;
+      if (editingSelf) { roleS.disabled = true; activeChk.disabled = true; }   // can't demote/deactivate yourself
+      var errBox = el('div', { class: 'err', style: 'display:none' });
+      var bg = el('div', { class: 'modal-bg', onclick: function (e) { if (e.target === bg) document.body.removeChild(bg); } });
+      var saveBtn = el('button', { class: 'btn', text: t('save') });
+      saveBtn.onclick = function () {
+        var sections = ['pos', 'orders', 'foods', 'settings'].filter(function (s) { return secChks[s].checked; });
+        var body = { display_name: dname.value, role: roleS.value, sections: sections, is_active: activeChk.checked };
+        if (!editing) { body.username = uname.value; body.password = pw.value; }
+        else if (pw.value) body.password = pw.value;
+        saveBtn.disabled = true; errBox.style.display = 'none';
+        var req = editing ? api('/users/' + editing.id, { method: 'PUT', body: JSON.stringify(body) })
+                          : api('/users', { method: 'POST', body: JSON.stringify(body) });
+        req.then(function (resp) {
+          toast(t('saved'), 'ok'); if (bg.parentNode) document.body.removeChild(bg);
+          if (editingSelf && resp && resp.user) { state.user = resp.user; renderApp(); return; }   // adopt updated own privileges
+          load();
+        }).catch(function (e) { if (e.status === 401) return logout(); errBox.textContent = e.message; errBox.style.display = ''; saveBtn.disabled = false; });
+      };
+      bg.appendChild(el('div', { class: 'modal' }, [
+        el('h3', { text: editing ? t('edit_user') : t('add_user') }),
+        errBox,
+        el('div', { class: 'row2' }, [
+          el('div', { class: 'field' }, [el('label', { text: t('username') }), uname]),
+          el('div', { class: 'field' }, [el('label', { text: t('disp_name') }), dname]),
+        ]),
+        el('div', { class: 'field' }, [el('label', { text: t('password') }), pw, editing ? el('div', { class: 'hint', style: 'margin:6px 0 0', text: t('pw_keep') }) : null]),
+        el('div', { class: 'field' }, [el('label', { text: t('role') }), roleS]),
+        secField,
+        el('label', { class: 'field', style: 'display:flex;align-items:center;gap:10px;cursor:pointer;margin-top:6px' }, [activeChk, el('span', { text: t('account_active') })]),
+        el('div', { class: 'modal-actions' }, [
+          el('button', { class: 'btn gray', text: t('cancel'), onclick: function () { document.body.removeChild(bg); } }),
+          saveBtn,
+        ]),
+      ]));
+      document.body.appendChild(bg);
+      if (editing) dname.focus(); else uname.focus();
+    }
+    load();
+  }
+
+  /* ------------------------------ CATEGORIES ------------------------------ */
+  function renderCategoriesPanel(host) {
+    var panel = el('div', { class: 'panel' });
+    host.appendChild(panel);
+    function clone(o) { return JSON.parse(JSON.stringify(o)); }
+    function uid() { return 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+    var list = (state.categories || []).map(clone);
+    function persist() {
+      return api('/categories', { method: 'PUT', body: JSON.stringify({ categories: list }) })
+        .then(function (d) { state.categories = d.categories || []; })
+        .catch(function (e) { if (e.status === 401) return logout(); toast(e.message || 'Error', 'bad'); });
+    }
+    // after a category change: sync printers/zones (server cascade may have edited
+    // them), redraw this panel + the zones panel — without a full renderApp() that
+    // would discard unsaved edits in the business/print-size forms.
+    function afterCatChange() {
+      api('/printers').then(function (d) { state.printerCfg = { printers: d.printers || [], zones: d.zones || [] }; })
+        .catch(function () {}).then(function () { draw(); if (_zonesReload) _zonesReload(); });
+    }
+    function nameOf(c) { return (state.lang === 'ar' ? (c.name_ar || c.name_ku || c.name_en) : state.lang === 'en' ? (c.name_en || c.name_ku || c.name_ar) : (c.name_ku || c.name_ar || c.name_en)) || c.id; }
+    function draw() {
+      panel.textContent = '';
+      panel.appendChild(el('div', { class: 'ph-head' }, [
+        el('h2', { text: t('manage_categories') }),
+        el('button', { class: 'btn', onclick: function () { catModal(null); } }, [t('add_category')]),
+      ]));
+      panel.appendChild(el('p', { class: 'hint', text: t('cat_hint') }));
+      if (!list.length) { panel.appendChild(el('p', { class: 'hint', text: t('no_categories') })); return; }
+      var box = el('div', { class: 'pr-list' });
+      list.forEach(function (c) {
+        box.appendChild(el('div', { class: 'pr-row' }, [
+          el('div', { class: 'pr-name' }, [
+            el('strong', { text: nameOf(c) }),
+            el('span', { class: 'pr-sub', text: [c.name_ku, c.name_ar, c.name_en].filter(Boolean).join(' · ') }),
+          ]),
+          el('div', { class: 'rowbtns' }, [
+            el('button', { class: 'btn-ghost', text: t('edit'), onclick: function () { catModal(c); } }),
+            el('button', { class: 'btn-ghost danger', text: t('del'), onclick: function () {
+              if (!confirm(t('del_category'))) return;
+              list = list.filter(function (x) { return x !== c; });
+              persist().then(afterCatChange);
+            } }),
+          ]),
+        ]));
+      });
+      panel.appendChild(box);
+    }
+    function catModal(editing) {
+      var nk = el('input', { class: 'input', value: editing ? editing.name_ku : '' });
+      var na = el('input', { class: 'input', value: editing ? editing.name_ar : '' });
+      var ne = el('input', { class: 'input', value: editing ? editing.name_en : '' });
+      var errBox = el('div', { class: 'err', style: 'display:none' });
+      var bg = el('div', { class: 'modal-bg', onclick: function (e) { if (e.target === bg) document.body.removeChild(bg); } });
+      var saveBtn = el('button', { class: 'btn', text: t('save') });
+      saveBtn.onclick = function () {
+        var ku = nk.value.trim(), ar = na.value.trim(), en = ne.value.trim();
+        if (!ku && !ar && !en) { errBox.textContent = t('cat_name_req'); errBox.style.display = ''; return; }
+        saveBtn.disabled = true;
+        if (editing) { editing.name_ku = ku; editing.name_ar = ar; editing.name_en = en; }
+        else { list.push({ id: uid(), name_ku: ku, name_ar: ar, name_en: en, sort_order: (list.length + 1) * 10 }); }
+        persist().then(function () { if (bg.parentNode) document.body.removeChild(bg); afterCatChange(); });
+      };
+      bg.appendChild(el('div', { class: 'modal' }, [
+        el('h3', { text: editing ? t('edit_category') : t('add_category') }),
+        errBox,
+        el('div', { class: 'field' }, [el('label', { text: t('name_ku') }), nk]),
+        el('div', { class: 'row2' }, [
+          el('div', { class: 'field' }, [el('label', { text: t('name_ar') }), na]),
+          el('div', { class: 'field' }, [el('label', { text: t('name_en') }), ne]),
+        ]),
+        el('div', { class: 'modal-actions' }, [
+          el('button', { class: 'btn gray', text: t('cancel'), onclick: function () { document.body.removeChild(bg); } }),
+          saveBtn,
+        ]),
+      ]));
+      document.body.appendChild(bg);
+      nk.focus();
+    }
+    draw();
   }
 
   /* ------------------------------ PRINTERS & ZONES ------------------------------ */
@@ -896,7 +1136,7 @@
       cfg.printers.forEach(function (p) { var opt = el('option', { value: p.id, text: p.name }); if (z.printer_id === p.id) opt.selected = true; prS.appendChild(opt); });
       prS.onchange = function () { z.printer_id = prS.value; persist(); };
       var catsWrap = el('div', { class: 'zcats' });
-      CATS.concat(['other']).forEach(function (c) {
+      cats().map(function (c) { return c.id; }).concat(['other']).forEach(function (c) {
         var chk = el('input', { type: 'checkbox' }); chk.checked = (z.categories || []).indexOf(c) >= 0;
         chk.onchange = function () {
           z.categories = z.categories || [];
@@ -904,7 +1144,7 @@
           else z.categories = z.categories.filter(function (x) { return x !== c; });
           persist();
         };
-        catsWrap.appendChild(el('label', { class: 'zchk' }, [chk, el('span', { text: t('cat_' + c) })]));
+        catsWrap.appendChild(el('label', { class: 'zchk' }, [chk, el('span', { text: catName(c) })]));
       });
       var catsField = el('div', { class: 'field', style: 'margin-top:10px' }, [el('label', { text: t('zone_cats') }), catsWrap]);
       function syncCats() { catsField.style.display = (typeS.value === 'customer') ? 'none' : ''; }
@@ -984,6 +1224,8 @@
       ]));
     }
 
+    // let the categories panel refresh zone checkboxes (reload cfg from fresh state)
+    _zonesReload = function () { cfg = { printers: printers().map(clone), zones: zones().map(clone) }; redraw(); };
     if (window.nb.networkInfo) window.nb.networkInfo().then(function (ni) { netinfo = ni; redraw(); }).catch(function () {});
     redraw();
   }
@@ -1004,16 +1246,16 @@
     var tbody = el('tbody');
     (order.items || []).forEach(function (it) {
       tbody.appendChild(el('tr', {}, [
-        el('td', { class: 'iname', text: it.name }),
-        el('td', { class: 'mid', text: '×' + it.qty }),
-        el('td', { class: 'num', text: money(it.line_total) }),
+        el('td', { class: 'iname', dir: 'auto', text: it.name }),
+        el('td', { class: 'mid' }, [el('span', { dir: 'ltr', text: '×' + it.qty })]),
+        el('td', { class: 'num' }, [el('span', { dir: 'ltr', text: money(it.line_total) })]),
       ]));
     });
     return el('div', { class: 'rcpt', dir: L._dir, style: '--pw:' + width }, [
-      el('div', { class: 'r-brand', text: bizName(lang) }),
+      el('div', { class: 'r-brand', dir: 'auto', text: bizName(lang) }),
       el('div', { class: 'r-rule' }),
-      el('div', { class: 'r-no', text: L.order + ' #' + order.order_no }),
-      el('div', { class: 'r-meta' }, [el('span', { text: orderDate(order) }), el('span', { dir: 'ltr', text: '#' + order.order_no })]),
+      el('div', { class: 'r-no' }, [L.order + ' ', el('span', { dir: 'ltr', text: '#' + order.order_no })]),
+      el('div', { class: 'r-meta' }, [el('span', { dir: 'ltr', text: orderDate(order) }), el('span', { dir: 'ltr', text: '#' + order.order_no })]),
       el('div', { class: 'r-rule' }),
       el('table', {}, [
         el('thead', {}, [el('tr', {}, [
@@ -1024,7 +1266,7 @@
       el('div', { class: 'r-rule solid' }),
       el('div', { class: 'r-total' }, [
         el('span', { class: 't-lbl', text: L.total }),
-        el('span', { class: 't-val', text: money(order.total) + ' ' + cur }),
+        el('span', { class: 't-val', dir: 'ltr', text: money(order.total) + ' ' + cur }),
       ]),
       el('div', { class: 'r-thanks', text: L.r_thanks }),
       el('div', { class: 'r-phone', dir: 'ltr' }, phoneList().map(function (ph) { return el('div', { text: ph }); })),
@@ -1076,6 +1318,8 @@
       + '.krow{display:flex;align-items:center;gap:' + (net ? '10px' : '3mm') + ';padding:' + (net ? '7px 0' : '2mm 0') + ';border-bottom:1px dashed #000;}'
       + '.kq{min-width:' + (net ? Math.round(48 * b) + 'px' : '10mm') + ';font-size:' + sz.kq + u + ';font-weight:900;}'
       + '.kn{font-size:' + sz.kn + u + ';font-weight:800;}'
+      // bidi: isolate every run so Kurdish/Arabic names never merge with Latin digits/prices
+      + '.iname,.kn,.brand,.station,.thanks,.tlbl,.tval,.no,.kq,.num,.mid,.meta span{unicode-bidi:isolate;}'
       + '</style>';
   }
   function ticketDoc(inner, net, dots, dir) {
@@ -1087,16 +1331,16 @@
     var cur = state.settings.currency || 'IQD';
     var dots = widthMm() === 58 ? 384 : 576;
     var rows = (order.items || []).map(function (it) {
-      return '<tr><td class="iname">' + escHtml(it.name) + '</td><td class="mid">×' + escHtml(it.qty) + '</td><td class="num">' + escHtml(money(it.line_total)) + '</td></tr>';
+      return '<tr><td class="iname" dir="auto">' + escHtml(it.name) + '</td><td class="mid"><span dir="ltr">×' + escHtml(it.qty) + '</span></td><td class="num"><span dir="ltr">' + escHtml(money(it.line_total)) + '</span></td></tr>';
     }).join('');
     var phones = phoneList().map(function (p) { return '<div>' + escHtml(p) + '</div>'; }).join('');
-    var inner = '<div class="brand">' + escHtml(bizName(lang)) + '</div><div class="rule"></div>'
-      + '<div class="no">' + escHtml(L.order) + ' #' + escHtml(order.order_no) + '</div>'
-      + '<div class="meta"><span>' + escHtml(orderDate(order)) + '</span><span dir="ltr">#' + escHtml(order.order_no) + '</span></div>'
+    var inner = '<div class="brand" dir="auto">' + escHtml(bizName(lang)) + '</div><div class="rule"></div>'
+      + '<div class="no">' + escHtml(L.order) + ' <span dir="ltr">#' + escHtml(order.order_no) + '</span></div>'
+      + '<div class="meta"><span dir="ltr">' + escHtml(orderDate(order)) + '</span><span dir="ltr">#' + escHtml(order.order_no) + '</span></div>'
       + '<div class="rule"></div>'
       + '<table><thead><tr><th>' + escHtml(L.item) + '</th><th class="mid">' + escHtml(L.qty) + '</th><th class="num">' + escHtml(L.total) + '</th></tr></thead><tbody>' + rows + '</tbody></table>'
       + '<div class="rule solid"></div>'
-      + '<div class="total"><span class="tlbl">' + escHtml(L.total) + '</span><span class="tval">' + escHtml(money(order.total)) + ' ' + escHtml(cur) + '</span></div>'
+      + '<div class="total"><span class="tlbl">' + escHtml(L.total) + '</span><span class="tval" dir="ltr">' + escHtml(money(order.total)) + ' ' + escHtml(cur) + '</span></div>'
       + '<div class="thanks">' + escHtml(L.r_thanks) + '</div>'
       + '<div class="phone" dir="ltr">' + phones + '</div>';
     return ticketDoc(inner, net, dots, L._dir);
@@ -1105,11 +1349,11 @@
     var lang = order.lang || state.lang; var L = I18N[lang] || I18N.ku;
     var dots = widthMm() === 58 ? 384 : 576;
     var rows = (items || []).map(function (it) {
-      return '<div class="krow"><span class="kq">×' + escHtml(it.qty) + '</span><span class="kn">' + escHtml(it.name) + '</span></div>';
+      return '<div class="krow"><span class="kq" dir="ltr">×' + escHtml(it.qty) + '</span><span class="kn" dir="auto">' + escHtml(it.name) + '</span></div>';
     }).join('');
-    var inner = '<div class="brand">#' + escHtml(order.order_no) + '</div>'
-      + (station ? '<div class="station">' + escHtml(station) + '</div>' : '')
-      + '<div class="meta"><span>' + escHtml(orderDate(order)) + '</span><span dir="ltr">#' + escHtml(order.order_no) + '</span></div>'
+    var inner = '<div class="brand" dir="ltr">#' + escHtml(order.order_no) + '</div>'
+      + (station ? '<div class="station" dir="auto">' + escHtml(station) + '</div>' : '')
+      + '<div class="meta"><span dir="ltr">' + escHtml(orderDate(order)) + '</span><span dir="ltr">#' + escHtml(order.order_no) + '</span></div>'
       + '<div class="rule"></div>' + rows;
     return ticketDoc(inner, net, dots, L._dir);
   }
@@ -1172,6 +1416,7 @@
   function boot() {
     Promise.all([
       api('/foods').then(function (d) { state.foods = d.foods || []; }),
+      api('/categories').then(function (d) { state.categories = d.categories || []; }).catch(function () {}),
       api('/settings').then(function (d) { state.settings = d.settings || {}; }),
       api('/printers').then(function (d) { state.printerCfg = { printers: d.printers || [], zones: d.zones || [] }; }).catch(function () {}),
     ]).then(function () { state.view = 'pos'; renderApp(); })

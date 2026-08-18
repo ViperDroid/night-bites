@@ -349,6 +349,8 @@ button { font-family: inherit; }
 .pr-name .pr-sub { font-size: 11.5px; color: var(--faint); }
 .pr-added { flex: 0 0 auto; font-size: 12px; font-weight: 800; color: var(--ok-deep); background: var(--ok-soft); padding: 6px 11px; border-radius: 8px; }
 .pr-row .rowbtns { flex: 0 0 auto; }
+.pr-row.off { opacity: .55; }
+.you-tag { color: var(--accent); font-weight: 800; font-size: 12px; }
 .pr-head2 { display: flex; align-items: flex-start; gap: 12px; margin-top: 20px; margin-bottom: 8px; }
 .pr-head2 > div:first-child { flex: 1; }
 .pr-head2 .btn-ghost { white-space: nowrap; }
@@ -406,6 +408,8 @@ button { font-family: inherit; }
 .preview-paper .r-total .t-val { font-size: 20px; }
 .preview-paper .r-thanks { text-align: center; font-size: 13px; font-weight: 800; margin-top: 8px; }
 .preview-paper .r-phone { text-align: center; font-weight: 900; font-size: 15px; margin-top: 6px; letter-spacing: .03em; }
+.preview-paper td, .preview-paper th, .preview-paper .iname, .preview-paper .r-no, .preview-paper .r-brand,
+.preview-paper .r-meta span, .preview-paper .r-total span { unicode-bidi: isolate; }
 
 /* ============================= RESPONSIVE ============================= */
 @media (max-width: 1000px) {
@@ -474,4 +478,6 @@ button { font-family: inherit; }
   .rcpt .r-total .t-val { font-size: 15pt; }
   .rcpt .r-phone { text-align: center; font-weight: 900; font-size: 11pt; margin-top: 1.5mm; letter-spacing: .04em; }
   .rcpt .r-thanks { text-align: center; font-size: 10pt; font-weight: 800; margin-top: 2mm; }
+  /* bidi: keep Kurdish/Arabic names and Latin numbers from merging */
+  .rcpt td, .rcpt th, .rcpt .iname, .rcpt .r-no, .rcpt .r-brand, .rcpt .r-meta span, .rcpt .r-total span { unicode-bidi: isolate; }
 }
