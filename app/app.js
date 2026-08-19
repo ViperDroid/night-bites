@@ -34,6 +34,7 @@
       receipt: 'Receipt', print_receipt: 'Print receipt', close: 'Close', printing: 'Printing…', printed: 'Printed', print_failed: 'Print failed',
       show_preview: 'Show receipt preview', show_preview_hint: 'When off, the receipt prints directly with no popup — faster for a busy cashier.',
       preview_on: 'On', preview_off: 'Off',
+      beep: 'Beep on print', beep_hint: 'Network printers with a buzzer beep when a ticket prints.',
       printers_zones: 'Printers & Zones', pz_hint: 'Scan for printers, register them, then route each food category to its printer.',
       desktop_only: 'Available in the desktop app.',
       scan: 'Scan for printers', scanning: 'Scanning…', rescan: 'Scan again',
@@ -41,7 +42,7 @@
       found_printers: 'Found', registered_printers: 'Registered printers',
       no_found: 'Nothing yet — tap “Scan for printers”.', no_registered: 'No printers registered yet.',
       kind_system: 'USB / installed', kind_network: 'Network',
-      register: 'Register', added: 'Added', remove: 'Remove', test: 'Test',
+      register: 'Register', added: 'Added', already_added: 'Already added', remove: 'Remove', test: 'Test',
       zones_title: 'Print zones', zones_hint: 'A zone sends the chosen food categories to one printer.',
       add_zone: 'Add zone', no_zones: 'No zones yet.', zone_name: 'Zone name',
       zone_type: 'Type', ztype_customer: 'Customer receipt (whole order)', ztype_items: 'Kitchen ticket (chosen categories)',
@@ -101,6 +102,7 @@
       receipt: 'وەسڵ', print_receipt: 'چاپی وەسڵ', close: 'داخستن', printing: 'چاپکردن…', printed: 'چاپکرا', print_failed: 'چاپکردن سەرکەوتوو نەبوو',
       show_preview: 'پیشاندانی وەسڵ پێش چاپ', show_preview_hint: 'ئەگەر ناچالاک بێت، وەسڵ ڕاستەوخۆ چاپدەکرێت بەبێ پیشاندان — خێراترە بۆ کاشێر.',
       preview_on: 'چالاک', preview_off: 'ناچالاک',
+      beep: 'دەنگ لە کاتی چاپ', beep_hint: 'پرینتەرە تۆڕییەکان کە بزوێنەریان هەیە دەنگ دەکەن کاتێک وەسڵ چاپدەکرێت.',
       printers_zones: 'پرینتەرەکان و زۆنەکان', pz_hint: 'گەڕان بۆ پرینتەر، تۆمارکردنیان، پاشان هەر جۆرێکی خواردن بنێرە بۆ پرینتەرەکەی.',
       desktop_only: 'تەنها لە بەرنامەی دیسکتۆپدا بەردەستە.',
       scan: 'گەڕان بۆ پرینتەر', scanning: 'گەڕان…', rescan: 'دووبارە گەڕان',
@@ -108,7 +110,7 @@
       found_printers: 'دۆزراوە', registered_printers: 'پرینتەرە تۆمارکراوەکان',
       no_found: 'هێشتا هیچ — کرتە لە «گەڕان بۆ پرینتەر» بکە.', no_registered: 'هێشتا هیچ پرینتەرێک تۆمار نەکراوە.',
       kind_system: 'USB / دامەزراو', kind_network: 'تۆڕ',
-      register: 'تۆمارکردن', added: 'زیادکرا', remove: 'لابردن', test: 'تاقیکردن',
+      register: 'تۆمارکردن', added: 'زیادکرا', already_added: 'پێشتر زیادکراوە', remove: 'لابردن', test: 'تاقیکردن',
       zones_title: 'زۆنەکانی چاپ', zones_hint: 'زۆنێک جۆرە دیاریکراوەکانی خواردن دەنێرێت بۆ پرینتەرێک.',
       add_zone: 'زیادکردنی زۆن', no_zones: 'هێشتا زۆن نییە.', zone_name: 'ناوی زۆن',
       zone_type: 'جۆر', ztype_customer: 'وەسڵی کڕیار (هەموو داواکاری)', ztype_items: 'وەسڵی چێشتخانە (جۆرە دیاریکراوەکان)',
@@ -168,6 +170,7 @@
       receipt: 'الإيصال', print_receipt: 'طباعة الإيصال', close: 'إغلاق', printing: 'جارٍ الطباعة…', printed: 'تمت الطباعة', print_failed: 'فشلت الطباعة',
       show_preview: 'إظهار معاينة الإيصال', show_preview_hint: 'عند الإيقاف، يُطبع الإيصال مباشرة دون نافذة — أسرع لأمين الصندوق.',
       preview_on: 'مُفعّل', preview_off: 'مُطفأ',
+      beep: 'صوت عند الطباعة', beep_hint: 'الطابعات الشبكية المزوّدة بجرس تُصدر صوتاً عند طباعة التذكرة.',
       printers_zones: 'الطابعات والمناطق', pz_hint: 'ابحث عن الطابعات، سجّلها، ثم وجّه كل فئة طعام إلى طابعتها.',
       desktop_only: 'متاح في تطبيق سطح المكتب.',
       scan: 'البحث عن الطابعات', scanning: 'جارٍ البحث…', rescan: 'إعادة البحث',
@@ -175,7 +178,7 @@
       found_printers: 'تم العثور', registered_printers: 'الطابعات المسجّلة',
       no_found: 'لا شيء بعد — اضغط «البحث عن الطابعات».', no_registered: 'لم تُسجّل أي طابعة بعد.',
       kind_system: 'USB / مثبّتة', kind_network: 'شبكة',
-      register: 'تسجيل', added: 'أُضيفت', remove: 'إزالة', test: 'اختبار',
+      register: 'تسجيل', added: 'أُضيفت', already_added: 'مضافة مسبقاً', remove: 'إزالة', test: 'اختبار',
       zones_title: 'مناطق الطباعة', zones_hint: 'المنطقة ترسل فئات الطعام المختارة إلى طابعة واحدة.',
       add_zone: 'إضافة منطقة', no_zones: 'لا مناطق بعد.', zone_name: 'اسم المنطقة',
       zone_type: 'النوع', ztype_customer: 'إيصال الزبون (الطلب كامل)', ztype_items: 'تذكرة المطبخ (الفئات المختارة)',
@@ -302,7 +305,7 @@
     if (state.token && state.user) renderApp(); else renderLogin();
   }
   function logout() {
-    var done = function () { state.token = null; state.user = null; localStorage.removeItem(TOKEN_KEY); renderLogin(); };
+    var done = function () { clearInterval(window._clk); window._clk = null; state.token = null; state.user = null; localStorage.removeItem(TOKEN_KEY); renderLogin(); };
     if (state.token) api('/logout', { method: 'POST' }).then(done, done); else done();
   }
 
@@ -419,7 +422,13 @@
   }
 
   /* ------------------------------ POS ------------------------------ */
-  function cartTotal() { return state.cart.reduce(function (s, c) { return s + c.price * c.qty; }, 0); }
+  function liveFood(id) { return state.foods.filter(function (x) { return x.id === id; })[0] || null; }
+  // resolve name/price LIVE from state.foods (fall back to the add-time snapshot only if the food
+  // was removed), so a mid-order language switch or a price edit shows in the cart and matches what
+  // the server actually charges at checkout.
+  function cartName(c) { var f = liveFood(c.id); return f ? foodName(f) : c.name; }
+  function cartPrice(c) { var f = liveFood(c.id); return f ? f.price : c.price; }
+  function cartTotal() { return state.cart.reduce(function (s, c) { return s + cartPrice(c) * c.qty; }, 0); }
   function cartCount() { return state.cart.reduce(function (s, c) { return s + c.qty; }, 0); }
   function addToCart(f) {
     var ex = state.cart.filter(function (c) { return c.id === f.id; })[0];
@@ -429,6 +438,7 @@
   function renderPOS(main, host) {
     var arrange = false;
     var dragEl = null, dragMoved = false;
+    var checkingOut = false;   // re-entrancy guard so a double-tap can't save the order twice
     host.className = 'wrap'; host.style.padding = '0';
     var pos = el('div', { class: 'pos' });
     var menuWrap = el('div', { class: 'menu-wrap' });
@@ -518,13 +528,13 @@
       } else {
         state.cart.forEach(function (c) {
           bodyC.appendChild(el('div', { class: 'cart-item' }, [
-            el('div', { class: 'ci-name' }, [el('div', { class: 'n', text: c.name }), el('div', { class: 'p', text: money(c.price) })]),
+            el('div', { class: 'ci-name' }, [el('div', { class: 'n', text: cartName(c) }), el('div', { class: 'p', text: money(cartPrice(c)) })]),
             el('div', { class: 'qty' }, [
               el('button', { text: '−', onclick: function () { c.qty -= 1; if (c.qty <= 0) state.cart = state.cart.filter(function (x) { return x !== c; }); drawGrid(); drawCart(); } }),
               el('span', { class: 'q', text: String(c.qty) }),
               el('button', { text: '+', onclick: function () { c.qty += 1; drawGrid(); drawCart(); } }),
             ]),
-            el('div', { class: 'ci-tot', text: money(c.price * c.qty) }),
+            el('div', { class: 'ci-tot', text: money(cartPrice(c) * c.qty) }),
             el('div', { class: 'ci-del', text: '✕', onclick: function () { state.cart = state.cart.filter(function (x) { return x !== c; }); drawGrid(); drawCart(); } }),
           ]));
         });
@@ -546,7 +556,9 @@
     // both buttons save (a receipt must reflect a real, saved order). Green also
     // fires the kitchen/station tickets; gray prints just the customer receipt.
     function checkout(withStations) {
+      if (checkingOut) return;                                  // ignore a rapid second tap
       if (!state.cart.length) { toast(t('need_items'), 'bad'); return; }
+      checkingOut = true;
       var payload = { lang: state.lang, items: state.cart.map(function (c) { return { food_id: c.id, qty: c.qty }; }) };
       api('/orders', { method: 'POST', body: JSON.stringify(payload) })
         .then(function (d) {
@@ -555,7 +567,13 @@
           toast(t('order_saved') + ' · #' + d.order.order_no, 'ok');
           state.cart = []; state.cartOpen = false; drawGrid(); drawCart(); cartEl.classList.remove('open');
         })
-        .catch(function (e) { if (e.status === 401) return logout(); toast(e.message || 'Error', 'bad'); });
+        .catch(function (e) {
+          if (e.status === 401) return logout();
+          // 409 = a food in the cart was deleted under a stale grid; refresh the menu so it disappears
+          if (e.status === 409) { api('/foods').then(function (d) { state.foods = d.foods || []; drawGrid(); drawCart(); }).catch(function () {}); }
+          toast(e.message || 'Error', 'bad');
+        })
+        .then(function () { checkingOut = false; }, function () { checkingOut = false; });
     }
 
     menuWrap.appendChild(catBar); menuWrap.appendChild(grid);
@@ -568,7 +586,12 @@
   function renderFoods(host) {
     var listBox = el('div');
     function load() {
-      api('/foods?all=1').then(function (d) { draw(d.foods || []); }).catch(function (e) { if (e.status === 401) return logout(); });
+      api('/foods?all=1').then(function (d) {
+        draw(d.foods || []);
+        // keep the shared POS list (grid + cart prices) in sync — it is otherwise only loaded at boot,
+        // so a food added/edited/deleted here would be stale on the register until an app restart.
+        state.foods = (d.foods || []).filter(function (f) { return f.is_active; });
+      }).catch(function (e) { if (e.status === 401) return logout(); });
     }
     function draw(rows) {
       listBox.textContent = '';
@@ -587,7 +610,7 @@
             el('button', { class: 'btn-ghost', text: t('edit'), onclick: function () { foodModal(f, load); } }),
             el('button', { class: 'btn-ghost danger', text: t('del'), onclick: function () {
               if (!confirm(t('confirm_del'))) return;
-              api('/foods/' + f.id, { method: 'DELETE' }).then(function () { toast(t('saved'), 'ok'); load(); }).catch(function (e) { toast(e.message, 'bad'); });
+              api('/foods/' + f.id, { method: 'DELETE' }).then(function () { toast(t('saved'), 'ok'); load(); }).catch(function (e) { if (e.status === 401) return logout(); toast(e.message, 'bad'); });
             } }),
           ])]),
         ]));
@@ -694,7 +717,7 @@
           if (open && !loaded) {
             body.appendChild(el('div', { class: 'od-loading', text: '…' }));
             api('/orders/' + o.id).then(function (r) { loaded = true; fill(r.order); })
-              .catch(function (e) { if (e.status === 401) return logout(); toast(e.message, 'bad'); });
+              .catch(function (e) { body.textContent = ''; if (e.status === 401) return logout(); toast(e.message, 'bad'); });
           }
         } }, [
           el('span', { class: 'od-no', text: '#' + o.order_no }),
@@ -881,6 +904,13 @@
       } }));
     });
 
+    var chosenBeep = { on: String(s.beep == null ? '1' : s.beep) !== '0' };
+    var beepSeg = el('div', { class: 'seg' });
+    [['1', t('preview_on')], ['0', t('preview_off')]].forEach(function (o) {
+      beepSeg.appendChild(el('button', { class: 'seg-b' + ((chosenBeep.on ? '1' : '0') === o[0] ? ' on' : ''), text: o[1], onclick: function () {
+        chosenBeep.on = o[0] === '1'; Array.prototype.forEach.call(beepSeg.children, function (b) { b.classList.remove('on'); }); this.classList.add('on');
+      } }));
+    });
     var resetT = el('input', { class: 'input', type: 'time', value: (s.reset_time || '00:00'), dir: 'ltr' });
     var phone = el('textarea', { class: 'textarea', dir: 'ltr', style: 'min-height:96px', placeholder: '0750 947 1000' });
     phone.value = (s.phones || s.phone || '');
@@ -894,7 +924,7 @@
       var pl = phone.value.split(/\r?\n/).map(function (x) { return x.trim(); }).filter(Boolean);
       api('/settings', { method: 'PUT', body: JSON.stringify({
         print_width: chosen.w, reset_time: resetT.value || '00:00', phones: phone.value, phone: pl[0] || '',
-        show_preview: chosenPrev.on ? '1' : '0',
+        show_preview: chosenPrev.on ? '1' : '0', beep: chosenBeep.on ? '1' : '0',
         business_name_ku: nk.value, business_name_ar: na.value, business_name_en: ne.value,
       }) }).then(function (d) { state.settings = d.settings; toast(t('saved'), 'ok'); saveBtn.disabled = false; renderApp(); })
         .catch(function (e) { if (e.status === 401) return logout(); toast(e.message, 'bad'); saveBtn.disabled = false; });
@@ -911,6 +941,10 @@
       el('div', { class: 'field', style: 'margin-top:18px' }, [
         el('label', { text: t('show_preview') }), prevSeg,
         el('div', { class: 'hint', style: 'margin:6px 0 0', text: t('show_preview_hint') }),
+      ]),
+      el('div', { class: 'field', style: 'margin-top:18px' }, [
+        el('label', { text: t('beep') }), beepSeg,
+        el('div', { class: 'hint', style: 'margin:6px 0 0', text: t('beep_hint') }),
       ]),
     ]));
     host.appendChild(el('div', { class: 'panel' }, [
@@ -939,7 +973,7 @@
           window.nb.checkUpdate().then(function (r) {
             upBtn.disabled = false; upBtn.textContent = 'Check for updates';
             toast(r && r.version ? ('Update: v' + r.version) : (r && r.dev ? 'Dev build' : 'You are up to date'), 'ok');
-          });
+          }).catch(function () { upBtn.disabled = false; upBtn.textContent = 'Check for updates'; toast('Update check failed', 'bad'); });
         } });
       host.appendChild(upBtn);
     }
@@ -1174,6 +1208,7 @@
       });
     }
     function register(f) {
+      if (isRegistered(f)) return;   // never register the same printer twice
       if (adding) return; adding = true;
       cfg.printers.push({ id: uid(), name: f.name || f.device || f.host, kind: f.kind, device: f.device || '', host: f.host || '', port: f.port || 9100 });
       persist().then(function () { adding = false; redraw(); });
@@ -1181,8 +1216,9 @@
     function addManual(host, port, name) {
       host = String(host || '').trim();
       if (!validIp(host)) { toast(t('bad_ip'), 'bad'); return; }
-      if (adding) return; adding = true;
       port = parseInt(port, 10) || 9100;
+      if (isRegistered({ kind: 'network', host: host, port: port })) { toast(t('already_added'), 'bad'); return; }  // no duplicate → no double prints
+      if (adding) return; adding = true;
       var doAdd = function (reach) {
         cfg.printers.push({ id: uid(), name: (name || '').trim() || (host + ':' + port), kind: 'network', device: '', host: host, port: port });
         persist().then(function () { adding = false; toast(reach ? t('reachable') : t('not_reachable'), reach ? 'ok' : 'bad'); redraw(); });
@@ -1255,7 +1291,12 @@
       });
       var catsField = el('div', { class: 'field', style: 'margin-top:10px' }, [el('label', { text: t('zone_cats') }), catsWrap]);
       function syncCats() { catsField.style.display = (typeS.value === 'customer') ? 'none' : ''; }
-      typeS.onchange = function () { z.type = typeS.value; syncCats(); persist(); };
+      typeS.onchange = function () {
+        z.type = typeS.value; syncCats();
+        // only one customer-receipt zone allowed — demote any other customer zone to kitchen tickets
+        if (z.type === 'customer') { cfg.zones.forEach(function (o) { if (o !== z && o.type === 'customer') o.type = 'items'; }); persist().then(redraw); return; }
+        persist();
+      };
       syncCats();
       return el('div', { class: 'zone-card' }, [
         el('div', { class: 'zone-top' }, [
@@ -1392,6 +1433,7 @@
   function customerZone() { return zones().filter(function (z) { return z.type === 'customer' && printerById(z.printer_id); })[0] || null; }
   function targetFor(p) { return p.kind === 'network' ? { kind: 'network', host: p.host, port: p.port || 9100 } : { kind: 'system', device: p.device }; }
   function widthMm() { return state.settings.print_width === '58' ? 58 : 80; }
+  function beepOn() { return String(state.settings.beep == null ? '1' : state.settings.beep) !== '0'; }
 
   /* ---- self-contained HTML tickets for silent printing ---- */
   function escHtml(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -1468,7 +1510,7 @@
   /* ---- routing ---- */
   function sendTo(printer, html) {
     if (!(window.nb && window.nb.printTicket && printer)) return Promise.resolve({ ok: false });
-    return window.nb.printTicket(html, targetFor(printer), widthMm()).catch(function () { return { ok: false }; });
+    return window.nb.printTicket(html, targetFor(printer), widthMm(), beepOn()).catch(function () { return { ok: false }; });
   }
   // Kitchen/station tickets — silent, one per zone that has matching items.
   function routeStations(order) {

@@ -13,6 +13,6 @@ contextBridge.exposeInMainWorld('nb', {
   scanNetwork: (ports) => ipcRenderer.invoke('scan-network-printers', { ports: ports }),
   probePrinter: (host, port) => ipcRenderer.invoke('probe-printer', { host: host, port: port }),
   // target = { kind:'system', device } | { kind:'network', host, port }
-  printTicket: (html, target, widthMm) => ipcRenderer.invoke('print-ticket', { html: html, target: target, widthMm: widthMm }),
+  printTicket: (html, target, widthMm, beep) => ipcRenderer.invoke('print-ticket', { html: html, target: target, widthMm: widthMm, beep: beep }),
   onUpdate: (cb) => ipcRenderer.on('update-status', (_e, data) => cb(data)),
 });

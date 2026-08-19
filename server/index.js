@@ -22,7 +22,7 @@ function createServer(opts) {
     order_items: [],
     settings: {
       print_width: '80', phone: '0750 947 1000', phones: '0750 947 1000',
-      currency: 'IQD', reset_time: '00:00', show_preview: '1',
+      currency: 'IQD', reset_time: '00:00', show_preview: '1', beep: '1',
       business_name_ku: 'نایت بایتس', business_name_ar: 'نايت بايتس', business_name_en: 'NIGHT BITES',
     },
     printers: [],   // registered: { id, name, device, kind }
@@ -30,10 +30,47 @@ function createServer(opts) {
     seq: { food: 100, order: 0, user: 1 },
   };
   let db;
-  try { db = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8')); }
-  catch { db = DEFAULT; save(); }
-  // fill any missing top-level keys (forward-compat across updates)
-  Object.keys(DEFAULT).forEach((k) => { if (db[k] === undefined) db[k] = DEFAULT[k]; });
+  db = loadDb();
+  // Load the data file defensively. A first run (no file) seeds DEFAULT and saves.
+  // But a file that EXISTS and can't be read/parsed (transient AV/backup lock, or a
+  // power-loss-corrupted file) must NEVER be silently overwritten with defaults —
+  // that would destroy all orders/menu/users. So: retry a few times for transient
+  // read errors, keep a recoverable copy of anything we couldn't parse, and run on
+  // defaults in memory WITHOUT persisting over the original.
+  function loadDb() {
+    let raw = null, err = null;
+    for (let attempt = 0; attempt < 5; attempt++) {
+      try { raw = fs.readFileSync(DATA_FILE, 'utf8'); err = null; break; }
+      catch (e) {
+        err = e;
+        if (e && e.code === 'ENOENT') break;          // genuinely no file yet — stop retrying
+        const until = Date.now() + 200; while (Date.now() < until) { /* brief spin for a transient lock */ }
+      }
+    }
+    if (err && err.code === 'ENOENT') { const d = DEFAULT; save(d); return d; }  // first run
+    if (err) {
+      // The file EXISTS but couldn't be read (antivirus/backup lock, or an IO error) even
+      // after retries. NEVER run on defaults here — the next save() would overwrite the real
+      // (intact) file with defaults and destroy all data. Fail fast: main.js shows an error
+      // dialog and quits; relaunching once the lock clears loads the file normally.
+      throw new Error('Could not read the data file (' + (err.code || err.message || err) + '). It may be locked by antivirus or backup software — close them and reopen NIGHT BITES.');
+    }
+    try {
+      const parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('not an object');
+      return parsed;
+    } catch (e) {                                       // exists but corrupt/unusable JSON — preserve a copy, start fresh
+      try { const bak = DATA_FILE + '.corrupt-' + Date.now(); fs.writeFileSync(bak, raw); console.error('night-bites: data file is corrupt (' + (e.message || e) + '); preserved a copy at ' + bak + ' and started on defaults.'); }
+      catch (_) { console.error('night-bites: data file is corrupt (' + (e.message || e) + '); started on defaults.'); }
+      return DEFAULT;
+    }
+  }
+  // fill any missing/null top-level keys (forward-compat + repair partial corruption)
+  Object.keys(DEFAULT).forEach((k) => { if (db[k] === undefined || db[k] === null) db[k] = DEFAULT[k]; });
+  // deep-fill seq subkeys and coerce the users array so a partial/wrong-typed field can't
+  // crash startup (db.seq.user / db.users.forEach below) or yield NaN ids.
+  db.seq = Object.assign({}, DEFAULT.seq, (db.seq && typeof db.seq === 'object') ? db.seq : {});
+  if (!Array.isArray(db.users) || !db.users.length) db.users = JSON.parse(JSON.stringify(DEFAULT.users));
   if (!db.seq.user) db.seq.user = 1;
   // migrate pre-accounts users (older installs): give them role/sections/etc.
   db.users.forEach((u) => {
@@ -44,9 +81,9 @@ function createServer(opts) {
     if (u.id > db.seq.user) db.seq.user = u.id;
   });
 
-  function save() {
+  function save(explicit) {
     const tmp = DATA_FILE + '.tmp';
-    fs.writeFileSync(tmp, JSON.stringify(db, null, 2));
+    fs.writeFileSync(tmp, JSON.stringify(explicit || db, null, 2));
     fs.renameSync(tmp, DATA_FILE);
   }
   function hash(pw) { const s = crypto.randomBytes(16).toString('hex'); return s + ':' + crypto.scryptSync(pw, s, 32).toString('hex'); }
@@ -146,14 +183,14 @@ function createServer(opts) {
     if (b.display_name !== undefined) u.display_name = String(b.display_name || u.username).slice(0, 60);
     if (b.role !== undefined) {
       const role = b.role === 'admin' ? 'admin' : 'staff';
-      if (u.role === 'admin' && role !== 'admin' && activeAdmins() <= 1) return res.status(400).json({ error: 'At least one admin is required' });
+      if (u.role === 'admin' && u.is_active !== false && role !== 'admin' && activeAdmins() <= 1) return res.status(400).json({ error: 'At least one admin is required' });
       u.role = role;
     }
     if (b.sections !== undefined) u.sections = cleanSections(b.sections);
     if (u.role === 'admin') u.sections = SECTIONS.slice();
     if (b.is_active !== undefined) {
       const active = !!b.is_active;
-      if (!active && u.role === 'admin' && activeAdmins() <= 1) return res.status(400).json({ error: 'At least one admin is required' });
+      if (!active && u.role === 'admin' && u.is_active !== false && activeAdmins() <= 1) return res.status(400).json({ error: 'At least one admin is required' });
       u.is_active = active;
     }
     if (b.password) {
@@ -168,18 +205,19 @@ function createServer(opts) {
     const id = parseInt(req.params.id, 10) || 0;
     if (id === req.user.id) return res.status(400).json({ error: 'You cannot delete your own account' });
     const i = db.users.findIndex((x) => x.id === id); if (i < 0) return res.status(404).json({ error: 'Not found' });
-    if (db.users[i].role === 'admin' && activeAdmins() <= 1) return res.status(400).json({ error: 'At least one admin is required' });
+    if (db.users[i].role === 'admin' && db.users[i].is_active !== false && activeAdmins() <= 1) return res.status(400).json({ error: 'At least one admin is required' });
     for (const [tok, uid] of tokens) { if (uid === id) tokens.delete(tok); }
     db.users.splice(i, 1); save(); res.json({ ok: true });
   }));
 
   // ---- settings ----
-  const ALLOWED = new Set(['print_width', 'business_name_ku', 'business_name_ar', 'business_name_en', 'phone', 'phones', 'currency', 'reset_time', 'show_preview']);
+  const ALLOWED = new Set(['print_width', 'business_name_ku', 'business_name_ar', 'business_name_en', 'phone', 'phones', 'currency', 'reset_time', 'show_preview', 'beep']);
   app.get('/api/settings', auth, (_q, r) => r.json({ settings: db.settings }));
   app.put('/api/settings', auth, requireSection('settings'), wrap((req, res) => {
     Object.keys(req.body || {}).forEach((k) => { if (ALLOWED.has(k)) db.settings[k] = String(req.body[k] == null ? '' : req.body[k]).slice(0, 500); });
     if (!['58', '80'].includes(db.settings.print_width)) db.settings.print_width = '80';
     db.settings.show_preview = (db.settings.show_preview === '0') ? '0' : '1';
+    db.settings.beep = (db.settings.beep === '0') ? '0' : '1';
     save(); res.json({ settings: db.settings });
   }));
 
@@ -191,7 +229,7 @@ function createServer(opts) {
     return {
       name_ku: String((b && b.name_ku) || '').trim().slice(0, 160), name_ar: String((b && b.name_ar) || '').trim().slice(0, 160),
       name_en: String((b && b.name_en) || '').trim().slice(0, 160), category: String((b && b.category) || '').trim().slice(0, 60),
-      price: money(b && b.price), is_active: (b && b.is_active === false) ? false : true, sort_order: Math.round(num(b && b.sort_order)),
+      price: Math.max(0, money(b && b.price)), is_active: (b && b.is_active === false) ? false : true, sort_order: Math.round(num(b && b.sort_order)),
     };
   }
   app.post('/api/foods', auth, requireSection('foods'), wrap((req, res) => {
@@ -200,7 +238,8 @@ function createServer(opts) {
   }));
   app.put('/api/foods/:id', auth, requireSection('foods'), wrap((req, res) => {
     const f = db.foods.find((x) => x.id === (parseInt(req.params.id, 10) || 0)); if (!f) return res.status(404).json({ error: 'Not found' });
-    Object.assign(f, readFood(req.body), { id: f.id }); save(); res.json({ food: shapeFood(f) });
+    const nf = readFood(req.body); if (!nf.name_ku && !nf.name_en && !nf.name_ar) return res.status(400).json({ error: 'Name is required' });
+    Object.assign(f, nf, { id: f.id }); save(); res.json({ food: shapeFood(f) });
   }));
   app.delete('/api/foods/:id', auth, requireSection('foods'), wrap((req, res) => {
     const id = parseInt(req.params.id, 10) || 0; const i = db.foods.findIndex((x) => x.id === id); if (i < 0) return res.status(404).json({ error: 'Not found' });
@@ -219,7 +258,8 @@ function createServer(opts) {
   });
   function boundary() {
     let rt = db.settings.reset_time || '00:00'; if (!/^\d{1,2}:\d{2}$/.test(rt)) rt = '00:00';
-    const [h, m] = rt.split(':').map((x) => parseInt(x, 10));
+    let [h, m] = rt.split(':').map((x) => parseInt(x, 10));
+    if (!(h >= 0 && h <= 23 && m >= 0 && m <= 59)) { h = 0; m = 0; }   // out-of-range time (e.g. 25:00) → midnight
     const now = new Date(); const b = new Date(now); b.setHours(h, m, 0, 0);
     if (now < b) b.setDate(b.getDate() - 1);
     return b.getTime();
@@ -242,12 +282,18 @@ function createServer(opts) {
     let start, end, label = String(q.range || 'today');
     if (q.from || q.to) {
       label = 'custom';
-      const sf = q.from ? new Date(String(q.from) + 'T00:00:00') : null;
-      const st = q.to ? new Date(String(q.to) + 'T23:59:59.999') : null;
+      // swap a reversed range by the raw date strings, so 'from' keeps its 00:00 open and
+      // 'to' its 23:59 close — swapping the parsed Dates would carry the wrong times and drop
+      // most of both endpoint days.
+      let fromStr = q.from ? String(q.from) : null;
+      let toStr = q.to ? String(q.to) : null;
+      if (fromStr && toStr && fromStr > toStr) { const tmp = fromStr; fromStr = toStr; toStr = tmp; }
+      const sf = fromStr ? new Date(fromStr + 'T00:00:00') : null;
+      const st = toStr ? new Date(toStr + 'T23:59:59.999') : null;
       end = (st && !isNaN(st)) ? st : now;
       // missing/invalid 'from' → that single 'to' day (never all-history via epoch)
       start = (sf && !isNaN(sf)) ? sf : new Date(end.getFullYear(), end.getMonth(), end.getDate(), 0, 0, 0, 0);
-      if (start.getTime() > end.getTime()) { const tmp = start; start = end; end = tmp; }   // swap a reversed range
+      if (start.getTime() > end.getTime()) { const tmp = start; start = end; end = tmp; }   // backstop for invalid-date edges
     } else if (q.range === 'month') {
       start = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0); end = now;
     } else if (q.range === 'week') {
@@ -277,6 +323,10 @@ function createServer(opts) {
     const byDay = [];
     const cur = new Date(start); cur.setHours(0, 0, 0, 0);
     const endDay = new Date(end); endDay.setHours(0, 0, 0, 0);
+    // keep the chart to the most recent 400 days so a very wide range shows the days that
+    // actually hold data (near `end`), never a wall of old empty bars that hides them.
+    const earliest = new Date(endDay); earliest.setDate(earliest.getDate() - 399);
+    if (cur.getTime() < earliest.getTime()) cur.setTime(earliest.getTime());
     for (let g = 0; cur.getTime() <= endDay.getTime() && g < 400; g++) {
       const k = dayKey(cur); const v = dayMap[k] || { count: 0, total: 0 };
       byDay.push({ day: k, count: v.count, total: money(v.total) });
@@ -296,11 +346,17 @@ function createServer(opts) {
     const body = req.body || {}; const lang = ['ku', 'ar', 'en'].includes(body.lang) ? body.lang : 'ku';
     const nameFor = (f) => lang === 'ar' ? (f.name_ar || f.name_ku || f.name_en) : lang === 'en' ? (f.name_en || f.name_ku || f.name_ar) : (f.name_ku || f.name_ar || f.name_en);
     const items = [];
+    const missing = [];
     (Array.isArray(body.items) ? body.items : []).forEach((it) => {
-      const f = db.foods.find((x) => x.id === (parseInt(it && it.food_id, 10) || 0)); if (!f) return;
+      const fid = parseInt(it && it.food_id, 10) || 0;
+      const f = db.foods.find((x) => x.id === fid);
+      if (!f) { missing.push(fid); return; }   // a food was deleted/renamed under a stale POS grid
       const qty = Math.max(1, Math.round(num(it.qty))); const price = money(f.price);
       items.push({ food_id: f.id, name: String(nameFor(f)).slice(0, 160), price, qty, line_total: money(price * qty), category: f.category || '' });
     });
+    // Never silently drop items — that would understate the order/receipt/total. If any
+    // requested item no longer resolves, reject the whole order so the cashier refreshes.
+    if (missing.length) return res.status(409).json({ error: 'Menu changed — refresh and re-ring', missing });
     if (!items.length) return res.status(400).json({ error: 'Add at least one item' });
     const total = money(items.reduce((s, i) => s + i.line_total, 0));
     const count = items.reduce((s, i) => s + i.qty, 0);
@@ -316,16 +372,17 @@ function createServer(opts) {
 
   // ---- printers & zones (config stored here; actual printing is in main via IPC) ----
   const str = (v, n) => String(v == null ? '' : v).slice(0, n || 80);
+  const clampPort = (v) => { const n = parseInt(v, 10); return (n >= 1 && n <= 65535) ? n : 9100; };  // bad/missing port → 9100, never 1
   const shapePrinter = (p) => ({
     id: str(p && p.id, 40) || ('p' + (++db.seq.food)),
     name: str(p && p.name, 80), kind: (p && p.kind === 'network') ? 'network' : 'system',
-    device: str(p && p.device, 160), host: str(p && p.host, 60), port: Math.max(1, Math.min(65535, num((p && p.port) || 9100))),
+    device: str(p && p.device, 160), host: str(p && p.host, 60), port: clampPort(p && p.port),
   });
   const shapeZone = (z) => ({
     id: str(z && z.id, 40) || ('z' + (++db.seq.food)),
     name: str(z && z.name, 80), type: (z && z.type === 'customer') ? 'customer' : 'items',
     printer_id: str(z && z.printer_id, 40),
-    categories: Array.isArray(z && z.categories) ? z.categories.map((c) => str(c, 40)).filter(Boolean).slice(0, 12) : [],
+    categories: Array.isArray(z && z.categories) ? z.categories.map((c) => str(c, 40)).filter(Boolean).slice(0, 60) : [],
   });
   app.get('/api/printers', auth, (_q, res) => res.json({ printers: db.printers, zones: db.zones }));
   app.put('/api/printers', auth, requireSection('settings'), wrap((req, res) => {
@@ -352,6 +409,9 @@ function createServer(opts) {
   }));
 
   // ---- static frontend ----
+  // Any unmatched /api/* request is a real 404 (JSON) — do NOT let it fall through to
+  // the SPA catch-all below, which would return 200 + index.html and mask the error.
+  app.use('/api', (_q, res) => res.status(404).json({ error: 'Not found' }));
   app.use(express.static(APP_DIR, { index: 'index.html' }));
   app.get('*', (_q, res) => res.sendFile(path.join(APP_DIR, 'index.html')));
 
