@@ -30,8 +30,35 @@ function createServer(opts) {
     seq: { food: 100, order: 0, user: 1 },
   };
   let db;
-  try { db = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8')); }
-  catch { db = DEFAULT; save(); }
+  db = loadDb();
+  // Load the data file defensively. A first run (no file) seeds DEFAULT and saves.
+  // But a file that EXISTS and can't be read/parsed (transient AV/backup lock, or a
+  // power-loss-corrupted file) must NEVER be silently overwritten with defaults —
+  // that would destroy all orders/menu/users. So: retry a few times for transient
+  // read errors, keep a recoverable copy of anything we couldn't parse, and run on
+  // defaults in memory WITHOUT persisting over the original.
+  function loadDb() {
+    let raw = null, err = null;
+    for (let attempt = 0; attempt < 4; attempt++) {
+      try { raw = fs.readFileSync(DATA_FILE, 'utf8'); err = null; break; }
+      catch (e) {
+        err = e;
+        if (e && e.code === 'ENOENT') break;          // genuinely no file yet — stop retrying
+        const until = Date.now() + 150; while (Date.now() < until) { /* brief spin for a transient lock */ }
+      }
+    }
+    if (err && err.code === 'ENOENT') { const d = DEFAULT; save(d); return d; }  // first run
+    if (err) {                                          // exists but unreadable — do NOT overwrite
+      console.error('night-bites: could not read data file (' + (err.code || err.message || err) + '); starting on defaults without overwriting.');
+      return DEFAULT;
+    }
+    try { return JSON.parse(raw); }
+    catch (e) {                                         // exists but corrupt JSON — preserve a copy, do NOT overwrite
+      try { const bak = DATA_FILE + '.corrupt-' + Date.now(); fs.writeFileSync(bak, raw); console.error('night-bites: data file is corrupt (' + (e.message || e) + '); preserved a copy at ' + bak + ' and started on defaults without overwriting.'); }
+      catch (_) { console.error('night-bites: data file is corrupt (' + (e.message || e) + '); started on defaults without overwriting.'); }
+      return DEFAULT;
+    }
+  }
   // fill any missing top-level keys (forward-compat across updates)
   Object.keys(DEFAULT).forEach((k) => { if (db[k] === undefined) db[k] = DEFAULT[k]; });
   if (!db.seq.user) db.seq.user = 1;
@@ -44,9 +71,9 @@ function createServer(opts) {
     if (u.id > db.seq.user) db.seq.user = u.id;
   });
 
-  function save() {
+  function save(explicit) {
     const tmp = DATA_FILE + '.tmp';
-    fs.writeFileSync(tmp, JSON.stringify(db, null, 2));
+    fs.writeFileSync(tmp, JSON.stringify(explicit || db, null, 2));
     fs.renameSync(tmp, DATA_FILE);
   }
   function hash(pw) { const s = crypto.randomBytes(16).toString('hex'); return s + ':' + crypto.scryptSync(pw, s, 32).toString('hex'); }
@@ -146,14 +173,14 @@ function createServer(opts) {
     if (b.display_name !== undefined) u.display_name = String(b.display_name || u.username).slice(0, 60);
     if (b.role !== undefined) {
       const role = b.role === 'admin' ? 'admin' : 'staff';
-      if (u.role === 'admin' && role !== 'admin' && activeAdmins() <= 1) return res.status(400).json({ error: 'At least one admin is required' });
+      if (u.role === 'admin' && u.is_active !== false && role !== 'admin' && activeAdmins() <= 1) return res.status(400).json({ error: 'At least one admin is required' });
       u.role = role;
     }
     if (b.sections !== undefined) u.sections = cleanSections(b.sections);
     if (u.role === 'admin') u.sections = SECTIONS.slice();
     if (b.is_active !== undefined) {
       const active = !!b.is_active;
-      if (!active && u.role === 'admin' && activeAdmins() <= 1) return res.status(400).json({ error: 'At least one admin is required' });
+      if (!active && u.role === 'admin' && u.is_active !== false && activeAdmins() <= 1) return res.status(400).json({ error: 'At least one admin is required' });
       u.is_active = active;
     }
     if (b.password) {
@@ -168,7 +195,7 @@ function createServer(opts) {
     const id = parseInt(req.params.id, 10) || 0;
     if (id === req.user.id) return res.status(400).json({ error: 'You cannot delete your own account' });
     const i = db.users.findIndex((x) => x.id === id); if (i < 0) return res.status(404).json({ error: 'Not found' });
-    if (db.users[i].role === 'admin' && activeAdmins() <= 1) return res.status(400).json({ error: 'At least one admin is required' });
+    if (db.users[i].role === 'admin' && db.users[i].is_active !== false && activeAdmins() <= 1) return res.status(400).json({ error: 'At least one admin is required' });
     for (const [tok, uid] of tokens) { if (uid === id) tokens.delete(tok); }
     db.users.splice(i, 1); save(); res.json({ ok: true });
   }));
@@ -296,11 +323,17 @@ function createServer(opts) {
     const body = req.body || {}; const lang = ['ku', 'ar', 'en'].includes(body.lang) ? body.lang : 'ku';
     const nameFor = (f) => lang === 'ar' ? (f.name_ar || f.name_ku || f.name_en) : lang === 'en' ? (f.name_en || f.name_ku || f.name_ar) : (f.name_ku || f.name_ar || f.name_en);
     const items = [];
+    const missing = [];
     (Array.isArray(body.items) ? body.items : []).forEach((it) => {
-      const f = db.foods.find((x) => x.id === (parseInt(it && it.food_id, 10) || 0)); if (!f) return;
+      const fid = parseInt(it && it.food_id, 10) || 0;
+      const f = db.foods.find((x) => x.id === fid);
+      if (!f) { missing.push(fid); return; }   // a food was deleted/renamed under a stale POS grid
       const qty = Math.max(1, Math.round(num(it.qty))); const price = money(f.price);
       items.push({ food_id: f.id, name: String(nameFor(f)).slice(0, 160), price, qty, line_total: money(price * qty), category: f.category || '' });
     });
+    // Never silently drop items — that would understate the order/receipt/total. If any
+    // requested item no longer resolves, reject the whole order so the cashier refreshes.
+    if (missing.length) return res.status(409).json({ error: 'Menu changed — refresh and re-ring', missing });
     if (!items.length) return res.status(400).json({ error: 'Add at least one item' });
     const total = money(items.reduce((s, i) => s + i.line_total, 0));
     const count = items.reduce((s, i) => s + i.qty, 0);
@@ -352,6 +385,9 @@ function createServer(opts) {
   }));
 
   // ---- static frontend ----
+  // Any unmatched /api/* request is a real 404 (JSON) — do NOT let it fall through to
+  // the SPA catch-all below, which would return 200 + index.html and mask the error.
+  app.use('/api', (_q, res) => res.status(404).json({ error: 'Not found' }));
   app.use(express.static(APP_DIR, { index: 'index.html' }));
   app.get('*', (_q, res) => res.sendFile(path.join(APP_DIR, 'index.html')));
 

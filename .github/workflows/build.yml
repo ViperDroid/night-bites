@@ -1,7 +1,11 @@
 name: Build Windows EXE
 on:
-  push: { branches: [ main ] }
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
   workflow_dispatch:
+permissions:
+  contents: write        # needed to publish a Release on version tags
 jobs:
   build:
     runs-on: windows-latest
@@ -18,4 +22,17 @@ jobs:
           if (Test-Path release/latest.yml) { Copy-Item release/latest.yml out/ -Force }
           Get-ChildItem release/*.blockmap -EA SilentlyContinue | Copy-Item -Destination out/ -Force
       - uses: actions/upload-artifact@v4
-        with: { name: night-bites-windows, path: out/*, retention-days: 7, if-no-files-found: error }
+        with: { name: night-bites-windows, path: out/*, retention-days: 90, if-no-files-found: error }
+      # Publish a DURABLE GitHub Release (installer + latest.yml + blockmap) when a v* tag is
+      # pushed. This gives the auto-update feed a permanent, non-expiring source to serve —
+      # unlike the build artifact above, which is eventually deleted. To make auto-update
+      # actually reach deployed machines, host these three files at the `publish` URL in
+      # package.json, or switch that publish provider to "github" so the app polls this release.
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $assets = Get-ChildItem out/* | ForEach-Object { $_.FullName }
+          gh release create $env:GITHUB_REF_NAME $assets --repo $env:GITHUB_REPOSITORY --title "NIGHT BITES $env:GITHUB_REF_NAME" --notes "Automated Windows build of $env:GITHUB_REF_NAME."

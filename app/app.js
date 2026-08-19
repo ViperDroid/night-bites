@@ -429,6 +429,7 @@
   function renderPOS(main, host) {
     var arrange = false;
     var dragEl = null, dragMoved = false;
+    var checkingOut = false;   // re-entrancy guard so a double-tap can't save the order twice
     host.className = 'wrap'; host.style.padding = '0';
     var pos = el('div', { class: 'pos' });
     var menuWrap = el('div', { class: 'menu-wrap' });
@@ -546,7 +547,9 @@
     // both buttons save (a receipt must reflect a real, saved order). Green also
     // fires the kitchen/station tickets; gray prints just the customer receipt.
     function checkout(withStations) {
+      if (checkingOut) return;                                  // ignore a rapid second tap
       if (!state.cart.length) { toast(t('need_items'), 'bad'); return; }
+      checkingOut = true;
       var payload = { lang: state.lang, items: state.cart.map(function (c) { return { food_id: c.id, qty: c.qty }; }) };
       api('/orders', { method: 'POST', body: JSON.stringify(payload) })
         .then(function (d) {
@@ -555,7 +558,13 @@
           toast(t('order_saved') + ' · #' + d.order.order_no, 'ok');
           state.cart = []; state.cartOpen = false; drawGrid(); drawCart(); cartEl.classList.remove('open');
         })
-        .catch(function (e) { if (e.status === 401) return logout(); toast(e.message || 'Error', 'bad'); });
+        .catch(function (e) {
+          if (e.status === 401) return logout();
+          // 409 = a food in the cart was deleted under a stale grid; refresh the menu so it disappears
+          if (e.status === 409) { api('/foods').then(function (d) { state.foods = d.foods || []; drawGrid(); drawCart(); }).catch(function () {}); }
+          toast(e.message || 'Error', 'bad');
+        })
+        .then(function () { checkingOut = false; }, function () { checkingOut = false; });
     }
 
     menuWrap.appendChild(catBar); menuWrap.appendChild(grid);

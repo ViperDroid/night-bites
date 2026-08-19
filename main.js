@@ -336,5 +336,11 @@ function pool(items, size, worker) {
 }
 
 app.on('second-instance', () => { if (win) { if (win.isMinimized()) win.restore(); win.focus(); } });
-app.whenReady().then(start);
+// If startup fails (e.g. userData is unwritable / disk full so the server can't boot),
+// show the operator a clear error instead of leaving an invisible, window-less process
+// running that only Task Manager can kill.
+app.whenReady().then(start).catch((e) => {
+  try { dialog.showErrorBox('NIGHT BITES failed to start', String((e && e.stack) || (e && e.message) || e)); } catch (_) {}
+  app.quit();
+});
 app.on('window-all-closed', () => { if (serverInfo && serverInfo.server) try { serverInfo.server.close(); } catch (_) {}; app.quit(); });
