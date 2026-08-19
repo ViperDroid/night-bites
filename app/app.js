@@ -1280,7 +1280,12 @@
       });
       var catsField = el('div', { class: 'field', style: 'margin-top:10px' }, [el('label', { text: t('zone_cats') }), catsWrap]);
       function syncCats() { catsField.style.display = (typeS.value === 'customer') ? 'none' : ''; }
-      typeS.onchange = function () { z.type = typeS.value; syncCats(); persist(); };
+      typeS.onchange = function () {
+        z.type = typeS.value; syncCats();
+        // only one customer-receipt zone allowed — demote any other customer zone to kitchen tickets
+        if (z.type === 'customer') { cfg.zones.forEach(function (o) { if (o !== z && o.type === 'customer') o.type = 'items'; }); persist().then(redraw); return; }
+        persist();
+      };
       syncCats();
       return el('div', { class: 'zone-card' }, [
         el('div', { class: 'zone-top' }, [
