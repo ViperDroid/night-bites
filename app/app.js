@@ -42,7 +42,7 @@
       found_printers: 'Found', registered_printers: 'Registered printers',
       no_found: 'Nothing yet — tap “Scan for printers”.', no_registered: 'No printers registered yet.',
       kind_system: 'USB / installed', kind_network: 'Network',
-      register: 'Register', added: 'Added', remove: 'Remove', test: 'Test',
+      register: 'Register', added: 'Added', already_added: 'Already added', remove: 'Remove', test: 'Test',
       zones_title: 'Print zones', zones_hint: 'A zone sends the chosen food categories to one printer.',
       add_zone: 'Add zone', no_zones: 'No zones yet.', zone_name: 'Zone name',
       zone_type: 'Type', ztype_customer: 'Customer receipt (whole order)', ztype_items: 'Kitchen ticket (chosen categories)',
@@ -110,7 +110,7 @@
       found_printers: 'دۆزراوە', registered_printers: 'پرینتەرە تۆمارکراوەکان',
       no_found: 'هێشتا هیچ — کرتە لە «گەڕان بۆ پرینتەر» بکە.', no_registered: 'هێشتا هیچ پرینتەرێک تۆمار نەکراوە.',
       kind_system: 'USB / دامەزراو', kind_network: 'تۆڕ',
-      register: 'تۆمارکردن', added: 'زیادکرا', remove: 'لابردن', test: 'تاقیکردن',
+      register: 'تۆمارکردن', added: 'زیادکرا', already_added: 'پێشتر زیادکراوە', remove: 'لابردن', test: 'تاقیکردن',
       zones_title: 'زۆنەکانی چاپ', zones_hint: 'زۆنێک جۆرە دیاریکراوەکانی خواردن دەنێرێت بۆ پرینتەرێک.',
       add_zone: 'زیادکردنی زۆن', no_zones: 'هێشتا زۆن نییە.', zone_name: 'ناوی زۆن',
       zone_type: 'جۆر', ztype_customer: 'وەسڵی کڕیار (هەموو داواکاری)', ztype_items: 'وەسڵی چێشتخانە (جۆرە دیاریکراوەکان)',
@@ -178,7 +178,7 @@
       found_printers: 'تم العثور', registered_printers: 'الطابعات المسجّلة',
       no_found: 'لا شيء بعد — اضغط «البحث عن الطابعات».', no_registered: 'لم تُسجّل أي طابعة بعد.',
       kind_system: 'USB / مثبّتة', kind_network: 'شبكة',
-      register: 'تسجيل', added: 'أُضيفت', remove: 'إزالة', test: 'اختبار',
+      register: 'تسجيل', added: 'أُضيفت', already_added: 'مضافة مسبقاً', remove: 'إزالة', test: 'اختبار',
       zones_title: 'مناطق الطباعة', zones_hint: 'المنطقة ترسل فئات الطعام المختارة إلى طابعة واحدة.',
       add_zone: 'إضافة منطقة', no_zones: 'لا مناطق بعد.', zone_name: 'اسم المنطقة',
       zone_type: 'النوع', ztype_customer: 'إيصال الزبون (الطلب كامل)', ztype_items: 'تذكرة المطبخ (الفئات المختارة)',
@@ -1197,6 +1197,7 @@
       });
     }
     function register(f) {
+      if (isRegistered(f)) return;   // never register the same printer twice
       if (adding) return; adding = true;
       cfg.printers.push({ id: uid(), name: f.name || f.device || f.host, kind: f.kind, device: f.device || '', host: f.host || '', port: f.port || 9100 });
       persist().then(function () { adding = false; redraw(); });
@@ -1204,8 +1205,9 @@
     function addManual(host, port, name) {
       host = String(host || '').trim();
       if (!validIp(host)) { toast(t('bad_ip'), 'bad'); return; }
-      if (adding) return; adding = true;
       port = parseInt(port, 10) || 9100;
+      if (isRegistered({ kind: 'network', host: host, port: port })) { toast(t('already_added'), 'bad'); return; }  // no duplicate → no double prints
+      if (adding) return; adding = true;
       var doAdd = function (reach) {
         cfg.printers.push({ id: uid(), name: (name || '').trim() || (host + ':' + port), kind: 'network', device: '', host: host, port: port });
         persist().then(function () { adding = false; toast(reach ? t('reachable') : t('not_reachable'), reach ? 'ok' : 'bad'); redraw(); });

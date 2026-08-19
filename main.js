@@ -103,9 +103,9 @@ ipcMain.handle('probe-printer', async (_e, payload) => {
   } catch { return { ok: false }; }
 });
 
-// Powerful scan: probe EVERY host on all local /24 subnet(s) across the common
-// raw-ESC/POS ports (9100/9101/9102). Returns the IPs that answered — finds any
-// network printer even if it isn't installed in Windows yet.
+// Powerful scan: probe EVERY host on all local /24 subnet(s) on the given raw-ESC/POS
+// port(s) — defaults to 9100, the standard port. Returns the IPs that answered — finds
+// any network printer even if it isn't installed in Windows yet.
 ipcMain.handle('scan-network-printers', async (_e, payload) => {
   const ports = (payload && Array.isArray(payload.ports) && payload.ports.length)
     ? payload.ports.map((p) => parseInt(p, 10)).filter(Boolean)

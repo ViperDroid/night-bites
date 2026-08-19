@@ -350,16 +350,17 @@ function createServer(opts) {
 
   // ---- printers & zones (config stored here; actual printing is in main via IPC) ----
   const str = (v, n) => String(v == null ? '' : v).slice(0, n || 80);
+  const clampPort = (v) => { const n = parseInt(v, 10); return (n >= 1 && n <= 65535) ? n : 9100; };  // bad/missing port → 9100, never 1
   const shapePrinter = (p) => ({
     id: str(p && p.id, 40) || ('p' + (++db.seq.food)),
     name: str(p && p.name, 80), kind: (p && p.kind === 'network') ? 'network' : 'system',
-    device: str(p && p.device, 160), host: str(p && p.host, 60), port: Math.max(1, Math.min(65535, num((p && p.port) || 9100))),
+    device: str(p && p.device, 160), host: str(p && p.host, 60), port: clampPort(p && p.port),
   });
   const shapeZone = (z) => ({
     id: str(z && z.id, 40) || ('z' + (++db.seq.food)),
     name: str(z && z.name, 80), type: (z && z.type === 'customer') ? 'customer' : 'items',
     printer_id: str(z && z.printer_id, 40),
-    categories: Array.isArray(z && z.categories) ? z.categories.map((c) => str(c, 40)).filter(Boolean).slice(0, 12) : [],
+    categories: Array.isArray(z && z.categories) ? z.categories.map((c) => str(c, 40)).filter(Boolean).slice(0, 60) : [],
   });
   app.get('/api/printers', auth, (_q, res) => res.json({ printers: db.printers, zones: db.zones }));
   app.put('/api/printers', auth, requireSection('settings'), wrap((req, res) => {
