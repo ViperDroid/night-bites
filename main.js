@@ -131,8 +131,9 @@ ipcMain.handle('print-ticket', async (_e, payload) => {
     const html = String(payload && payload.html || '');
     const target = (payload && payload.target) || {};
     const widthMm = (payload && payload.widthMm === 58) ? 58 : 80;
+    const beep = !!(payload && payload.beep);   // buzzer only works on the raw-ESC/POS (network) path
     if (target.kind === 'network' && target.host) {
-      return await printNetwork(html, String(target.host), parseInt(target.port, 10) || 9100, widthMm);
+      return await printNetwork(html, String(target.host), parseInt(target.port, 10) || 9100, widthMm, beep);
     }
     return await printSystem(html, String(target.device || ''), widthMm);
   } catch (e) { return { ok: false, error: String(e && e.message || e) }; }
@@ -166,7 +167,7 @@ function printSystem(html, device, widthMm) {
 /* ---- network-printer path: render → rasterize → ESC/POS over TCP:9100 ----
    Renders the same HTML to a bitmap and ships it as a raster image, so Arabic /
    Kurdish print correctly on any raw network thermal printer (no driver needed). */
-async function printNetwork(html, host, port, widthMm) {
+async function printNetwork(html, host, port, widthMm, beep) {
   const dots = widthMm === 58 ? 384 : 576;   // printable dots: 58mm≈384, 80mm≈576
   let w = null;
   try {
@@ -188,7 +189,7 @@ async function printNetwork(html, host, port, widthMm) {
     const size = img.getSize();
     const bmp = img.toBitmap();               // BGRA
     const realW = size.height ? Math.round((bmp.length / 4) / size.height) : size.width;
-    const payload = rasterEscpos(bmp, realW, size.height);
+    const payload = rasterEscpos(bmp, realW, size.height, beep);
     try { w.close(); } catch (_) {} w = null;
     return await sendTcp(host, port, payload);
   } catch (e) {
@@ -211,7 +212,7 @@ function withTimeout(p, ms, msg) {
 }
 
 // BGRA bitmap → ESC/POS raster (banded so we never overflow the printer buffer).
-function rasterEscpos(bmp, width, height) {
+function rasterEscpos(bmp, width, height, beep) {
   const W = Math.min(width, 576);
   const bytesPerRow = Math.ceil(W / 8);
   const chunks = [Buffer.from([0x1B, 0x40])]; // ESC @  (init)
@@ -234,6 +235,9 @@ function rasterEscpos(bmp, width, height) {
     chunks.push(Buffer.from([0x1D, 0x76, 0x30, 0x00, xL, xH, yL, yH]));
     chunks.push(data);
   }
+  // Xprinter buzzer (models with a physical beeper): ESC B n t — n beeps of t×50ms.
+  // Harmless on printers that don't support it; gated by the "Beep on print" setting.
+  if (beep) chunks.push(Buffer.from([0x1B, 0x42, 0x02, 0x03]));  // 2 beeps
   chunks.push(Buffer.from([0x0A, 0x0A, 0x0A, 0x0A]));      // feed
   chunks.push(Buffer.from([0x1D, 0x56, 0x42, 0x00]));      // GS V B 0 — partial cut
   return Buffer.concat(chunks);

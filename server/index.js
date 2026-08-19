@@ -22,7 +22,7 @@ function createServer(opts) {
     order_items: [],
     settings: {
       print_width: '80', phone: '0750 947 1000', phones: '0750 947 1000',
-      currency: 'IQD', reset_time: '00:00', show_preview: '1',
+      currency: 'IQD', reset_time: '00:00', show_preview: '1', beep: '1',
       business_name_ku: 'نایت بایتس', business_name_ar: 'نايت بايتس', business_name_en: 'NIGHT BITES',
     },
     printers: [],   // registered: { id, name, device, kind }
@@ -201,12 +201,13 @@ function createServer(opts) {
   }));
 
   // ---- settings ----
-  const ALLOWED = new Set(['print_width', 'business_name_ku', 'business_name_ar', 'business_name_en', 'phone', 'phones', 'currency', 'reset_time', 'show_preview']);
+  const ALLOWED = new Set(['print_width', 'business_name_ku', 'business_name_ar', 'business_name_en', 'phone', 'phones', 'currency', 'reset_time', 'show_preview', 'beep']);
   app.get('/api/settings', auth, (_q, r) => r.json({ settings: db.settings }));
   app.put('/api/settings', auth, requireSection('settings'), wrap((req, res) => {
     Object.keys(req.body || {}).forEach((k) => { if (ALLOWED.has(k)) db.settings[k] = String(req.body[k] == null ? '' : req.body[k]).slice(0, 500); });
     if (!['58', '80'].includes(db.settings.print_width)) db.settings.print_width = '80';
     db.settings.show_preview = (db.settings.show_preview === '0') ? '0' : '1';
+    db.settings.beep = (db.settings.beep === '0') ? '0' : '1';
     save(); res.json({ settings: db.settings });
   }));
 

@@ -34,6 +34,7 @@
       receipt: 'Receipt', print_receipt: 'Print receipt', close: 'Close', printing: 'Printing…', printed: 'Printed', print_failed: 'Print failed',
       show_preview: 'Show receipt preview', show_preview_hint: 'When off, the receipt prints directly with no popup — faster for a busy cashier.',
       preview_on: 'On', preview_off: 'Off',
+      beep: 'Beep on print', beep_hint: 'Network printers with a buzzer beep when a ticket prints.',
       printers_zones: 'Printers & Zones', pz_hint: 'Scan for printers, register them, then route each food category to its printer.',
       desktop_only: 'Available in the desktop app.',
       scan: 'Scan for printers', scanning: 'Scanning…', rescan: 'Scan again',
@@ -101,6 +102,7 @@
       receipt: 'وەسڵ', print_receipt: 'چاپی وەسڵ', close: 'داخستن', printing: 'چاپکردن…', printed: 'چاپکرا', print_failed: 'چاپکردن سەرکەوتوو نەبوو',
       show_preview: 'پیشاندانی وەسڵ پێش چاپ', show_preview_hint: 'ئەگەر ناچالاک بێت، وەسڵ ڕاستەوخۆ چاپدەکرێت بەبێ پیشاندان — خێراترە بۆ کاشێر.',
       preview_on: 'چالاک', preview_off: 'ناچالاک',
+      beep: 'دەنگ لە کاتی چاپ', beep_hint: 'پرینتەرە تۆڕییەکان کە بزوێنەریان هەیە دەنگ دەکەن کاتێک وەسڵ چاپدەکرێت.',
       printers_zones: 'پرینتەرەکان و زۆنەکان', pz_hint: 'گەڕان بۆ پرینتەر، تۆمارکردنیان، پاشان هەر جۆرێکی خواردن بنێرە بۆ پرینتەرەکەی.',
       desktop_only: 'تەنها لە بەرنامەی دیسکتۆپدا بەردەستە.',
       scan: 'گەڕان بۆ پرینتەر', scanning: 'گەڕان…', rescan: 'دووبارە گەڕان',
@@ -168,6 +170,7 @@
       receipt: 'الإيصال', print_receipt: 'طباعة الإيصال', close: 'إغلاق', printing: 'جارٍ الطباعة…', printed: 'تمت الطباعة', print_failed: 'فشلت الطباعة',
       show_preview: 'إظهار معاينة الإيصال', show_preview_hint: 'عند الإيقاف، يُطبع الإيصال مباشرة دون نافذة — أسرع لأمين الصندوق.',
       preview_on: 'مُفعّل', preview_off: 'مُطفأ',
+      beep: 'صوت عند الطباعة', beep_hint: 'الطابعات الشبكية المزوّدة بجرس تُصدر صوتاً عند طباعة التذكرة.',
       printers_zones: 'الطابعات والمناطق', pz_hint: 'ابحث عن الطابعات، سجّلها، ثم وجّه كل فئة طعام إلى طابعتها.',
       desktop_only: 'متاح في تطبيق سطح المكتب.',
       scan: 'البحث عن الطابعات', scanning: 'جارٍ البحث…', rescan: 'إعادة البحث',
@@ -890,6 +893,13 @@
       } }));
     });
 
+    var chosenBeep = { on: String(s.beep == null ? '1' : s.beep) !== '0' };
+    var beepSeg = el('div', { class: 'seg' });
+    [['1', t('preview_on')], ['0', t('preview_off')]].forEach(function (o) {
+      beepSeg.appendChild(el('button', { class: 'seg-b' + ((chosenBeep.on ? '1' : '0') === o[0] ? ' on' : ''), text: o[1], onclick: function () {
+        chosenBeep.on = o[0] === '1'; Array.prototype.forEach.call(beepSeg.children, function (b) { b.classList.remove('on'); }); this.classList.add('on');
+      } }));
+    });
     var resetT = el('input', { class: 'input', type: 'time', value: (s.reset_time || '00:00'), dir: 'ltr' });
     var phone = el('textarea', { class: 'textarea', dir: 'ltr', style: 'min-height:96px', placeholder: '0750 947 1000' });
     phone.value = (s.phones || s.phone || '');
@@ -903,7 +913,7 @@
       var pl = phone.value.split(/\r?\n/).map(function (x) { return x.trim(); }).filter(Boolean);
       api('/settings', { method: 'PUT', body: JSON.stringify({
         print_width: chosen.w, reset_time: resetT.value || '00:00', phones: phone.value, phone: pl[0] || '',
-        show_preview: chosenPrev.on ? '1' : '0',
+        show_preview: chosenPrev.on ? '1' : '0', beep: chosenBeep.on ? '1' : '0',
         business_name_ku: nk.value, business_name_ar: na.value, business_name_en: ne.value,
       }) }).then(function (d) { state.settings = d.settings; toast(t('saved'), 'ok'); saveBtn.disabled = false; renderApp(); })
         .catch(function (e) { if (e.status === 401) return logout(); toast(e.message, 'bad'); saveBtn.disabled = false; });
@@ -920,6 +930,10 @@
       el('div', { class: 'field', style: 'margin-top:18px' }, [
         el('label', { text: t('show_preview') }), prevSeg,
         el('div', { class: 'hint', style: 'margin:6px 0 0', text: t('show_preview_hint') }),
+      ]),
+      el('div', { class: 'field', style: 'margin-top:18px' }, [
+        el('label', { text: t('beep') }), beepSeg,
+        el('div', { class: 'hint', style: 'margin:6px 0 0', text: t('beep_hint') }),
       ]),
     ]));
     host.appendChild(el('div', { class: 'panel' }, [
@@ -1401,6 +1415,7 @@
   function customerZone() { return zones().filter(function (z) { return z.type === 'customer' && printerById(z.printer_id); })[0] || null; }
   function targetFor(p) { return p.kind === 'network' ? { kind: 'network', host: p.host, port: p.port || 9100 } : { kind: 'system', device: p.device }; }
   function widthMm() { return state.settings.print_width === '58' ? 58 : 80; }
+  function beepOn() { return String(state.settings.beep == null ? '1' : state.settings.beep) !== '0'; }
 
   /* ---- self-contained HTML tickets for silent printing ---- */
   function escHtml(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -1477,7 +1492,7 @@
   /* ---- routing ---- */
   function sendTo(printer, html) {
     if (!(window.nb && window.nb.printTicket && printer)) return Promise.resolve({ ok: false });
-    return window.nb.printTicket(html, targetFor(printer), widthMm()).catch(function () { return { ok: false }; });
+    return window.nb.printTicket(html, targetFor(printer), widthMm(), beepOn()).catch(function () { return { ok: false }; });
   }
   // Kitchen/station tickets — silent, one per zone that has matching items.
   function routeStations(order) {
