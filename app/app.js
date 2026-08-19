@@ -305,7 +305,7 @@
     if (state.token && state.user) renderApp(); else renderLogin();
   }
   function logout() {
-    var done = function () { state.token = null; state.user = null; localStorage.removeItem(TOKEN_KEY); renderLogin(); };
+    var done = function () { clearInterval(window._clk); window._clk = null; state.token = null; state.user = null; localStorage.removeItem(TOKEN_KEY); renderLogin(); };
     if (state.token) api('/logout', { method: 'POST' }).then(done, done); else done();
   }
 
@@ -422,7 +422,13 @@
   }
 
   /* ------------------------------ POS ------------------------------ */
-  function cartTotal() { return state.cart.reduce(function (s, c) { return s + c.price * c.qty; }, 0); }
+  function liveFood(id) { return state.foods.filter(function (x) { return x.id === id; })[0] || null; }
+  // resolve name/price LIVE from state.foods (fall back to the add-time snapshot only if the food
+  // was removed), so a mid-order language switch or a price edit shows in the cart and matches what
+  // the server actually charges at checkout.
+  function cartName(c) { var f = liveFood(c.id); return f ? foodName(f) : c.name; }
+  function cartPrice(c) { var f = liveFood(c.id); return f ? f.price : c.price; }
+  function cartTotal() { return state.cart.reduce(function (s, c) { return s + cartPrice(c) * c.qty; }, 0); }
   function cartCount() { return state.cart.reduce(function (s, c) { return s + c.qty; }, 0); }
   function addToCart(f) {
     var ex = state.cart.filter(function (c) { return c.id === f.id; })[0];
@@ -522,13 +528,13 @@
       } else {
         state.cart.forEach(function (c) {
           bodyC.appendChild(el('div', { class: 'cart-item' }, [
-            el('div', { class: 'ci-name' }, [el('div', { class: 'n', text: c.name }), el('div', { class: 'p', text: money(c.price) })]),
+            el('div', { class: 'ci-name' }, [el('div', { class: 'n', text: cartName(c) }), el('div', { class: 'p', text: money(cartPrice(c)) })]),
             el('div', { class: 'qty' }, [
               el('button', { text: '−', onclick: function () { c.qty -= 1; if (c.qty <= 0) state.cart = state.cart.filter(function (x) { return x !== c; }); drawGrid(); drawCart(); } }),
               el('span', { class: 'q', text: String(c.qty) }),
               el('button', { text: '+', onclick: function () { c.qty += 1; drawGrid(); drawCart(); } }),
             ]),
-            el('div', { class: 'ci-tot', text: money(c.price * c.qty) }),
+            el('div', { class: 'ci-tot', text: money(cartPrice(c) * c.qty) }),
             el('div', { class: 'ci-del', text: '✕', onclick: function () { state.cart = state.cart.filter(function (x) { return x !== c; }); drawGrid(); drawCart(); } }),
           ]));
         });
@@ -580,7 +586,12 @@
   function renderFoods(host) {
     var listBox = el('div');
     function load() {
-      api('/foods?all=1').then(function (d) { draw(d.foods || []); }).catch(function (e) { if (e.status === 401) return logout(); });
+      api('/foods?all=1').then(function (d) {
+        draw(d.foods || []);
+        // keep the shared POS list (grid + cart prices) in sync — it is otherwise only loaded at boot,
+        // so a food added/edited/deleted here would be stale on the register until an app restart.
+        state.foods = (d.foods || []).filter(function (f) { return f.is_active; });
+      }).catch(function (e) { if (e.status === 401) return logout(); });
     }
     function draw(rows) {
       listBox.textContent = '';
@@ -599,7 +610,7 @@
             el('button', { class: 'btn-ghost', text: t('edit'), onclick: function () { foodModal(f, load); } }),
             el('button', { class: 'btn-ghost danger', text: t('del'), onclick: function () {
               if (!confirm(t('confirm_del'))) return;
-              api('/foods/' + f.id, { method: 'DELETE' }).then(function () { toast(t('saved'), 'ok'); load(); }).catch(function (e) { toast(e.message, 'bad'); });
+              api('/foods/' + f.id, { method: 'DELETE' }).then(function () { toast(t('saved'), 'ok'); load(); }).catch(function (e) { if (e.status === 401) return logout(); toast(e.message, 'bad'); });
             } }),
           ])]),
         ]));
@@ -706,7 +717,7 @@
           if (open && !loaded) {
             body.appendChild(el('div', { class: 'od-loading', text: '…' }));
             api('/orders/' + o.id).then(function (r) { loaded = true; fill(r.order); })
-              .catch(function (e) { if (e.status === 401) return logout(); toast(e.message, 'bad'); });
+              .catch(function (e) { body.textContent = ''; if (e.status === 401) return logout(); toast(e.message, 'bad'); });
           }
         } }, [
           el('span', { class: 'od-no', text: '#' + o.order_no }),
@@ -962,7 +973,7 @@
           window.nb.checkUpdate().then(function (r) {
             upBtn.disabled = false; upBtn.textContent = 'Check for updates';
             toast(r && r.version ? ('Update: v' + r.version) : (r && r.dev ? 'Dev build' : 'You are up to date'), 'ok');
-          });
+          }).catch(function () { upBtn.disabled = false; upBtn.textContent = 'Check for updates'; toast('Update check failed', 'bad'); });
         } });
       host.appendChild(upBtn);
     }

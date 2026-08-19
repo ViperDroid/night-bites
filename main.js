@@ -245,11 +245,16 @@ function rasterEscpos(bmp, width, height, beep) {
 
 function sendTcp(host, port, buf) {
   return new Promise((resolve) => {
-    let done = false; const finish = (v) => { if (!done) { done = true; resolve(v); } };
-    const s = net.connect({ host, port, timeout: 6000 }, () => { s.write(buf, () => s.end()); });
-    s.on('close', () => finish({ ok: true }));
-    s.on('error', (e) => { try { s.destroy(); } catch (_) {} finish({ ok: false, error: String(e && e.message || e) }); });
-    s.on('timeout', () => { try { s.destroy(); } catch (_) {} finish({ ok: false, error: 'timeout' }); });
+    let done = false, wrote = false;
+    const finish = (v) => { if (!done) { done = true; try { s.destroy(); } catch (_) {} resolve(v); } };
+    const s = net.connect({ host, port, timeout: 6000 }, () => { s.write(buf, () => { wrote = true; s.end(); }); });
+    // Success = our raster actually went out AND the printer closed cleanly. A close before the
+    // write completes, or with an error, is a real failure. A 6s inactivity timeout AFTER the
+    // write (a slow printer physically printing a long ticket) is a delivered success, not a
+    // failure — reporting it as failure would trigger a duplicate browser-print fallback.
+    s.on('close', (hadError) => finish({ ok: wrote && !hadError }));
+    s.on('error', (e) => finish({ ok: false, error: String(e && e.message || e) }));
+    s.on('timeout', () => finish(wrote ? { ok: true } : { ok: false, error: 'timeout' }));
   });
 }
 

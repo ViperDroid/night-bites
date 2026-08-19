@@ -39,28 +39,38 @@ function createServer(opts) {
   // defaults in memory WITHOUT persisting over the original.
   function loadDb() {
     let raw = null, err = null;
-    for (let attempt = 0; attempt < 4; attempt++) {
+    for (let attempt = 0; attempt < 5; attempt++) {
       try { raw = fs.readFileSync(DATA_FILE, 'utf8'); err = null; break; }
       catch (e) {
         err = e;
         if (e && e.code === 'ENOENT') break;          // genuinely no file yet — stop retrying
-        const until = Date.now() + 150; while (Date.now() < until) { /* brief spin for a transient lock */ }
+        const until = Date.now() + 200; while (Date.now() < until) { /* brief spin for a transient lock */ }
       }
     }
     if (err && err.code === 'ENOENT') { const d = DEFAULT; save(d); return d; }  // first run
-    if (err) {                                          // exists but unreadable — do NOT overwrite
-      console.error('night-bites: could not read data file (' + (err.code || err.message || err) + '); starting on defaults without overwriting.');
-      return DEFAULT;
+    if (err) {
+      // The file EXISTS but couldn't be read (antivirus/backup lock, or an IO error) even
+      // after retries. NEVER run on defaults here — the next save() would overwrite the real
+      // (intact) file with defaults and destroy all data. Fail fast: main.js shows an error
+      // dialog and quits; relaunching once the lock clears loads the file normally.
+      throw new Error('Could not read the data file (' + (err.code || err.message || err) + '). It may be locked by antivirus or backup software — close them and reopen NIGHT BITES.');
     }
-    try { return JSON.parse(raw); }
-    catch (e) {                                         // exists but corrupt JSON — preserve a copy, do NOT overwrite
-      try { const bak = DATA_FILE + '.corrupt-' + Date.now(); fs.writeFileSync(bak, raw); console.error('night-bites: data file is corrupt (' + (e.message || e) + '); preserved a copy at ' + bak + ' and started on defaults without overwriting.'); }
-      catch (_) { console.error('night-bites: data file is corrupt (' + (e.message || e) + '); started on defaults without overwriting.'); }
+    try {
+      const parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('not an object');
+      return parsed;
+    } catch (e) {                                       // exists but corrupt/unusable JSON — preserve a copy, start fresh
+      try { const bak = DATA_FILE + '.corrupt-' + Date.now(); fs.writeFileSync(bak, raw); console.error('night-bites: data file is corrupt (' + (e.message || e) + '); preserved a copy at ' + bak + ' and started on defaults.'); }
+      catch (_) { console.error('night-bites: data file is corrupt (' + (e.message || e) + '); started on defaults.'); }
       return DEFAULT;
     }
   }
-  // fill any missing top-level keys (forward-compat across updates)
-  Object.keys(DEFAULT).forEach((k) => { if (db[k] === undefined) db[k] = DEFAULT[k]; });
+  // fill any missing/null top-level keys (forward-compat + repair partial corruption)
+  Object.keys(DEFAULT).forEach((k) => { if (db[k] === undefined || db[k] === null) db[k] = DEFAULT[k]; });
+  // deep-fill seq subkeys and coerce the users array so a partial/wrong-typed field can't
+  // crash startup (db.seq.user / db.users.forEach below) or yield NaN ids.
+  db.seq = Object.assign({}, DEFAULT.seq, (db.seq && typeof db.seq === 'object') ? db.seq : {});
+  if (!Array.isArray(db.users) || !db.users.length) db.users = JSON.parse(JSON.stringify(DEFAULT.users));
   if (!db.seq.user) db.seq.user = 1;
   // migrate pre-accounts users (older installs): give them role/sections/etc.
   db.users.forEach((u) => {
@@ -219,7 +229,7 @@ function createServer(opts) {
     return {
       name_ku: String((b && b.name_ku) || '').trim().slice(0, 160), name_ar: String((b && b.name_ar) || '').trim().slice(0, 160),
       name_en: String((b && b.name_en) || '').trim().slice(0, 160), category: String((b && b.category) || '').trim().slice(0, 60),
-      price: money(b && b.price), is_active: (b && b.is_active === false) ? false : true, sort_order: Math.round(num(b && b.sort_order)),
+      price: Math.max(0, money(b && b.price)), is_active: (b && b.is_active === false) ? false : true, sort_order: Math.round(num(b && b.sort_order)),
     };
   }
   app.post('/api/foods', auth, requireSection('foods'), wrap((req, res) => {
@@ -228,7 +238,8 @@ function createServer(opts) {
   }));
   app.put('/api/foods/:id', auth, requireSection('foods'), wrap((req, res) => {
     const f = db.foods.find((x) => x.id === (parseInt(req.params.id, 10) || 0)); if (!f) return res.status(404).json({ error: 'Not found' });
-    Object.assign(f, readFood(req.body), { id: f.id }); save(); res.json({ food: shapeFood(f) });
+    const nf = readFood(req.body); if (!nf.name_ku && !nf.name_en && !nf.name_ar) return res.status(400).json({ error: 'Name is required' });
+    Object.assign(f, nf, { id: f.id }); save(); res.json({ food: shapeFood(f) });
   }));
   app.delete('/api/foods/:id', auth, requireSection('foods'), wrap((req, res) => {
     const id = parseInt(req.params.id, 10) || 0; const i = db.foods.findIndex((x) => x.id === id); if (i < 0) return res.status(404).json({ error: 'Not found' });
@@ -247,7 +258,8 @@ function createServer(opts) {
   });
   function boundary() {
     let rt = db.settings.reset_time || '00:00'; if (!/^\d{1,2}:\d{2}$/.test(rt)) rt = '00:00';
-    const [h, m] = rt.split(':').map((x) => parseInt(x, 10));
+    let [h, m] = rt.split(':').map((x) => parseInt(x, 10));
+    if (!(h >= 0 && h <= 23 && m >= 0 && m <= 59)) { h = 0; m = 0; }   // out-of-range time (e.g. 25:00) → midnight
     const now = new Date(); const b = new Date(now); b.setHours(h, m, 0, 0);
     if (now < b) b.setDate(b.getDate() - 1);
     return b.getTime();
@@ -270,12 +282,18 @@ function createServer(opts) {
     let start, end, label = String(q.range || 'today');
     if (q.from || q.to) {
       label = 'custom';
-      const sf = q.from ? new Date(String(q.from) + 'T00:00:00') : null;
-      const st = q.to ? new Date(String(q.to) + 'T23:59:59.999') : null;
+      // swap a reversed range by the raw date strings, so 'from' keeps its 00:00 open and
+      // 'to' its 23:59 close — swapping the parsed Dates would carry the wrong times and drop
+      // most of both endpoint days.
+      let fromStr = q.from ? String(q.from) : null;
+      let toStr = q.to ? String(q.to) : null;
+      if (fromStr && toStr && fromStr > toStr) { const tmp = fromStr; fromStr = toStr; toStr = tmp; }
+      const sf = fromStr ? new Date(fromStr + 'T00:00:00') : null;
+      const st = toStr ? new Date(toStr + 'T23:59:59.999') : null;
       end = (st && !isNaN(st)) ? st : now;
       // missing/invalid 'from' → that single 'to' day (never all-history via epoch)
       start = (sf && !isNaN(sf)) ? sf : new Date(end.getFullYear(), end.getMonth(), end.getDate(), 0, 0, 0, 0);
-      if (start.getTime() > end.getTime()) { const tmp = start; start = end; end = tmp; }   // swap a reversed range
+      if (start.getTime() > end.getTime()) { const tmp = start; start = end; end = tmp; }   // backstop for invalid-date edges
     } else if (q.range === 'month') {
       start = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0); end = now;
     } else if (q.range === 'week') {
@@ -305,6 +323,10 @@ function createServer(opts) {
     const byDay = [];
     const cur = new Date(start); cur.setHours(0, 0, 0, 0);
     const endDay = new Date(end); endDay.setHours(0, 0, 0, 0);
+    // keep the chart to the most recent 400 days so a very wide range shows the days that
+    // actually hold data (near `end`), never a wall of old empty bars that hides them.
+    const earliest = new Date(endDay); earliest.setDate(earliest.getDate() - 399);
+    if (cur.getTime() < earliest.getTime()) cur.setTime(earliest.getTime());
     for (let g = 0; cur.getTime() <= endDay.getTime() && g < 400; g++) {
       const k = dayKey(cur); const v = dayMap[k] || { count: 0, total: 0 };
       byDay.push({ day: k, count: v.count, total: money(v.total) });
