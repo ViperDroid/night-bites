@@ -17,7 +17,7 @@
       sec_sale: 'SALE', sec_manage: 'MANAGE',
       signed_in: 'Signed in', logout: 'Sign out',
       cat_all: 'All', cat_burgers: 'Burgers', cat_sandwiches: 'Sandwiches', cat_sides: 'Sides', cat_other: 'Other',
-      cart: 'Order', empty_cart: 'Tap a food to add it', total: 'Total',
+      cart: 'Order', empty_cart: 'Tap a food to add it', total: 'Total', note_ph: 'Note (e.g. no onions)…',
       print: 'Print', save_print: 'Save & Print', clear: 'Clear', arrange: 'Arrange', arrange_done: 'Done',
       manage_foods: 'Foods', add_food: 'Add food', name_ku: 'Name (Kurdish)', name_ar: 'Name (Arabic)',
       name_en: 'Name (English)', category: 'Category', price: 'Price', active: 'Active', actions: '',
@@ -85,7 +85,7 @@
       sec_sale: 'فرۆشتن', sec_manage: 'بەڕێوەبردن',
       signed_in: 'چووەتە ژوورەوە', logout: 'چوونەدەرەوە',
       cat_all: 'هەموو', cat_burgers: 'بەرگر', cat_sandwiches: 'ساندویچ', cat_sides: 'لاوەکی', cat_other: 'ئەوانیتر',
-      cart: 'داواکاری', empty_cart: 'کرتە لە خواردنێک بکە بۆ زیادکردن', total: 'کۆی گشتی',
+      cart: 'داواکاری', empty_cart: 'کرتە لە خواردنێک بکە بۆ زیادکردن', total: 'کۆی گشتی', note_ph: 'تێبینی (بۆ نموونە بەبێ پیاز)…',
       print: 'چاپکردن', save_print: 'پاشەکەوت و چاپ', clear: 'سڕینەوە', arrange: 'ڕیزکردن', arrange_done: 'تەواو',
       manage_foods: 'خواردنەکان', add_food: 'زیادکردنی خواردن', name_ku: 'ناو (کوردی)', name_ar: 'ناو (عەرەبی)',
       name_en: 'ناو (ئینگلیزی)', category: 'جۆر', price: 'نرخ', active: 'چالاک', actions: '',
@@ -153,7 +153,7 @@
       sec_sale: 'البيع', sec_manage: 'الإدارة',
       signed_in: 'مسجّل الدخول', logout: 'تسجيل الخروج',
       cat_all: 'الكل', cat_burgers: 'برجر', cat_sandwiches: 'ساندويتش', cat_sides: 'إضافات', cat_other: 'أخرى',
-      cart: 'الطلب', empty_cart: 'اضغط على صنف لإضافته', total: 'الإجمالي',
+      cart: 'الطلب', empty_cart: 'اضغط على صنف لإضافته', total: 'الإجمالي', note_ph: 'ملاحظة (مثلاً بدون بصل)…',
       print: 'طباعة', save_print: 'حفظ وطباعة', clear: 'مسح', arrange: 'ترتيب', arrange_done: 'تم',
       manage_foods: 'الأصناف', add_food: 'إضافة صنف', name_ku: 'الاسم (كردي)', name_ar: 'الاسم (عربي)',
       name_en: 'الاسم (إنجليزي)', category: 'الفئة', price: 'السعر', active: 'مُفعّل', actions: '',
@@ -432,7 +432,7 @@
   function cartCount() { return state.cart.reduce(function (s, c) { return s + c.qty; }, 0); }
   function addToCart(f) {
     var ex = state.cart.filter(function (c) { return c.id === f.id; })[0];
-    if (ex) ex.qty += 1; else state.cart.push({ id: f.id, name: foodName(f), price: f.price, qty: 1 });
+    if (ex) ex.qty += 1; else state.cart.push({ id: f.id, name: foodName(f), price: f.price, qty: 1, note: '' });
   }
 
   function renderPOS(main, host) {
@@ -527,15 +527,20 @@
         bodyC.appendChild(el('div', { class: 'cart-empty' }, [el('div', { text: t('empty_cart') })]));
       } else {
         state.cart.forEach(function (c) {
-          bodyC.appendChild(el('div', { class: 'cart-item' }, [
-            el('div', { class: 'ci-name' }, [el('div', { class: 'n', text: cartName(c) }), el('div', { class: 'p', text: money(cartPrice(c)) })]),
-            el('div', { class: 'qty' }, [
-              el('button', { text: '−', onclick: function () { c.qty -= 1; if (c.qty <= 0) state.cart = state.cart.filter(function (x) { return x !== c; }); drawGrid(); drawCart(); } }),
-              el('span', { class: 'q', text: String(c.qty) }),
-              el('button', { text: '+', onclick: function () { c.qty += 1; drawGrid(); drawCart(); } }),
+          var noteInput = el('input', { class: 'ci-note', type: 'text', dir: 'auto', value: c.note || '', placeholder: t('note_ph'),
+            oninput: function (e) { c.note = e.target.value; } });
+          bodyC.appendChild(el('div', { class: 'cart-item' + ((c.note || '').trim() ? ' has-note' : '') }, [
+            el('div', { class: 'ci-main' }, [
+              el('div', { class: 'ci-name' }, [el('div', { class: 'n', text: cartName(c) }), el('div', { class: 'p', text: money(cartPrice(c)) })]),
+              el('div', { class: 'qty' }, [
+                el('button', { text: '−', onclick: function () { c.qty -= 1; if (c.qty <= 0) state.cart = state.cart.filter(function (x) { return x !== c; }); drawGrid(); drawCart(); } }),
+                el('span', { class: 'q', text: String(c.qty) }),
+                el('button', { text: '+', onclick: function () { c.qty += 1; drawGrid(); drawCart(); } }),
+              ]),
+              el('div', { class: 'ci-tot', text: money(cartPrice(c) * c.qty) }),
+              el('div', { class: 'ci-del', text: '✕', onclick: function () { state.cart = state.cart.filter(function (x) { return x !== c; }); drawGrid(); drawCart(); } }),
             ]),
-            el('div', { class: 'ci-tot', text: money(cartPrice(c) * c.qty) }),
-            el('div', { class: 'ci-del', text: '✕', onclick: function () { state.cart = state.cart.filter(function (x) { return x !== c; }); drawGrid(); drawCart(); } }),
+            noteInput,
           ]));
         });
       }
@@ -559,7 +564,7 @@
       if (checkingOut) return;                                  // ignore a rapid second tap
       if (!state.cart.length) { toast(t('need_items'), 'bad'); return; }
       checkingOut = true;
-      var payload = { lang: state.lang, items: state.cart.map(function (c) { return { food_id: c.id, qty: c.qty }; }) };
+      var payload = { lang: state.lang, items: state.cart.map(function (c) { return { food_id: c.id, qty: c.qty, note: c.note || '' }; }) };
       api('/orders', { method: 'POST', body: JSON.stringify(payload) })
         .then(function (d) {
           if (withStations) routeStations(d.order);
@@ -731,7 +736,7 @@
           body.textContent = '';
           (order.items || []).forEach(function (it) {
             body.appendChild(el('div', { class: 'od-item' }, [
-              el('span', { class: 'od-iname', text: it.name }),
+              el('span', { class: 'od-iname', text: it.name + ((it.note || '').trim() ? '  » ' + (it.note || '').trim() : '') }),
               el('span', { class: 'od-iq', text: '×' + it.qty }),
               el('span', { class: 'od-iu', text: money(it.price) + ' ' + cur }),
               el('span', { class: 'od-ilt', text: money(it.line_total) + ' ' + cur }),
@@ -1393,8 +1398,11 @@
     var width = state.settings.print_width === '58' ? '58mm' : '80mm';
     var tbody = el('tbody');
     (order.items || []).forEach(function (it) {
+      var note = (it.note || '').trim();
+      var nameTd = el('td', { class: 'iname', dir: 'auto' }, [it.name]);
+      if (note) nameTd.appendChild(el('span', { class: 'inote', dir: 'auto', text: '» ' + note }));
       tbody.appendChild(el('tr', {}, [
-        el('td', { class: 'iname', dir: 'auto', text: it.name }),
+        nameTd,
         el('td', { class: 'mid' }, [el('span', { dir: 'ltr', text: '×' + it.qty })]),
         el('td', { class: 'num' }, [el('span', { dir: 'ltr', text: money(it.line_total) })]),
       ]));
@@ -1431,6 +1439,16 @@
   function zones() { return (state.printerCfg && state.printerCfg.zones) || []; }
   function printerById(id) { return printers().filter(function (p) { return p.id === id; })[0] || null; }
   function customerZone() { return zones().filter(function (z) { return z.type === 'customer' && printerById(z.printer_id); })[0] || null; }
+  // Which printer a customer receipt (incl. an Order-History reprint) goes to. Prefer a dedicated
+  // customer zone; otherwise fall back to any zone's printer (e.g. the kitchen/station printer),
+  // then the first registered printer — so it always prints to the configured cashier printer
+  // instead of dropping to the browser's Save-as-PDF dialog.
+  function receiptPrinter() {
+    var z = customerZone();
+    if (z) { var cp = printerById(z.printer_id); if (cp) return cp; }
+    var zp = zones().map(function (z2) { return printerById(z2.printer_id); }).filter(Boolean)[0];
+    return zp || printers()[0] || null;
+  }
   function targetFor(p) { return p.kind === 'network' ? { kind: 'network', host: p.host, port: p.port || 9100 } : { kind: 'system', device: p.device }; }
   function widthMm() { return state.settings.print_width === '58' ? 58 : 80; }
   function beepOn() { return String(state.settings.beep == null ? '1' : state.settings.beep) !== '0'; }
@@ -1441,13 +1459,21 @@
     var b = net ? (dots / 576) : 1;
     var u = net ? 'px' : 'pt';
     var sz = net
-      ? { pad: Math.round(16 * b) + 'px ' + Math.round(12 * b) + 'px', brand: Math.round(40 * b), no: Math.round(30 * b), meta: Math.round(19 * b), th: Math.round(19 * b), td: Math.round(23 * b), tlbl: Math.round(26 * b), tval: Math.round(34 * b), phone: Math.round(26 * b), thanks: Math.round(22 * b), kq: Math.round(34 * b), kn: Math.round(30 * b), station: Math.round(26 * b) }
-      : { pad: '4mm 3mm 6mm', brand: 20, no: 12, meta: 8.5, th: 8, td: 9.5, tlbl: 11, tval: 15, phone: 11, thanks: 10, kq: 14, kn: 14, station: 11 };
+      ? { pad: Math.round(16 * b) + 'px ' + Math.round(12 * b) + 'px', brand: Math.round(40 * b), no: Math.round(30 * b), meta: Math.round(19 * b), th: Math.round(19 * b), td: Math.round(23 * b), tlbl: Math.round(26 * b), tval: Math.round(34 * b), phone: Math.round(26 * b), thanks: Math.round(22 * b), kq: Math.round(34 * b), kn: Math.round(30 * b), station: Math.round(26 * b), knote: Math.round(25 * b), inote: Math.round(20 * b) }
+      : { pad: '4mm 3mm 6mm', brand: 20, no: 12, meta: 8.5, th: 8, td: 9.5, tlbl: 11, tval: 15, phone: 11, thanks: 10, kq: 14, kn: 14, station: 11, knote: 11, inote: 8.5 };
     var w = net ? ('width:' + dots + 'px;') : ('width:' + (dots === 384 ? '58mm' : '80mm') + ';');
     var gap = net ? '8px' : '2.5mm';
+    // Embed a Naskh font (thick, well-separated dots) so Kurdish/Arabic prints clearly on
+    // thermal — the system fallback (Segoe UI) has thin dots that drop out. font-display:block
+    // so the ticket is captured/printed with the real font, never the thin fallback.
+    var fontFace = window.NB_TICKET_FONT
+      ? "@font-face{font-family:'NBArabic';src:url(" + window.NB_TICKET_FONT + ") format('woff2');font-weight:400 900;font-style:normal;font-display:block;}"
+      : '';
+    var fam = (window.NB_TICKET_FONT ? "'NBArabic'," : '') + '"Segoe UI",Tahoma,Arial,sans-serif';
     return '<style>'
+      + fontFace
       + '*{margin:0;padding:0;box-sizing:border-box;}'
-      + 'body{background:#fff;color:#000;font-family:"Segoe UI",Tahoma,Arial,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact;}'
+      + 'body{background:#fff;color:#000;font-family:' + fam + ';-webkit-print-color-adjust:exact;print-color-adjust:exact;}'
       + '.t{' + w + 'padding:' + sz.pad + ';line-height:1.4;}'
       + '.brand{text-align:center;font-size:' + sz.brand + u + ';font-weight:900;letter-spacing:.02em;}'
       + '.station{text-align:center;font-size:' + sz.station + u + ';font-weight:900;margin-top:' + (net ? '3px' : '.6mm') + ';}'
@@ -1467,8 +1493,11 @@
       + '.krow{display:flex;align-items:center;gap:' + (net ? '10px' : '3mm') + ';padding:' + (net ? '7px 0' : '2mm 0') + ';border-bottom:1px dashed #000;}'
       + '.kq{min-width:' + (net ? Math.round(48 * b) + 'px' : '10mm') + ';font-size:' + sz.kq + u + ';font-weight:900;}'
       + '.kn{font-size:' + sz.kn + u + ';font-weight:800;}'
+      // per-item note — prominent on the kitchen ticket (.knote), subtle on the customer receipt (.inote)
+      + '.knote{display:block;font-size:' + sz.knote + u + ';font-weight:800;margin-top:' + (net ? '3px' : '.8mm') + ';}'
+      + '.inote{display:block;font-size:' + sz.inote + u + ';font-weight:700;margin-top:' + (net ? '2px' : '.4mm') + ';}'
       // bidi: isolate every run so Kurdish/Arabic names never merge with Latin digits/prices
-      + '.iname,.kn,.brand,.station,.thanks,.tlbl,.tval,.no,.kq,.num,.mid,.meta span{unicode-bidi:isolate;}'
+      + '.iname,.kn,.knote,.inote,.brand,.station,.thanks,.tlbl,.tval,.no,.kq,.num,.mid,.meta span{unicode-bidi:isolate;}'
       + '</style>';
   }
   function ticketDoc(inner, net, dots, dir) {
@@ -1480,7 +1509,8 @@
     var cur = state.settings.currency || 'IQD';
     var dots = widthMm() === 58 ? 384 : 576;
     var rows = (order.items || []).map(function (it) {
-      return '<tr><td class="iname" dir="auto">' + escHtml(it.name) + '</td><td class="mid"><span dir="ltr">×' + escHtml(it.qty) + '</span></td><td class="num"><span dir="ltr">' + escHtml(money(it.line_total)) + '</span></td></tr>';
+      var note = (it.note || '').trim();
+      return '<tr><td class="iname" dir="auto">' + escHtml(it.name) + (note ? '<span class="inote" dir="auto">» ' + escHtml(note) + '</span>' : '') + '</td><td class="mid"><span dir="ltr">×' + escHtml(it.qty) + '</span></td><td class="num"><span dir="ltr">' + escHtml(money(it.line_total)) + '</span></td></tr>';
     }).join('');
     var phones = phoneList().map(function (p) { return '<div>' + escHtml(p) + '</div>'; }).join('');
     var inner = '<div class="brand" dir="auto">' + escHtml(bizName(lang)) + '</div><div class="rule"></div>'
@@ -1498,7 +1528,9 @@
     var lang = order.lang || state.lang; var L = I18N[lang] || I18N.ku;
     var dots = widthMm() === 58 ? 384 : 576;
     var rows = (items || []).map(function (it) {
-      return '<div class="krow"><span class="kq" dir="ltr">×' + escHtml(it.qty) + '</span><span class="kn" dir="auto">' + escHtml(it.name) + '</span></div>';
+      var note = (it.note || '').trim();
+      return '<div class="krow"><span class="kq" dir="ltr">×' + escHtml(it.qty) + '</span><span class="kn" dir="auto">' + escHtml(it.name)
+        + (note ? '<span class="knote" dir="auto">» ' + escHtml(note) + '</span>' : '') + '</span></div>';
     }).join('');
     var inner = '<div class="brand" dir="ltr">#' + escHtml(order.order_no) + '</div>'
       + (station ? '<div class="station" dir="auto">' + escHtml(station) + '</div>' : '')
@@ -1527,9 +1559,8 @@
   // printer. If the zone print fails (offline printer, no bridge) fall back to
   // the browser print so a receipt ALWAYS comes out — never nothing.
   function printCustomerDirect(order) {
-    var z = (window.nb && window.nb.printTicket) ? customerZone() : null;
-    if (z) {
-      var p = printerById(z.printer_id);
+    var p = (window.nb && window.nb.printTicket) ? receiptPrinter() : null;
+    if (p) {
       sendTo(p, customerTicketHTML(order, p.kind === 'network')).then(function (r) {
         if (r && r.ok) { toast(t('printed'), 'ok'); }
         else { toast(t('print_failed'), 'bad'); printViaBrowser(order); }

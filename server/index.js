@@ -254,7 +254,7 @@ function createServer(opts) {
   const shapeOrder = (o, withItems) => ({
     id: o.id, order_no: o.order_no, lang: o.lang, total: num(o.total), item_count: o.item_count,
     kitchen_status: o.kitchen_status || 'new', created_at: o.created_at,
-    items: withItems ? db.order_items.filter((i) => i.order_id === o.id).map((i) => ({ id: i.id, food_id: i.food_id, name: i.name, price: num(i.price), qty: i.qty, line_total: num(i.line_total), category: i.category })) : undefined,
+    items: withItems ? db.order_items.filter((i) => i.order_id === o.id).map((i) => ({ id: i.id, food_id: i.food_id, name: i.name, price: num(i.price), qty: i.qty, line_total: num(i.line_total), category: i.category, note: i.note || '' })) : undefined,
   });
   function boundary() {
     let rt = db.settings.reset_time || '00:00'; if (!/^\d{1,2}:\d{2}$/.test(rt)) rt = '00:00';
@@ -352,7 +352,7 @@ function createServer(opts) {
       const f = db.foods.find((x) => x.id === fid);
       if (!f) { missing.push(fid); return; }   // a food was deleted/renamed under a stale POS grid
       const qty = Math.max(1, Math.round(num(it.qty))); const price = money(f.price);
-      items.push({ food_id: f.id, name: String(nameFor(f)).slice(0, 160), price, qty, line_total: money(price * qty), category: f.category || '' });
+      items.push({ food_id: f.id, name: String(nameFor(f)).slice(0, 160), price, qty, line_total: money(price * qty), category: f.category || '', note: String((it && it.note) || '').trim().slice(0, 200) });
     });
     // Never silently drop items — that would understate the order/receipt/total. If any
     // requested item no longer resolves, reject the whole order so the cashier refreshes.
