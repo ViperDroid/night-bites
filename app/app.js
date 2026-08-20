@@ -18,6 +18,8 @@
       signed_in: 'Signed in', logout: 'Sign out',
       cat_all: 'All', cat_burgers: 'Burgers', cat_sandwiches: 'Sandwiches', cat_sides: 'Sides', cat_other: 'Other',
       cart: 'Order', empty_cart: 'Tap a food to add it', total: 'Total', note_ph: 'Note (e.g. no onions)…',
+      save_draft: 'Save to draft', drafts_title: 'Held orders', draft_saved: 'Saved to drafts', draft_name_title: 'Save to draft — pay later',
+      draft_name_ph: 'Name (e.g. Table 5, red shirt)', draft_replace_confirm: 'Replace the current order with this held order?', draft_del_confirm: 'Delete this held order?',
       print: 'Print', save_print: 'Save & Print', clear: 'Clear', arrange: 'Arrange', arrange_done: 'Done',
       manage_foods: 'Foods', add_food: 'Add food', name_ku: 'Name (Kurdish)', name_ar: 'Name (Arabic)',
       name_en: 'Name (English)', category: 'Category', price: 'Price', active: 'Active', actions: '',
@@ -86,6 +88,8 @@
       signed_in: 'چووەتە ژوورەوە', logout: 'چوونەدەرەوە',
       cat_all: 'هەموو', cat_burgers: 'بەرگر', cat_sandwiches: 'ساندویچ', cat_sides: 'لاوەکی', cat_other: 'ئەوانیتر',
       cart: 'داواکاری', empty_cart: 'کرتە لە خواردنێک بکە بۆ زیادکردن', total: 'کۆی گشتی', note_ph: 'تێبینی (بۆ نموونە بەبێ پیاز)…',
+      save_draft: 'هەڵگرتن (پاشان پارە)', drafts_title: 'داواکارییە هەڵگیراوەکان', draft_saved: 'هەڵگیرا', draft_name_title: 'هەڵگرتن — پاشان پارە دەدرێت',
+      draft_name_ph: 'ناو (نموونە: مێزی ٥، کراسی سوور)', draft_replace_confirm: 'داواکاری ئێستا بگۆڕدرێت بەم داواکارییە هەڵگیراوە؟', draft_del_confirm: 'ئەم داواکارییە هەڵگیراوە بسڕدرێتەوە؟',
       print: 'چاپکردن', save_print: 'پاشەکەوت و چاپ', clear: 'سڕینەوە', arrange: 'ڕیزکردن', arrange_done: 'تەواو',
       manage_foods: 'خواردنەکان', add_food: 'زیادکردنی خواردن', name_ku: 'ناو (کوردی)', name_ar: 'ناو (عەرەبی)',
       name_en: 'ناو (ئینگلیزی)', category: 'جۆر', price: 'نرخ', active: 'چالاک', actions: '',
@@ -154,6 +158,8 @@
       signed_in: 'مسجّل الدخول', logout: 'تسجيل الخروج',
       cat_all: 'الكل', cat_burgers: 'برجر', cat_sandwiches: 'ساندويتش', cat_sides: 'إضافات', cat_other: 'أخرى',
       cart: 'الطلب', empty_cart: 'اضغط على صنف لإضافته', total: 'الإجمالي', note_ph: 'ملاحظة (مثلاً بدون بصل)…',
+      save_draft: 'حفظ (الدفع لاحقاً)', drafts_title: 'طلبات معلّقة', draft_saved: 'تم الحفظ', draft_name_title: 'حفظ — الدفع لاحقاً',
+      draft_name_ph: 'اسم (مثلاً: طاولة ٥، قميص أحمر)', draft_replace_confirm: 'استبدال الطلب الحالي بهذا الطلب المعلّق؟', draft_del_confirm: 'حذف هذا الطلب المعلّق؟',
       print: 'طباعة', save_print: 'حفظ وطباعة', clear: 'مسح', arrange: 'ترتيب', arrange_done: 'تم',
       manage_foods: 'الأصناف', add_food: 'إضافة صنف', name_ku: 'الاسم (كردي)', name_ar: 'الاسم (عربي)',
       name_en: 'الاسم (إنجليزي)', category: 'الفئة', price: 'السعر', active: 'مُفعّل', actions: '',
@@ -242,7 +248,8 @@
     categories: [],
     settings: {},
     printerCfg: { printers: [], zones: [] },
-    cart: [],          // [{ id, name, price, qty }]
+    cart: [],          // [{ id, name, price, qty, note }]
+    drafts: [],        // held "pay later" orders (from /api/drafts)
     cat: 'all',
     sidebarOpen: false,
     cartOpen: false,
@@ -445,6 +452,7 @@
     var catBar = el('div', { class: 'cat-bar' });
     var grid = el('div', { class: 'menu-grid' });
     var cartEl = el('aside', { class: 'cart' + (state.cartOpen ? ' open' : '') });
+    var draftStrip = el('div', { class: 'draft-strip' });
 
     function drawCats() {
       catBar.textContent = '';
@@ -553,9 +561,71 @@
           el('button', { class: 'btn gray', onclick: function () { checkout(false); } }, [t('print')]),
           el('button', { class: 'btn green', onclick: function () { checkout(true); } }, [t('save_print')]),
         ]),
+        state.cart.length ? el('button', { class: 'btn hold', onclick: function () { saveDraft(); } }, ['⏸ ' + t('save_draft')]) : null,
         state.cart.length ? el('button', { class: 'cart-clear', text: t('clear'), onclick: function () { state.cart = []; drawGrid(); drawCart(); } }) : null,
       ]);
       cartEl.appendChild(grip); cartEl.appendChild(head); cartEl.appendChild(bodyC); cartEl.appendChild(foot);
+    }
+
+    /* ---- drafts: held "pay later" carts, shown as cards above the menu ---- */
+    function draftTime(iso) { var d = new Date(iso); return isNaN(d) ? '' : d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }); }
+    function drawDrafts() {
+      draftStrip.textContent = '';
+      var list = state.drafts || [];
+      if (!list.length) { draftStrip.classList.remove('has'); return; }
+      draftStrip.classList.add('has');
+      draftStrip.appendChild(el('div', { class: 'draft-strip-lbl', text: t('drafts_title') + ' · ' + list.length }));
+      var row = el('div', { class: 'draft-cards' });
+      var cur = state.settings.currency || 'IQD';
+      list.forEach(function (d) {
+        row.appendChild(el('div', { class: 'draft-card', onclick: function () { recallDraft(d); } }, [
+          el('button', { class: 'dc-del', text: '✕', onclick: function (e) { e.stopPropagation(); deleteDraft(d); } }),
+          el('div', { class: 'dc-name', dir: 'auto', text: d.name || ('#' + d.id) }),
+          el('div', { class: 'dc-meta', dir: 'ltr', text: d.item_count + '× · ' + money(d.total) + ' ' + cur }),
+          el('div', { class: 'dc-time', dir: 'ltr', text: draftTime(d.created_at) }),
+        ]));
+      });
+      draftStrip.appendChild(row);
+    }
+    function refreshDrafts() { api('/drafts').then(function (d) { state.drafts = d.drafts || []; drawDrafts(); }).catch(function () {}); }
+    function saveDraft() {
+      if (!state.cart.length) { toast(t('need_items'), 'bad'); return; }
+      askDraftName(function (name) {
+        var items = state.cart.map(function (c) { return { food_id: c.id, name: cartName(c), price: cartPrice(c), qty: c.qty, note: c.note || '' }; });
+        api('/drafts', { method: 'POST', body: JSON.stringify({ name: name, lang: state.lang, items: items }) })
+          .then(function (d) { state.drafts.push(d.draft); state.cart = []; state.cartOpen = false; cartEl.classList.remove('open'); drawGrid(); drawCart(); drawDrafts(); toast(t('draft_saved'), 'ok'); })
+          .catch(function (e) { if (e.status === 401) return logout(); toast(e.message || 'Error', 'bad'); });
+      });
+    }
+    function recallDraft(d) {
+      var go = function () {
+        state.cart = (d.items || []).map(function (it) { var f = liveFood(it.food_id); return { id: it.food_id, name: f ? foodName(f) : (it.name || ''), price: f ? f.price : it.price, qty: it.qty, note: it.note || '' }; });
+        state.drafts = state.drafts.filter(function (x) { return x.id !== d.id; });
+        api('/drafts/' + d.id, { method: 'DELETE' }).catch(function () {});
+        state.cartOpen = true; cartEl.classList.add('open'); drawGrid(); drawCart(); drawDrafts();
+      };
+      if (state.cart.length) { if (!confirm(t('draft_replace_confirm'))) return; }
+      go();
+    }
+    function deleteDraft(d) {
+      if (!confirm(t('draft_del_confirm'))) return;
+      state.drafts = state.drafts.filter(function (x) { return x.id !== d.id; }); drawDrafts();
+      api('/drafts/' + d.id, { method: 'DELETE' }).catch(function (e) { if (e && e.status === 401) return logout(); refreshDrafts(); });
+    }
+    function askDraftName(cb) {
+      var bg = el('div', { class: 'modal-bg' });
+      function close() { if (bg.parentNode) document.body.removeChild(bg); }
+      bg.onclick = function (e) { if (e.target === bg) close(); };
+      var input = el('input', { class: 'input', type: 'text', dir: 'auto', placeholder: t('draft_name_ph') });
+      var saveB = el('button', { class: 'btn green', text: t('save_draft') });
+      saveB.onclick = function () { var v = (input.value || '').trim(); close(); cb(v); };
+      input.onkeydown = function (e) { if (e.key === 'Enter') saveB.onclick(); };
+      bg.appendChild(el('div', { class: 'modal' }, [
+        el('h3', { text: t('draft_name_title') }), input,
+        el('div', { class: 'modal-actions' }, [el('button', { class: 'btn gray', text: t('close'), onclick: close }), saveB]),
+      ]));
+      document.body.appendChild(bg);
+      setTimeout(function () { try { input.focus(); } catch (_) {} }, 30);
     }
 
     // both buttons save (a receipt must reflect a real, saved order). Green also
@@ -581,10 +651,10 @@
         .then(function () { checkingOut = false; }, function () { checkingOut = false; });
     }
 
-    menuWrap.appendChild(catBar); menuWrap.appendChild(grid);
+    menuWrap.appendChild(draftStrip); menuWrap.appendChild(catBar); menuWrap.appendChild(grid);
     pos.appendChild(menuWrap); pos.appendChild(cartEl);
     host.appendChild(pos);
-    drawCats(); drawGrid(); drawCart();
+    drawCats(); drawGrid(); drawCart(); drawDrafts(); refreshDrafts();
   }
 
   /* ------------------------------ FOODS MGMT ------------------------------ */
@@ -1439,16 +1509,6 @@
   function zones() { return (state.printerCfg && state.printerCfg.zones) || []; }
   function printerById(id) { return printers().filter(function (p) { return p.id === id; })[0] || null; }
   function customerZone() { return zones().filter(function (z) { return z.type === 'customer' && printerById(z.printer_id); })[0] || null; }
-  // Which printer a customer receipt (incl. an Order-History reprint) goes to. Prefer a dedicated
-  // customer zone; otherwise fall back to any zone's printer (e.g. the kitchen/station printer),
-  // then the first registered printer — so it always prints to the configured cashier printer
-  // instead of dropping to the browser's Save-as-PDF dialog.
-  function receiptPrinter() {
-    var z = customerZone();
-    if (z) { var cp = printerById(z.printer_id); if (cp) return cp; }
-    var zp = zones().map(function (z2) { return printerById(z2.printer_id); }).filter(Boolean)[0];
-    return zp || printers()[0] || null;
-  }
   function targetFor(p) { return p.kind === 'network' ? { kind: 'network', host: p.host, port: p.port || 9100 } : { kind: 'system', device: p.device }; }
   function widthMm() { return state.settings.print_width === '58' ? 58 : 80; }
   function beepOn() { return String(state.settings.beep == null ? '1' : state.settings.beep) !== '0'; }
@@ -1559,8 +1619,9 @@
   // printer. If the zone print fails (offline printer, no bridge) fall back to
   // the browser print so a receipt ALWAYS comes out — never nothing.
   function printCustomerDirect(order) {
-    var p = (window.nb && window.nb.printTicket) ? receiptPrinter() : null;
-    if (p) {
+    var z = (window.nb && window.nb.printTicket) ? customerZone() : null;
+    if (z) {
+      var p = printerById(z.printer_id);
       sendTo(p, customerTicketHTML(order, p.kind === 'network')).then(function (r) {
         if (r && r.ok) { toast(t('printed'), 'ok'); }
         else { toast(t('print_failed'), 'bad'); printViaBrowser(order); }
@@ -1689,6 +1750,7 @@
       api('/categories').then(function (d) { state.categories = d.categories || []; }).catch(function () {}),
       api('/settings').then(function (d) { state.settings = d.settings || {}; }),
       api('/printers').then(function (d) { state.printerCfg = { printers: d.printers || [], zones: d.zones || [] }; }).catch(function () {}),
+      api('/drafts').then(function (d) { state.drafts = d.drafts || []; }).catch(function () {}),
     ]).then(function () { state.view = 'pos'; renderApp(); })
       .catch(function () { state.view = 'pos'; renderApp(); });
   }

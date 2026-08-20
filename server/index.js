@@ -20,6 +20,7 @@ function createServer(opts) {
     categories: seedCategories(),
     orders: [],
     order_items: [],
+    drafts: [],     // held "pay later" carts: { id, name, lang, items:[{food_id,name,price,qty,note}], total, item_count, created_at }
     settings: {
       print_width: '80', phone: '0750 947 1000', phones: '0750 947 1000',
       currency: 'IQD', reset_time: '00:00', show_preview: '1', beep: '1',
@@ -27,7 +28,7 @@ function createServer(opts) {
     },
     printers: [],   // registered: { id, name, device, kind }
     zones: [],      // { id, name, printer_device, categories: [] }
-    seq: { food: 100, order: 0, user: 1 },
+    seq: { food: 100, order: 0, user: 1, draft: 0 },
   };
   let db;
   db = loadDb();
@@ -368,6 +369,29 @@ function createServer(opts) {
     save(); res.status(201).json({ order: shapeOrder(order, true) });
   }));
   app.post('/api/orders/:id/done', auth, wrap((req, res) => { const o = db.orders.find((x) => x.id === (parseInt(req.params.id, 10) || 0)); if (!o) return res.status(404).json({ error: 'Not found' }); o.kitchen_status = 'done'; save(); res.json({ ok: true }); }));
+
+  // ---- drafts (held "pay later" carts) — saved from the POS, recalled later to finish & print ----
+  app.get('/api/drafts', auth, requireSection('pos'), (_q, res) => res.json({ drafts: db.drafts }));
+  app.post('/api/drafts', auth, requireSection('pos'), wrap((req, res) => {
+    const b = req.body || {};
+    const items = (Array.isArray(b.items) ? b.items : []).map((it) => ({
+      food_id: parseInt(it && it.food_id, 10) || 0,
+      name: String((it && it.name) || '').slice(0, 160),
+      price: money(it && it.price),
+      qty: Math.max(1, Math.round(num(it && it.qty))),
+      note: String((it && it.note) || '').trim().slice(0, 200),
+    })).filter((it) => it.food_id);
+    if (!items.length) return res.status(400).json({ error: 'Add at least one item' });
+    const total = money(items.reduce((s, i) => s + i.price * i.qty, 0));
+    const item_count = items.reduce((s, i) => s + i.qty, 0);
+    const draft = { id: ++db.seq.draft, name: String(b.name || '').trim().slice(0, 60), lang: ['ku', 'ar', 'en'].includes(b.lang) ? b.lang : 'ku', items, total, item_count, created_at: new Date().toISOString() };
+    db.drafts.push(draft); save(); res.status(201).json({ draft });
+  }));
+  app.delete('/api/drafts/:id', auth, requireSection('pos'), wrap((req, res) => {
+    const id = parseInt(req.params.id, 10) || 0;
+    const i = db.drafts.findIndex((d) => d.id === id); if (i < 0) return res.status(404).json({ error: 'Not found' });
+    db.drafts.splice(i, 1); save(); res.json({ ok: true });
+  }));
   app.get('/api/kitchen', auth, (_q, res) => { const b = boundary(); res.json({ orders: db.orders.filter((o) => (o.kitchen_status || 'new') === 'new' && new Date(o.created_at).getTime() >= b).sort((a, b) => a.id - b.id).slice(0, 60).map((o) => shapeOrder(o, true)) }); });
 
   // ---- printers & zones (config stored here; actual printing is in main via IPC) ----
