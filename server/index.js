@@ -391,6 +391,38 @@ function createServer(opts) {
     items.forEach((it) => db.order_items.push(Object.assign({ id: db.order_items.length ? db.order_items[db.order_items.length - 1].id + 1 : 1, order_id: id }, it)));
     save(); res.status(201).json({ order: shapeOrder(order, true) });
   }));
+  // Update an OPEN order's items — used when the cashier adds more to a cart that was already
+  // partly sent to the kitchen. The order GROWS in place (same id + order_no + created_at) instead
+  // of a second order being created, so the ticket number never changes mid-order.
+  app.put('/api/orders/:id', auth, requireSection('pos'), wrap((req, res) => {
+    const o = db.orders.find((x) => x.id === (parseInt(req.params.id, 10) || 0));
+    if (!o) return res.status(404).json({ error: 'Not found' });
+    // Only TODAY's orders can be grown in place — never rewrite a prior-day/closed order, which
+    // would silently corrupt historical sales reports. The UI only ever PUTs the order it just
+    // opened this session, so this never trips in normal use; it's a report-integrity guard.
+    if (new Date(o.created_at).getTime() < boundary()) return res.status(409).json({ error: 'Order is closed' });
+    const body = req.body || {}; const lang = ['ku', 'ar', 'en'].includes(body.lang) ? body.lang : o.lang;
+    const nameFor = (f) => lang === 'ar' ? (f.name_ar || f.name_ku || f.name_en) : lang === 'en' ? (f.name_en || f.name_ku || f.name_ar) : (f.name_ku || f.name_ar || f.name_en);
+    const items = []; const missing = [];
+    (Array.isArray(body.items) ? body.items : []).forEach((it) => {
+      const fid = parseInt(it && it.food_id, 10) || 0; const f = db.foods.find((x) => x.id === fid);
+      if (!f) { missing.push(fid); return; }
+      const qty = Math.max(1, Math.round(num(it.qty))); const price = money(f.price);
+      items.push({ food_id: f.id, name: String(nameFor(f)).slice(0, 160), price, qty, line_total: money(price * qty), category: f.category || '', note: String((it && it.note) || '').trim().slice(0, 200) });
+    });
+    if (missing.length) return res.status(409).json({ error: 'Menu changed — refresh and re-ring', missing });
+    if (!items.length) return res.status(400).json({ error: 'Add at least one item' });
+    db.order_items = db.order_items.filter((i) => i.order_id !== o.id);
+    let nid = db.order_items.reduce((m, i) => Math.max(m, i.id), 0);
+    items.forEach((it) => db.order_items.push(Object.assign({ id: ++nid, order_id: o.id }, it)));
+    const newCount = items.reduce((s, i) => s + i.qty, 0);
+    o.lang = lang; o.total = money(items.reduce((s, i) => s + i.line_total, 0));
+    // If the order grew, put it back in the kitchen queue so a KDS/kitchen screen shows the additions
+    // (a print-based kitchen already got the delta ticket; this covers screen kitchens).
+    if (newCount > o.item_count) o.kitchen_status = 'new';
+    o.item_count = newCount;
+    save(); res.json({ order: shapeOrder(o, true) });
+  }));
   app.post('/api/orders/:id/done', auth, wrap((req, res) => { const o = db.orders.find((x) => x.id === (parseInt(req.params.id, 10) || 0)); if (!o) return res.status(404).json({ error: 'Not found' }); o.kitchen_status = 'done'; save(); res.json({ ok: true }); }));
 
   // ---- drafts (held "pay later" carts) — saved from the POS, recalled later to finish & print ----

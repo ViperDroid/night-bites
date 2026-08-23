@@ -444,7 +444,7 @@
     // Each card tap adds a SEPARATE line so every one can carry its own note (e.g. 3× "no tomato"
     // + 1× plain). The +/- buttons still adjust a single line's qty (keeping its note); the grid
     // badge sums all lines of the food.
-    state.cart.push({ id: f.id, name: foodName(f), price: f.price, qty: 1, note: '' });
+    state.cart.push({ id: f.id, name: foodName(f), price: f.price, qty: 1, note: '', sent: 0 });
   }
 
   function renderPOS(main, host) {
@@ -564,13 +564,13 @@
         ]),
         el('div', { class: 'cart-actions' }, [
           el('button', { class: 'btn green', onclick: function () { payComplete(); } }, ['💵 ' + t('pay_print')]),
-          (function () { var sent = cartSent();
+          (function () { var sent = firedOrder && !hasPending();
             return el('button', { class: 'btn kitchen' + (sent ? ' sent' : ''), onclick: function () { sendToKitchen(); } },
               [sent ? ('✓ ' + t('sent_kitchen') + ' #' + firedOrder.order_no) : ('🍳 ' + t('send_kitchen'))]);
           })(),
         ]),
         state.cart.length ? el('button', { class: 'btn hold', onclick: function () { saveDraft(); } }, ['⏸ ' + t('save_draft')]) : null,
-        state.cart.length ? el('button', { class: 'cart-clear', text: t('clear'), onclick: function () { state.cart = []; drawGrid(); drawCart(); } }) : null,
+        state.cart.length ? el('button', { class: 'cart-clear', text: t('clear'), onclick: function () { state.cart = []; firedOrder = null; drawGrid(); drawCart(); } }) : null,
       ]);
       cartEl.appendChild(grip); cartEl.appendChild(head); cartEl.appendChild(bodyC); cartEl.appendChild(foot);
     }
@@ -601,13 +601,14 @@
       askDraftName(function (name) {
         var items = state.cart.map(function (c) { return { food_id: c.id, name: cartName(c), price: cartPrice(c), qty: c.qty, note: c.note || '' }; });
         api('/drafts', { method: 'POST', body: JSON.stringify({ name: name, lang: state.lang, items: items }) })
-          .then(function (d) { state.drafts.push(d.draft); state.cart = []; state.cartOpen = false; cartEl.classList.remove('open'); drawGrid(); drawCart(); drawDrafts(); toast(t('draft_saved'), 'ok'); })
+          .then(function (d) { state.drafts.push(d.draft); state.cart = []; firedOrder = null; state.cartOpen = false; cartEl.classList.remove('open'); drawGrid(); drawCart(); drawDrafts(); toast(t('draft_saved'), 'ok'); })
           .catch(function (e) { if (e.status === 401) return logout(); toast(e.message || 'Error', 'bad'); });
       });
     }
     function recallDraft(d) {
       var go = function () {
-        state.cart = (d.items || []).map(function (it) { var f = liveFood(it.food_id); return { id: it.food_id, name: f ? foodName(f) : (it.name || ''), price: f ? f.price : it.price, qty: it.qty, note: it.note || '' }; });
+        firedOrder = null;   // a recalled draft is a fresh cart — nothing sent to the kitchen yet
+        state.cart = (d.items || []).map(function (it) { var f = liveFood(it.food_id); return { id: it.food_id, name: f ? foodName(f) : (it.name || ''), price: f ? f.price : it.price, qty: it.qty, note: it.note || '', sent: 0 }; });
         state.drafts = state.drafts.filter(function (x) { return x.id !== d.id; });
         api('/drafts/' + d.id, { method: 'DELETE' }).catch(function () {});
         state.cartOpen = true; cartEl.classList.add('open'); drawGrid(); drawCart(); drawDrafts();
@@ -642,11 +643,28 @@
     // To avoid a DOUBLE order when both are used on one cart (send to kitchen, then pay), "Send to
     // kitchen" remembers the saved order + a signature of the cart; "Pay & Print" reuses that same
     // order (just prints its receipt) as long as the cart hasn't changed since it was fired.
-    var firedOrder = null, firedSig = '';
-    function cartSig() { return JSON.stringify(state.cart.map(function (c) { return [c.id, c.qty, c.note || '']; })); }
-    function cartSent() { return !!(firedOrder && firedSig === cartSig()); }
-    function saveOrder() {
-      var payload = { lang: state.lang, items: state.cart.map(function (c) { return { food_id: c.id, qty: c.qty, note: c.note || '' }; }) };
+    // The order is OPENED on the first "Send to kitchen" (or at pay) and then GROWS in place: each
+    // cart line tracks how many of it have been fired (line.sent). "Send to kitchen" fires ONLY the
+    // not-yet-sent items and updates the SAME order (same #), so adding an item after a first send
+    // sends just the new item — never re-fires what's already cooking and never makes a 2nd order.
+    var firedOrder = null;   // the open order, once anything on this cart has been sent to the kitchen
+    function liveCat(id) { var f = liveFood(id); return (f && f.category) || 'other'; }
+    function orderItems() { return state.cart.map(function (c) { return { food_id: c.id, qty: c.qty, note: c.note || '' }; }); }
+    // Lines with units not yet fired to the kitchen — captured as {line, qty} so we later mark
+    // EXACTLY what we fired. We never re-read the live cart to mark "sent", because the cashier can
+    // add/increment items during the server round-trip; those must stay pending, not be flagged sent.
+    function pendingLines() {
+      var out = [];
+      state.cart.forEach(function (c) { var d = c.qty - (c.sent || 0); if (d > 0) out.push({ line: c, qty: d }); });
+      return out;
+    }
+    function hasPending() { return pendingLines().length > 0; }
+    function fireItems(pend) { return pend.map(function (p) { return { food_id: p.line.id, name: cartName(p.line), qty: p.qty, note: p.line.note || '', category: liveCat(p.line.id) }; }); }
+    // fire the captured new units to the kitchen under the order's number, then mark just those units
+    function fireToKitchen(order, pend) { routeStations({ order_no: order.order_no, created_at: order.created_at, lang: state.lang, items: fireItems(pend) }); pend.forEach(function (p) { p.line.sent = (p.line.sent || 0) + p.qty; }); }
+    function persistOrderRec() {   // create the order, or update the open one, to the FULL current cart
+      var payload = { lang: state.lang, items: orderItems() };
+      if (firedOrder) return api('/orders/' + firedOrder.id, { method: 'PUT', body: JSON.stringify(payload) }).then(function (d) { return d.order; });
       return api('/orders', { method: 'POST', body: JSON.stringify(payload) }).then(function (d) { return d.order; });
     }
     function coErr(e) {
@@ -658,26 +676,27 @@
     function sendToKitchen() {
       if (checkingOut) return;
       if (!state.cart.length) { toast(t('need_items'), 'bad'); return; }
-      if (cartSent()) { toast(t('already_sent'), 'bad'); return; }   // this exact cart is already at the kitchen
+      var pend = pendingLines();                                       // snapshot the units to fire BEFORE the async round-trip
+      if (!pend.length) { toast(t('already_sent'), 'bad'); return; }   // nothing new to send
       checkingOut = true;
-      saveOrder().then(function (order) {
-        firedOrder = order; firedSig = cartSig();
-        routeStations(order);
+      persistOrderRec().then(function (order) {
+        firedOrder = order;
+        fireToKitchen(order, pend);   // fire ONLY the captured units, under the SAME order #; mark just those
         toast(t('sent_kitchen') + ' · #' + order.order_no, 'ok');
-        drawCart();                                                  // show the "sent" state; cart stays so they can still pay
+        drawCart();                                                    // cart stays; button reflects any still-pending items
       }).catch(coErr).then(function () { checkingOut = false; }, function () { checkingOut = false; });
     }
     function payComplete() {
       if (checkingOut) return;
       if (!state.cart.length) { toast(t('need_items'), 'bad'); return; }
-      var done = function (order) {
+      var pend = pendingLines();                                       // anything not yet sent must still reach the kitchen
+      checkingOut = true;
+      persistOrderRec().then(function (order) {                        // creates it, or finalises the open order
+        if (pend.length) fireToKitchen(order, pend);                   // never bill an item the kitchen never received
         printOrder(order);
         toast(t('order_saved') + ' · #' + order.order_no, 'ok');
-        firedOrder = null; firedSig = ''; state.cart = []; state.cartOpen = false; drawGrid(); drawCart(); cartEl.classList.remove('open');
-      };
-      if (cartSent()) { done(firedOrder); return; }                  // already saved + fired to kitchen — just print, no 2nd order
-      checkingOut = true;
-      saveOrder().then(done).catch(coErr).then(function () { checkingOut = false; }, function () { checkingOut = false; });
+        firedOrder = null; state.cart = []; state.cartOpen = false; drawGrid(); drawCart(); cartEl.classList.remove('open');
+      }).catch(coErr).then(function () { checkingOut = false; }, function () { checkingOut = false; });
     }
 
     menuWrap.appendChild(draftStrip); menuWrap.appendChild(catBar); menuWrap.appendChild(grid);
