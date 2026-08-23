@@ -82,6 +82,26 @@ function createServer(opts) {
     if (u.id > db.seq.user) db.seq.user = u.id;
   });
 
+  // Belt-and-suspenders data safety. The data file lives in userData, which an app update does NOT
+  // touch — so data already survives updates — but on every startup (which includes right after an
+  // auto-update installs and relaunches) we keep a small rolling set of backups of the just-loaded
+  // file. That means a bad write, a corrupt file, or a botched update can always be rolled back:
+  // copy night-bites-data.json.bak1 (most recent) back over night-bites-data.json.
+  (function backupRolling() {
+    try {
+      if (!fs.existsSync(DATA_FILE)) return;                       // first run — nothing to back up yet
+      const hasData = (db.orders && db.orders.length) || (db.foods && db.foods.length)
+        || (db.order_items && db.order_items.length) || (db.drafts && db.drafts.length);
+      if (!hasData) return;                                        // never overwrite good backups with an empty seed
+      const KEEP = 5;
+      for (let i = KEEP - 1; i >= 1; i--) {
+        const from = DATA_FILE + '.bak' + i, to = DATA_FILE + '.bak' + (i + 1);
+        if (fs.existsSync(from)) { try { fs.copyFileSync(from, to); } catch (_) {} }
+      }
+      fs.copyFileSync(DATA_FILE, DATA_FILE + '.bak1');
+    } catch (_) { /* best-effort — must never block startup */ }
+  })();
+
   function save(explicit) {
     const tmp = DATA_FILE + '.tmp';
     fs.writeFileSync(tmp, JSON.stringify(explicit || db, null, 2));
@@ -246,7 +266,10 @@ function createServer(opts) {
     const id = parseInt(req.params.id, 10) || 0; const i = db.foods.findIndex((x) => x.id === id); if (i < 0) return res.status(404).json({ error: 'Not found' });
     db.foods.splice(i, 1); save(); res.json({ ok: true });
   }));
-  app.post('/api/foods/reorder', auth, requireSection('foods'), wrap((req, res) => {
+  // Reordering is a POS-layout action done by dragging cards in the register grid, so allow
+  // 'pos' users (cashiers) — not just 'foods' managers — to persist it. Otherwise a cashier's
+  // drag-drop 403s server-side and the order reverts to the saved sort on the next foods reload.
+  app.post('/api/foods/reorder', auth, requireSection('pos'), wrap((req, res) => {
     const ids = Array.isArray(req.body && req.body.ids) ? req.body.ids.map((x) => parseInt(x, 10)) : [];
     let o = 10; ids.forEach((id) => { const f = db.foods.find((x) => x.id === id); if (f) { f.sort_order = o; o += 10; } }); save(); res.json({ ok: true });
   }));

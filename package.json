@@ -1,6 +1,6 @@
 {
   "name": "night-bites",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "NIGHT BITES — offline restaurant POS (Kurdish / Arabic / English)",
   "author": "NIGHT BITES",
   "main": "main.js",
@@ -21,10 +21,26 @@
     "appId": "com.nightbites.pos",
     "productName": "NIGHT BITES",
     "artifactName": "NIGHT-BITES-Setup-${version}.${ext}",
-    "files": [ "main.js", "preload.js", "server/**/*", "app/**/*", "build/icon.ico" ],
-    "directories": { "output": "release", "buildResources": "build" },
+    "files": [
+      "main.js",
+      "preload.js",
+      "server/**/*",
+      "app/**/*",
+      "build/icon.ico"
+    ],
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
     "win": {
-      "target": [ { "target": "nsis", "arch": [ "x64" ] } ],
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
       "icon": "build/icon.ico"
     },
     "nsis": {
@@ -37,7 +53,10 @@
       "shortcutName": "NIGHT BITES"
     },
     "publish": [
-      { "provider": "generic", "url": "https://lightstudio.space/bite-burger/updates/" }
+      {
+        "provider": "generic",
+        "url": "https://lightstudio.space/bite-burger/updates/"
+      }
     ]
   }
 }

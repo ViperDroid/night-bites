@@ -20,6 +20,7 @@
       cart: 'Order', empty_cart: 'Tap a food to add it', total: 'Total', note_ph: 'Note (e.g. no onions)…',
       save_draft: 'Save to draft', drafts_title: 'Held orders', draft_saved: 'Saved to drafts', draft_name_title: 'Save to draft — pay later',
       draft_name_ph: 'Name (e.g. Table 5, red shirt)', draft_replace_confirm: 'Replace the current order with this held order?', draft_del_confirm: 'Delete this held order?',
+      pay_print: 'Pay & print', send_kitchen: 'Send to kitchen', sent_kitchen: 'Sent to kitchen', already_sent: 'Already sent to the kitchen',
       print: 'Print', save_print: 'Save & Print', clear: 'Clear', arrange: 'Arrange', arrange_done: 'Done',
       manage_foods: 'Foods', add_food: 'Add food', name_ku: 'Name (Kurdish)', name_ar: 'Name (Arabic)',
       name_en: 'Name (English)', category: 'Category', price: 'Price', active: 'Active', actions: '',
@@ -90,6 +91,7 @@
       cart: 'داواکاری', empty_cart: 'کرتە لە خواردنێک بکە بۆ زیادکردن', total: 'کۆی گشتی', note_ph: 'تێبینی (بۆ نموونە بەبێ پیاز)…',
       save_draft: 'هەڵگرتن (پاشان پارە)', drafts_title: 'داواکارییە هەڵگیراوەکان', draft_saved: 'هەڵگیرا', draft_name_title: 'هەڵگرتن — پاشان پارە دەدرێت',
       draft_name_ph: 'ناو (نموونە: مێزی ٥، کراسی سوور)', draft_replace_confirm: 'داواکاری ئێستا بگۆڕدرێت بەم داواکارییە هەڵگیراوە؟', draft_del_confirm: 'ئەم داواکارییە هەڵگیراوە بسڕدرێتەوە؟',
+      pay_print: 'پارەدان و چاپ', send_kitchen: 'ناردن بۆ چێشتخانە', sent_kitchen: 'نێردرا بۆ چێشتخانە', already_sent: 'پێشتر نێردراوە بۆ چێشتخانە',
       print: 'چاپکردن', save_print: 'پاشەکەوت و چاپ', clear: 'سڕینەوە', arrange: 'ڕیزکردن', arrange_done: 'تەواو',
       manage_foods: 'خواردنەکان', add_food: 'زیادکردنی خواردن', name_ku: 'ناو (کوردی)', name_ar: 'ناو (عەرەبی)',
       name_en: 'ناو (ئینگلیزی)', category: 'جۆر', price: 'نرخ', active: 'چالاک', actions: '',
@@ -160,6 +162,7 @@
       cart: 'الطلب', empty_cart: 'اضغط على صنف لإضافته', total: 'الإجمالي', note_ph: 'ملاحظة (مثلاً بدون بصل)…',
       save_draft: 'حفظ (الدفع لاحقاً)', drafts_title: 'طلبات معلّقة', draft_saved: 'تم الحفظ', draft_name_title: 'حفظ — الدفع لاحقاً',
       draft_name_ph: 'اسم (مثلاً: طاولة ٥، قميص أحمر)', draft_replace_confirm: 'استبدال الطلب الحالي بهذا الطلب المعلّق؟', draft_del_confirm: 'حذف هذا الطلب المعلّق؟',
+      pay_print: 'الدفع والطباعة', send_kitchen: 'إرسال للمطبخ', sent_kitchen: 'أُرسل للمطبخ', already_sent: 'أُرسل للمطبخ مسبقاً',
       print: 'طباعة', save_print: 'حفظ وطباعة', clear: 'مسح', arrange: 'ترتيب', arrange_done: 'تم',
       manage_foods: 'الأصناف', add_food: 'إضافة صنف', name_ku: 'الاسم (كردي)', name_ar: 'الاسم (عربي)',
       name_en: 'الاسم (إنجليزي)', category: 'الفئة', price: 'السعر', active: 'مُفعّل', actions: '',
@@ -438,8 +441,10 @@
   function cartTotal() { return state.cart.reduce(function (s, c) { return s + cartPrice(c) * c.qty; }, 0); }
   function cartCount() { return state.cart.reduce(function (s, c) { return s + c.qty; }, 0); }
   function addToCart(f) {
-    var ex = state.cart.filter(function (c) { return c.id === f.id; })[0];
-    if (ex) ex.qty += 1; else state.cart.push({ id: f.id, name: foodName(f), price: f.price, qty: 1, note: '' });
+    // Each card tap adds a SEPARATE line so every one can carry its own note (e.g. 3× "no tomato"
+    // + 1× plain). The +/- buttons still adjust a single line's qty (keeping its note); the grid
+    // badge sums all lines of the food.
+    state.cart.push({ id: f.id, name: foodName(f), price: f.price, qty: 1, note: '' });
   }
 
   function renderPOS(main, host) {
@@ -509,14 +514,14 @@
         : state.foods.filter(function (f) { return state.cat === 'all' || (f.category || 'other') === state.cat; });
       if (!list.length) { grid.appendChild(el('div', { class: 'empty', style: 'grid-column:1/-1' }, [el('h3', { text: '—' })])); return; }
       list.forEach(function (f) {
-        var inCart = state.cart.filter(function (c) { return c.id === f.id; })[0];
+        var inCartQty = state.cart.filter(function (c) { return c.id === f.id; }).reduce(function (s, c) { return s + c.qty; }, 0);
         var card = el('div', { class: 'food-card', 'data-fid': f.id, onclick: function () {
           if (arrange) return;
           addToCart(f); drawGrid(); drawCart();
           if (window.innerWidth <= 1000) { state.cartOpen = true; cartEl.classList.add('open'); }
         } }, [
           arrange ? el('span', { class: 'fgrip', text: '⋮⋮' })
-                  : (inCart ? el('span', { class: 'qbadge', text: String(inCart.qty) }) : el('span', { class: 'fadd', text: '+' })),
+                  : (inCartQty ? el('span', { class: 'qbadge', text: String(inCartQty) }) : el('span', { class: 'fadd', text: '+' })),
           el('div', { class: 'fname', text: foodName(f) }),
           el('div', { class: 'fprice' }, [money(f.price) + ' ', el('small', { text: state.settings.currency || 'IQD' })]),
         ]);
@@ -558,8 +563,11 @@
           el('span', { class: 'val' }, [money(cartTotal()) + ' ', el('small', { text: state.settings.currency || 'IQD' })]),
         ]),
         el('div', { class: 'cart-actions' }, [
-          el('button', { class: 'btn gray', onclick: function () { checkout(false); } }, [t('print')]),
-          el('button', { class: 'btn green', onclick: function () { checkout(true); } }, [t('save_print')]),
+          el('button', { class: 'btn green', onclick: function () { payComplete(); } }, ['💵 ' + t('pay_print')]),
+          (function () { var sent = cartSent();
+            return el('button', { class: 'btn kitchen' + (sent ? ' sent' : ''), onclick: function () { sendToKitchen(); } },
+              [sent ? ('✓ ' + t('sent_kitchen') + ' #' + firedOrder.order_no) : ('🍳 ' + t('send_kitchen'))]);
+          })(),
         ]),
         state.cart.length ? el('button', { class: 'btn hold', onclick: function () { saveDraft(); } }, ['⏸ ' + t('save_draft')]) : null,
         state.cart.length ? el('button', { class: 'cart-clear', text: t('clear'), onclick: function () { state.cart = []; drawGrid(); drawCart(); } }) : null,
@@ -628,27 +636,48 @@
       setTimeout(function () { try { input.focus(); } catch (_) {} }, 30);
     }
 
-    // both buttons save (a receipt must reflect a real, saved order). Green also
-    // fires the kitchen/station tickets; gray prints just the customer receipt.
-    function checkout(withStations) {
-      if (checkingOut) return;                                  // ignore a rapid second tap
-      if (!state.cart.length) { toast(t('need_items'), 'bad'); return; }
-      checkingOut = true;
+    // Two INDEPENDENT actions so paying never auto-fires the kitchen:
+    //   • Pay & Print     -> save the order + print the customer/cash receipt (no kitchen ticket)
+    //   • Send to kitchen -> save the order + print the kitchen station ticket(s) (no receipt)
+    // To avoid a DOUBLE order when both are used on one cart (send to kitchen, then pay), "Send to
+    // kitchen" remembers the saved order + a signature of the cart; "Pay & Print" reuses that same
+    // order (just prints its receipt) as long as the cart hasn't changed since it was fired.
+    var firedOrder = null, firedSig = '';
+    function cartSig() { return JSON.stringify(state.cart.map(function (c) { return [c.id, c.qty, c.note || '']; })); }
+    function cartSent() { return !!(firedOrder && firedSig === cartSig()); }
+    function saveOrder() {
       var payload = { lang: state.lang, items: state.cart.map(function (c) { return { food_id: c.id, qty: c.qty, note: c.note || '' }; }) };
-      api('/orders', { method: 'POST', body: JSON.stringify(payload) })
-        .then(function (d) {
-          if (withStations) routeStations(d.order);
-          printOrder(d.order);
-          toast(t('order_saved') + ' · #' + d.order.order_no, 'ok');
-          state.cart = []; state.cartOpen = false; drawGrid(); drawCart(); cartEl.classList.remove('open');
-        })
-        .catch(function (e) {
-          if (e.status === 401) return logout();
-          // 409 = a food in the cart was deleted under a stale grid; refresh the menu so it disappears
-          if (e.status === 409) { api('/foods').then(function (d) { state.foods = d.foods || []; drawGrid(); drawCart(); }).catch(function () {}); }
-          toast(e.message || 'Error', 'bad');
-        })
-        .then(function () { checkingOut = false; }, function () { checkingOut = false; });
+      return api('/orders', { method: 'POST', body: JSON.stringify(payload) }).then(function (d) { return d.order; });
+    }
+    function coErr(e) {
+      if (e.status === 401) return logout();
+      // 409 = a food in the cart was deleted under a stale grid; refresh the menu so it disappears
+      if (e.status === 409) { api('/foods').then(function (d) { state.foods = d.foods || []; drawGrid(); drawCart(); }).catch(function () {}); }
+      toast(e.message || 'Error', 'bad');
+    }
+    function sendToKitchen() {
+      if (checkingOut) return;
+      if (!state.cart.length) { toast(t('need_items'), 'bad'); return; }
+      if (cartSent()) { toast(t('already_sent'), 'bad'); return; }   // this exact cart is already at the kitchen
+      checkingOut = true;
+      saveOrder().then(function (order) {
+        firedOrder = order; firedSig = cartSig();
+        routeStations(order);
+        toast(t('sent_kitchen') + ' · #' + order.order_no, 'ok');
+        drawCart();                                                  // show the "sent" state; cart stays so they can still pay
+      }).catch(coErr).then(function () { checkingOut = false; }, function () { checkingOut = false; });
+    }
+    function payComplete() {
+      if (checkingOut) return;
+      if (!state.cart.length) { toast(t('need_items'), 'bad'); return; }
+      var done = function (order) {
+        printOrder(order);
+        toast(t('order_saved') + ' · #' + order.order_no, 'ok');
+        firedOrder = null; firedSig = ''; state.cart = []; state.cartOpen = false; drawGrid(); drawCart(); cartEl.classList.remove('open');
+      };
+      if (cartSent()) { done(firedOrder); return; }                  // already saved + fired to kitchen — just print, no 2nd order
+      checkingOut = true;
+      saveOrder().then(done).catch(coErr).then(function () { checkingOut = false; }, function () { checkingOut = false; });
     }
 
     menuWrap.appendChild(draftStrip); menuWrap.appendChild(catBar); menuWrap.appendChild(grid);

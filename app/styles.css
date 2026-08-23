@@ -95,6 +95,9 @@ button { font-family: inherit; }
 .btn.gray { background: var(--card); box-shadow: none; border: 1px solid var(--line); color: var(--ink); }
 .btn.gray:hover:not(:disabled){ filter: none; border-color: var(--accent); color: var(--accent); }
 .btn.green { background: linear-gradient(180deg, var(--ok), var(--ok-deep)); box-shadow: 0 6px 14px rgba(18,138,62,.22); }
+.btn.kitchen { background: linear-gradient(180deg, var(--accent), var(--accent-2)); box-shadow: 0 6px 14px rgba(242,102,31,.22); }
+.btn.kitchen.sent { background: var(--ok-soft); color: var(--ok-deep); border: 1px solid var(--ok); box-shadow: none; }
+.btn.kitchen.sent:hover:not(:disabled) { filter: none; }
 .btn-ghost {
   padding: 8px 13px; font-size: 13px; font-weight: 700; color: var(--muted);
   background: var(--card); border: 1px solid var(--line); border-radius: 9px; cursor: pointer;
