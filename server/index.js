@@ -82,6 +82,13 @@ function createServer(opts) {
     if (u.id > db.seq.user) db.seq.user = u.id;
   });
 
+  // Repair ordering: any food missing a positive sort_order (older data, or added before the
+  // append-to-end fix) is pushed to the END of the menu, stable by id, so it never sticks to the top.
+  (function normalizeFoodSort() {
+    let mx = db.foods.reduce((m, f) => Math.max(m, f.sort_order > 0 ? f.sort_order : 0), 0);
+    db.foods.filter((f) => !(f.sort_order > 0)).sort((a, b) => a.id - b.id).forEach((f) => { mx += 10; f.sort_order = mx; });
+  })();
+
   // Belt-and-suspenders data safety. The data file lives in userData, which an app update does NOT
   // touch — so data already survives updates — but on every startup (which includes right after an
   // auto-update installs and relaunches) we keep a small rolling set of backups of the just-loaded
@@ -255,7 +262,11 @@ function createServer(opts) {
   }
   app.post('/api/foods', auth, requireSection('foods'), wrap((req, res) => {
     const f = readFood(req.body); if (!f.name_ku && !f.name_en && !f.name_ar) return res.status(400).json({ error: 'Name is required' });
-    const id = ++db.seq.food; f.id = id; if (!f.sort_order) f.sort_order = id * 10; db.foods.push(f); save(); res.status(201).json({ food: shapeFood(f) });
+    // Always APPEND a new food to the end of the menu (max existing sort_order + 10) so it never
+    // jumps to the top and never disturbs the cashier's drag-drop arrangement.
+    const id = ++db.seq.food; f.id = id;
+    f.sort_order = db.foods.reduce((m, x) => Math.max(m, x.sort_order || 0), 0) + 10;
+    db.foods.push(f); save(); res.status(201).json({ food: shapeFood(f) });
   }));
   app.put('/api/foods/:id', auth, requireSection('foods'), wrap((req, res) => {
     const f = db.foods.find((x) => x.id === (parseInt(req.params.id, 10) || 0)); if (!f) return res.status(404).json({ error: 'Not found' });
