@@ -441,9 +441,11 @@
   function cartTotal() { return state.cart.reduce(function (s, c) { return s + cartPrice(c) * c.qty; }, 0); }
   function cartCount() { return state.cart.reduce(function (s, c) { return s + c.qty; }, 0); }
   function addToCart(f) {
-    // Each card tap adds a SEPARATE line so every one can carry its own note (e.g. 3× "no tomato"
-    // + 1× plain). The +/- buttons still adjust a single line's qty (keeping its note); the grid
-    // badge sums all lines of the food.
+    // Merge repeated taps of the SAME food into ONE line — but only the PLAIN (no-note) line, so a
+    // noted variant (e.g. "no tomato") keeps its own separate line. Grow a noted line with its +/- .
+    // So: tap 2 → add the note → tap 2 more starts a fresh plain line = "2 no-tomato" + "2 normal".
+    var plain = state.cart.filter(function (c) { return c.id === f.id && !(c.note || '').trim(); })[0];
+    if (plain) { plain.qty += 1; return; }
     state.cart.push({ id: f.id, name: foodName(f), price: f.price, qty: 1, note: '', sent: 0 });
   }
 
