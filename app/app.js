@@ -32,6 +32,10 @@
       no_orders: 'No orders yet', order: 'Order', qty: 'Qty', item: 'Item', date: 'Date',
       details: 'Details', hide: 'Hide', unit_price: 'Unit price', lang_label: 'Language', line_total: 'Total', order_details: 'Order items',
       r_thanks: 'Thank you! · See you again',
+      receipt_designer: 'Receipt', rd_hint: 'Customize the customer receipt — the preview updates live as you change things.',
+      logo: 'Logo', upload_logo: 'Upload logo', no_logo: 'No logo', subtitle: 'Subtitle / slogan', thanks_line: 'Thank-you line', footer_text: 'Footer text',
+      text_size: 'Text size', name_size: 'Name size', logo_size: 'Logo size', alignment: 'Alignment', show_date: 'Date / №', show_hide: 'Show / hide',
+      rd_customer: 'Customer receipt', rd_kitchen: 'Kitchen ticket', show_notes: 'Item notes', kitchen_footer: 'Kitchen footer',
       need_items: 'Add at least one item first',
       order_saved: 'Order saved',
       receipt: 'Receipt', print_receipt: 'Print receipt', close: 'Close', printing: 'Printing…', printed: 'Printed', print_failed: 'Print failed',
@@ -103,6 +107,10 @@
       no_orders: 'هێشتا داواکاری نییە', order: 'داواکاری', qty: 'بڕ', item: 'خواردن', date: 'بەروار',
       details: 'وردەکاری', hide: 'شاردنەوە', unit_price: 'نرخی یەکە', lang_label: 'زمان', line_total: 'کۆ', order_details: 'خواردنەکانی داواکاری',
       r_thanks: 'سوپاس! · دووبارە بەخێربێیتەوە',
+      receipt_designer: 'وەسڵ', rd_hint: 'وەسڵی کڕیار خۆت ڕێکبخە — پێشبینین لە هەمان کاتدا نوێ دەبێتەوە.',
+      logo: 'لۆگۆ', upload_logo: 'بارکردنی لۆگۆ', no_logo: 'بێ لۆگۆ', subtitle: 'ژێرناو / دروشم', thanks_line: 'دێڕی سوپاس', footer_text: 'نووسینی ژێرەوە',
+      text_size: 'قەبارەی نووسین', name_size: 'قەبارەی ناو', logo_size: 'قەبارەی لۆگۆ', alignment: 'ڕێکخستن', show_date: 'بەروار / ژمارە', show_hide: 'پیشاندان / شاردنەوە',
+      rd_customer: 'وەسڵی کڕیار', rd_kitchen: 'وەسڵی چێشتخانە', show_notes: 'تێبینییەکان', kitchen_footer: 'ژێرەوەی چێشتخانە',
       need_items: 'سەرەتا خواردنێک زیاد بکە',
       order_saved: 'داواکاری پاشەکەوتکرا',
       receipt: 'وەسڵ', print_receipt: 'چاپی وەسڵ', close: 'داخستن', printing: 'چاپکردن…', printed: 'چاپکرا', print_failed: 'چاپکردن سەرکەوتوو نەبوو',
@@ -174,6 +182,10 @@
       no_orders: 'لا توجد طلبات بعد', order: 'طلب', qty: 'كمية', item: 'الصنف', date: 'التاريخ',
       details: 'التفاصيل', hide: 'إخفاء', unit_price: 'سعر الوحدة', lang_label: 'اللغة', line_total: 'الإجمالي', order_details: 'أصناف الطلب',
       r_thanks: 'شكراً! · نراكم مجدداً',
+      receipt_designer: 'الإيصال', rd_hint: 'خصّص إيصال الزبون — المعاينة تتحدّث فوراً أثناء التغيير.',
+      logo: 'الشعار', upload_logo: 'رفع شعار', no_logo: 'بلا شعار', subtitle: 'عنوان فرعي / شعار', thanks_line: 'سطر الشكر', footer_text: 'نص التذييل',
+      text_size: 'حجم النص', name_size: 'حجم الاسم', logo_size: 'حجم الشعار', alignment: 'المحاذاة', show_date: 'التاريخ / الرقم', show_hide: 'إظهار / إخفاء',
+      rd_customer: 'إيصال الزبون', rd_kitchen: 'تذكرة المطبخ', show_notes: 'الملاحظات', kitchen_footer: 'تذييل المطبخ',
       need_items: 'أضف صنفاً واحداً على الأقل',
       order_saved: 'تم حفظ الطلب',
       receipt: 'الإيصال', print_receipt: 'طباعة الإيصال', close: 'إغلاق', printing: 'جارٍ الطباعة…', printed: 'تمت الطباعة', print_failed: 'فشلت الطباعة',
@@ -295,8 +307,9 @@
     clearTimeout(toastEl._t); toastEl._t = setTimeout(function () { toastEl.className = 'toast ' + (kind || ''); }, 2400);
   }
   function money(n) { var v = Math.round(Number(n) || 0); return String(v).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
-  function phoneList() {
-    var raw = state.settings.phones || state.settings.phone || '0750 947 1000';
+  function phoneList(s) {
+    s = s || state.settings;
+    var raw = s.phones || s.phone || '0750 947 1000';
     return String(raw).split(/\r?\n/).map(function (x) { return x.trim(); }).filter(Boolean);
   }
   function foodName(f, lang) {
@@ -1010,6 +1023,141 @@
   }
 
   /* ------------------------------ SETTINGS ------------------------------ */
+  // ---- Receipt designer: live-preview customizer for the customer receipt ----
+  function renderReceiptDesigner(host) {
+    var s = state.settings;
+    var m = {
+      logo: s.r_logo || '',
+      nk: s.business_name_ku || '', na: s.business_name_ar || '', ne: s.business_name_en || '',
+      subtitle: s.r_subtitle || '', phones: (s.phones || s.phone || ''), thanks: s.r_thanks || '', footer: s.r_footer || '',
+      scale: String(s.r_scale || '1'), name_size: s.r_name_size || 'l', logo_size: s.r_logo_size || 'm', align: s.r_align || 'center',
+      show_logo: s.r_show_logo !== '0', show_meta: s.r_show_meta !== '0', show_thanks: s.r_show_thanks !== '0', show_footer: s.r_show_footer !== '0', show_phone: s.r_show_phone !== '0',
+      k_scale: String(s.k_scale || '1'), k_show_meta: s.k_show_meta !== '0', k_show_note: s.k_show_note !== '0', k_footer: s.k_footer || '',
+    };
+    var sample = { order_no: 7, lang: state.lang, created_at: new Date().toISOString(), total: 11000,
+      items: [{ name: 'بەرگری گۆشت بە پەنیر', qty: 2, line_total: 9000, note: 'بەبێ تەماتە' }, { name: 'پەتاتەی سوورکراو', qty: 1, line_total: 2000, note: '' }] };
+    var sampleK = { order_no: 7, lang: state.lang, created_at: new Date().toISOString(),
+      items: [{ name: 'بەرگری گۆشت بە پەنیر', qty: 2, note: 'بەبێ تەماتە' }, { name: 'پەتاتەی سوورکراو', qty: 1, note: '' }] };
+    function live() {
+      return Object.assign({}, state.settings, {
+        r_logo: m.logo, business_name_ku: m.nk, business_name_ar: m.na, business_name_en: m.ne,
+        r_subtitle: m.subtitle, phones: m.phones, r_thanks: m.thanks, r_footer: m.footer,
+        r_scale: m.scale, r_name_size: m.name_size, r_logo_size: m.logo_size, r_align: m.align,
+        r_show_logo: m.show_logo ? '1' : '0', r_show_meta: m.show_meta ? '1' : '0', r_show_thanks: m.show_thanks ? '1' : '0', r_show_footer: m.show_footer ? '1' : '0', r_show_phone: m.show_phone ? '1' : '0',
+        k_scale: m.k_scale, k_show_meta: m.k_show_meta ? '1' : '0', k_show_note: m.k_show_note ? '1' : '0', k_footer: m.k_footer,
+      });
+    }
+    var preview = el('div', { class: 'rcpt-preview' });
+    var reT, mode = 'customer';
+    function refresh() { clearTimeout(reT); reT = setTimeout(function () {
+      var ls = live(); preview.textContent = '';
+      if (mode === 'kitchen') preview.appendChild(frameFromHTML(kitchenTicketHTML(sampleK, sampleK.items, t('nav_kitchen'), false, ls), ls.print_width === '58'));
+      else preview.appendChild(receiptFrame(sample, ls));
+    }, 70); }
+    function seg(opts, cur, pick) {
+      var w = el('div', { class: 'seg' });
+      opts.forEach(function (o) { w.appendChild(el('button', { class: 'seg-b' + (String(o[0]) === String(cur) ? ' on' : ''), text: o[1], onclick: function () { Array.prototype.forEach.call(w.children, function (bb) { bb.classList.remove('on'); }); this.classList.add('on'); pick(o[0]); refresh(); } })); });
+      return w;
+    }
+    function toggle(label, val, set) { var chk = el('input', { type: 'checkbox' }); chk.checked = val; chk.onchange = function () { set(chk.checked); refresh(); }; return el('label', { class: 'chkrow' }, [chk, el('span', { text: label })]); }
+    function txt(val, ph, set, ta) { var e = el(ta ? 'textarea' : 'input', { class: ta ? 'textarea' : 'input', dir: 'auto', placeholder: ph || '' }); e.value = val; if (ta) e.style.minHeight = '64px'; e.oninput = function () { set(e.value); refresh(); }; return e; }
+
+    var logoThumb = el('div', { class: 'logo-thumb' });
+    function drawThumb() { logoThumb.textContent = ''; if (m.logo) logoThumb.appendChild(el('img', { src: m.logo })); else logoThumb.appendChild(el('span', { class: 'hint', text: t('no_logo') })); }
+    drawThumb();
+    var fileIn = el('input', { type: 'file', accept: 'image/*', style: 'display:none' });
+    fileIn.onchange = function () {
+      var f = fileIn.files && fileIn.files[0]; if (!f) return;
+      var rd = new FileReader();
+      rd.onload = function () { var img = new Image();
+        img.onload = function () {
+          var box = 380, sc = Math.min(1, box / img.width, box / img.height);
+          var cw = Math.max(1, Math.round(img.width * sc)), ch = Math.max(1, Math.round(img.height * sc));
+          var cv = document.createElement('canvas'); cv.width = cw; cv.height = ch; cv.getContext('2d').drawImage(img, 0, 0, cw, ch);
+          var data = cv.toDataURL('image/png');
+          if (data.length > 260000) {   // photographic logo → PNG too big; flatten on white + JPEG keeps it small
+            var cv2 = document.createElement('canvas'); cv2.width = cw; cv2.height = ch; var c2 = cv2.getContext('2d');
+            c2.fillStyle = '#fff'; c2.fillRect(0, 0, cw, ch); c2.drawImage(img, 0, 0, cw, ch);
+            data = cv2.toDataURL('image/jpeg', 0.85);
+          }
+          if (data.length > 390000) { toast('Logo too large — use a smaller image', 'bad'); return; }
+          m.logo = data; m.show_logo = true; drawThumb(); refresh();
+        };
+        img.onerror = function () { toast('Bad image', 'bad'); };
+        img.src = rd.result; };
+      rd.readAsDataURL(f); fileIn.value = '';
+    };
+
+    var saveBtn = el('button', { class: 'btn', text: t('save') });
+    saveBtn.onclick = function () {
+      saveBtn.disabled = true;
+      var pl = m.phones.split(/\r?\n/).map(function (x) { return x.trim(); }).filter(Boolean);
+      api('/settings', { method: 'PUT', body: JSON.stringify({
+        business_name_ku: m.nk, business_name_ar: m.na, business_name_en: m.ne, phones: m.phones, phone: pl[0] || '',
+        r_logo: m.logo, r_show_logo: m.show_logo ? '1' : '0', r_logo_size: m.logo_size,
+        r_subtitle: m.subtitle, r_thanks: m.thanks, r_footer: m.footer,
+        r_show_meta: m.show_meta ? '1' : '0', r_show_thanks: m.show_thanks ? '1' : '0', r_show_footer: m.show_footer ? '1' : '0', r_show_phone: m.show_phone ? '1' : '0',
+        r_scale: m.scale, r_name_size: m.name_size, r_align: m.align,
+        k_scale: m.k_scale, k_show_meta: m.k_show_meta ? '1' : '0', k_show_note: m.k_show_note ? '1' : '0', k_footer: m.k_footer,
+      }) }).then(function (d) { state.settings = d.settings; toast(t('saved'), 'ok'); saveBtn.disabled = false; })
+        .catch(function (e) { if (e.status === 401) return logout(); toast(e.message, 'bad'); saveBtn.disabled = false; });
+    };
+
+    var custBox = el('div', {}, [
+      el('div', { class: 'field' }, [el('label', { text: t('logo') }),
+        el('div', { class: 'logo-row' }, [logoThumb, el('div', { class: 'logo-btns' }, [
+          el('button', { class: 'btn-ghost', text: t('upload_logo'), onclick: function () { fileIn.click(); } }),
+          el('button', { class: 'btn-ghost danger', text: t('remove'), onclick: function () { m.logo = ''; drawThumb(); refresh(); } }), fileIn ])]),
+        el('div', { class: 'sub-ctrl' }, [el('span', { class: 'hint', text: t('logo_size') }), seg([['s', 'S'], ['m', 'M'], ['l', 'L']], m.logo_size, function (v) { m.logo_size = v; })]),
+      ]),
+      el('div', { class: 'row3' }, [
+        el('div', { class: 'field' }, [el('label', { text: t('biz_name') + ' (KU)' }), txt(m.nk, '', function (v) { m.nk = v; })]),
+        el('div', { class: 'field' }, [el('label', { text: '(AR)' }), txt(m.na, '', function (v) { m.na = v; })]),
+        el('div', { class: 'field' }, [el('label', { text: '(EN)' }), txt(m.ne, '', function (v) { m.ne = v; })]),
+      ]),
+      el('div', { class: 'field' }, [el('label', { text: t('subtitle') }), txt(m.subtitle, '', function (v) { m.subtitle = v; })]),
+      el('div', { class: 'field' }, [el('label', { text: t('phones') }), txt(m.phones, '0750 947 1000', function (v) { m.phones = v; }, true)]),
+      el('div', { class: 'field' }, [el('label', { text: t('thanks_line') }), txt(m.thanks, (I18N[state.lang] || I18N.ku).r_thanks, function (v) { m.thanks = v; })]),
+      el('div', { class: 'field' }, [el('label', { text: t('footer_text') }), txt(m.footer, '', function (v) { m.footer = v; }, true)]),
+      el('div', { class: 'row2' }, [
+        el('div', { class: 'field' }, [el('label', { text: t('text_size') }), seg([['0.85', 'A−'], ['1', 'A'], ['1.15', 'A+'], ['1.3', 'A++']], m.scale, function (v) { m.scale = v; })]),
+        el('div', { class: 'field' }, [el('label', { text: t('name_size') }), seg([['s', 'S'], ['m', 'M'], ['l', 'L'], ['xl', 'XL']], m.name_size, function (v) { m.name_size = v; })]),
+      ]),
+      el('div', { class: 'field' }, [el('label', { text: t('alignment') }), seg([['right', '⇤'], ['center', '↔'], ['left', '⇥']], m.align, function (v) { m.align = v; })]),
+      el('div', { class: 'field' }, [el('label', { text: t('show_hide') }),
+        el('div', { class: 'chk-grid' }, [
+          toggle(t('logo'), m.show_logo, function (v) { m.show_logo = v; }),
+          toggle(t('show_date'), m.show_meta, function (v) { m.show_meta = v; }),
+          toggle(t('thanks_line'), m.show_thanks, function (v) { m.show_thanks = v; }),
+          toggle(t('footer_text'), m.show_footer, function (v) { m.show_footer = v; }),
+          toggle(t('phones'), m.show_phone, function (v) { m.show_phone = v; }),
+        ]),
+      ]),
+    ]);
+    var kitBox = el('div', { style: 'display:none' }, [
+      el('div', { class: 'field' }, [el('label', { text: t('text_size') }), seg([['0.85', 'A−'], ['1', 'A'], ['1.15', 'A+'], ['1.3', 'A++']], m.k_scale, function (v) { m.k_scale = v; })]),
+      el('div', { class: 'field' }, [el('label', { text: t('kitchen_footer') }), txt(m.k_footer, '', function (v) { m.k_footer = v; }, true)]),
+      el('div', { class: 'field' }, [el('label', { text: t('show_hide') }),
+        el('div', { class: 'chk-grid' }, [
+          toggle(t('show_date'), m.k_show_meta, function (v) { m.k_show_meta = v; }),
+          toggle(t('show_notes'), m.k_show_note, function (v) { m.k_show_note = v; }),
+        ]),
+      ]),
+    ]);
+    function setMode(mo) { mode = mo; custBox.style.display = mo === 'customer' ? '' : 'none'; kitBox.style.display = mo === 'kitchen' ? '' : 'none'; }
+
+    host.appendChild(el('div', { class: 'panel receipt-designer' }, [
+      el('h2', { text: t('receipt_designer') }),
+      el('p', { class: 'hint', text: t('rd_hint') }),
+      el('div', { class: 'rd-mode' }, [seg([['customer', t('rd_customer')], ['kitchen', t('rd_kitchen')]], 'customer', setMode)]),
+      el('div', { class: 'rd-wrap' }, [
+        el('div', { class: 'rd-preview-col' }, [preview]),
+        el('div', { class: 'rd-controls' }, [custBox, kitBox, el('div', { style: 'margin-top:10px' }, [saveBtn])]),
+      ]),
+    ]));
+    refresh();
+  }
+
   function renderSettings(host) {
     var s = state.settings;
     var widthSeg = el('div', { class: 'seg' });
@@ -1037,20 +1185,13 @@
       } }));
     });
     var resetT = el('input', { class: 'input', type: 'time', value: (s.reset_time || '00:00'), dir: 'ltr' });
-    var phone = el('textarea', { class: 'textarea', dir: 'ltr', style: 'min-height:96px', placeholder: '0750 947 1000' });
-    phone.value = (s.phones || s.phone || '');
-    var nk = el('input', { class: 'input', value: s.business_name_ku || '' });
-    var na = el('input', { class: 'input', value: s.business_name_ar || '' });
-    var ne = el('input', { class: 'input', value: s.business_name_en || '' });
 
     var saveBtn = el('button', { class: 'btn', text: t('save') });
     saveBtn.onclick = function () {
       saveBtn.disabled = true;
-      var pl = phone.value.split(/\r?\n/).map(function (x) { return x.trim(); }).filter(Boolean);
       api('/settings', { method: 'PUT', body: JSON.stringify({
-        print_width: chosen.w, reset_time: resetT.value || '00:00', phones: phone.value, phone: pl[0] || '',
+        print_width: chosen.w, reset_time: resetT.value || '00:00',
         show_preview: chosenPrev.on ? '1' : '0', beep: chosenBeep.on ? '1' : '0',
-        business_name_ku: nk.value, business_name_ar: na.value, business_name_en: ne.value,
       }) }).then(function (d) { state.settings = d.settings; toast(t('saved'), 'ok'); saveBtn.disabled = false; renderApp(); })
         .catch(function (e) { if (e.status === 401) return logout(); toast(e.message, 'bad'); saveBtn.disabled = false; });
     };
@@ -1071,17 +1212,10 @@
         el('label', { text: t('beep') }), beepSeg,
         el('div', { class: 'hint', style: 'margin:6px 0 0', text: t('beep_hint') }),
       ]),
+      el('div', { style: 'margin-top:14px' }, [saveBtn]),
     ]));
-    host.appendChild(el('div', { class: 'panel' }, [
-      el('h2', { text: t('business') }),
-      el('div', { class: 'field', style: 'margin-top:14px' }, [el('label', { text: t('phones') }), phone, el('div', { class: 'hint', style: 'margin:6px 0 0', text: t('phones_hint') })]),
-      el('div', { class: 'row3' }, [
-        el('div', { class: 'field' }, [el('label', { text: t('biz_name') + ' (KU)' }), nk]),
-        el('div', { class: 'field' }, [el('label', { text: t('biz_name') + ' (AR)' }), na]),
-        el('div', { class: 'field' }, [el('label', { text: t('biz_name') + ' (EN)' }), ne]),
-      ]),
-      el('div', { style: 'margin-top:6px' }, [saveBtn]),
-    ]));
+
+    renderReceiptDesigner(host);
 
     if (isAdmin()) renderUsersPanel(host);
     renderCategoriesPanel(host);
@@ -1504,54 +1638,39 @@
   }
 
   /* ------------------------------ PRINT ------------------------------ */
-  function bizName(lang) {
-    var s = state.settings;
+  function bizName(lang, s) {
+    s = s || state.settings;
     return lang === 'ar' ? (s.business_name_ar || 'نايت بايتس') : lang === 'en' ? (s.business_name_en || 'NIGHT BITES') : (s.business_name_ku || 'نایت بایتس');
   }
   function orderDate(order) { var d = new Date(String(order.created_at).replace(' ', 'T')); return isNaN(d) ? String(order.created_at) : d.toLocaleString('en-GB'); }
 
-  // On-screen receipt element (used for the preview popup and the browser-print fallback).
-  function buildReceiptEl(order) {
-    var lang = order.lang || state.lang;
-    var L = I18N[lang] || I18N.ku;
-    var cur = state.settings.currency || 'IQD';
-    var width = state.settings.print_width === '58' ? '58mm' : '80mm';
-    var tbody = el('tbody');
-    (order.items || []).forEach(function (it) {
-      var note = (it.note || '').trim();
-      var nameTd = el('td', { class: 'iname', dir: 'auto' }, [it.name]);
-      if (note) nameTd.appendChild(el('span', { class: 'inote', dir: 'auto', text: '» ' + note }));
-      tbody.appendChild(el('tr', {}, [
-        nameTd,
-        el('td', { class: 'mid' }, [el('span', { dir: 'ltr', text: '×' + it.qty })]),
-        el('td', { class: 'num' }, [el('span', { dir: 'ltr', text: money(it.line_total) })]),
-      ]));
-    });
-    return el('div', { class: 'rcpt', dir: L._dir, style: '--pw:' + width }, [
-      el('div', { class: 'r-brand', dir: 'auto', text: bizName(lang) }),
-      el('div', { class: 'r-rule' }),
-      el('div', { class: 'r-no' }, [L.order + ' ', el('span', { dir: 'ltr', text: '#' + order.order_no })]),
-      el('div', { class: 'r-meta' }, [el('span', { dir: 'ltr', text: orderDate(order) }), el('span', { dir: 'ltr', text: '#' + order.order_no })]),
-      el('div', { class: 'r-rule' }),
-      el('table', {}, [
-        el('thead', {}, [el('tr', {}, [
-          el('th', { text: L.item }), el('th', { class: 'mid', text: L.qty }), el('th', { class: 'num', text: L.total }),
-        ])]),
-        tbody,
-      ]),
-      el('div', { class: 'r-rule solid' }),
-      el('div', { class: 'r-total' }, [
-        el('span', { class: 't-lbl', text: L.total }),
-        el('span', { class: 't-val', dir: 'ltr', text: money(order.total) + ' ' + cur }),
-      ]),
-      el('div', { class: 'r-thanks', text: L.r_thanks }),
-      el('div', { class: 'r-phone', dir: 'ltr' }, phoneList().map(function (ph) { return el('div', { text: ph }); })),
-    ]);
+  // On-screen receipt = an <iframe> rendering the EXACT print HTML (customerTicketHTML), so the
+  // preview always matches what prints. Pass `s` to preview unsaved settings (the designer).
+  // Build a preview iframe from ready ticket HTML. sandbox="allow-same-origin" (NO allow-scripts)
+  // means any stray markup in the receipt can never run a script, while the parent can still size it.
+  function frameFromHTML(html, narrow) {
+    var ifr = el('iframe', { class: 'rcpt-frame', title: 'receipt' });
+    ifr.setAttribute('scrolling', 'no');
+    ifr.setAttribute('sandbox', 'allow-same-origin');
+    ifr.style.width = (narrow ? 232 : 312) + 'px';
+    ifr.addEventListener('load', function () { try { ifr.style.height = (ifr.contentDocument.body.scrollHeight + 2) + 'px'; } catch (e) {} });
+    ifr.setAttribute('srcdoc', html);
+    return ifr;
   }
+  function receiptFrame(order, s) { return frameFromHTML(customerTicketHTML(order, false, s), (s || state.settings).print_width === '58'); }
+  // Browser-print fallback: print the exact receipt HTML from its own iframe, but only AFTER its
+  // embedded font + logo have decoded — otherwise font-display:block can print blank/invisible text.
   function printViaBrowser(order) {
-    printRoot.textContent = '';
-    printRoot.appendChild(buildReceiptEl(order));
-    setTimeout(function () { window.print(); }, 80);
+    var ifr = document.createElement('iframe');
+    ifr.style.cssText = 'position:fixed;right:-9999px;bottom:0;width:80mm;border:0;';
+    ifr.setAttribute('srcdoc', customerTicketHTML(order, false));
+    ifr.onload = function () {
+      var w = ifr.contentWindow, d = w.document;
+      var go = function () { try { w.focus(); w.print(); } catch (e) {} setTimeout(function () { try { document.body.removeChild(ifr); } catch (e) {} }, 3000); };
+      try { Promise.all([d.fonts.ready, Promise.all(Array.prototype.map.call(d.images, function (i) { return i.decode ? i.decode().catch(function () {}) : 0; }))]).then(go, go); }
+      catch (e) { setTimeout(go, 300); }
+    };
+    document.body.appendChild(ifr);
   }
 
   /* ---- printer / zone helpers ---- */
@@ -1565,12 +1684,28 @@
 
   /* ---- self-contained HTML tickets for silent printing ---- */
   function escHtml(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-  function ticketStyle(net, dots) {
+  function ticketStyle(net, dots, s, kind) {
+    s = s || state.settings || {};
+    kind = kind || 'customer';
+    var cust = kind === 'customer', kit = kind === 'kitchen';
+    var rScale = Math.max(0.7, Math.min(1.6, parseFloat(s.r_scale) || 1));
+    var kScale = Math.max(0.7, Math.min(1.6, parseFloat(s.k_scale) || 1));
+    var nameMul = cust ? (({ s: 0.8, m: 1, l: 1.2, xl: 1.45 })[s.r_name_size] || 1.2) : 1;
+    var hAlign = cust ? (({ center: 'center', right: 'right', left: 'left' })[s.r_align] || 'center') : 'center';
+    var logoW = ({ s: '34%', m: '50%', l: '66%' })[s.r_logo_size] || '50%';
+    var logoMargin = hAlign === 'left' ? '0 auto 0 0' : hAlign === 'right' ? '0 0 0 auto' : '0 auto';
     var b = net ? (dots / 576) : 1;
     var u = net ? 'px' : 'pt';
     var sz = net
-      ? { pad: Math.round(16 * b) + 'px ' + Math.round(12 * b) + 'px', brand: Math.round(40 * b), no: Math.round(30 * b), meta: Math.round(19 * b), th: Math.round(19 * b), td: Math.round(23 * b), tlbl: Math.round(26 * b), tval: Math.round(34 * b), phone: Math.round(26 * b), thanks: Math.round(22 * b), kq: Math.round(34 * b), kn: Math.round(30 * b), station: Math.round(26 * b), knote: Math.round(25 * b), inote: Math.round(20 * b) }
-      : { pad: '4mm 3mm 6mm', brand: 20, no: 12, meta: 8.5, th: 8, td: 9.5, tlbl: 11, tval: 15, phone: 11, thanks: 10, kq: 14, kn: 14, station: 11, knote: 11, inote: 8.5 };
+      ? { pad: Math.round(16 * b) + 'px ' + Math.round(12 * b) + 'px', brand: Math.round(40 * b), no: Math.round(30 * b), meta: Math.round(19 * b), th: Math.round(19 * b), td: Math.round(23 * b), tlbl: Math.round(26 * b), tval: Math.round(34 * b), phone: Math.round(26 * b), thanks: Math.round(22 * b), sub: Math.round(24 * b), footer: Math.round(22 * b), kq: Math.round(34 * b), kn: Math.round(30 * b), station: Math.round(26 * b), knote: Math.round(25 * b), inote: Math.round(20 * b) }
+      : { pad: '4mm 3mm 6mm', brand: 20, no: 12, meta: 8.5, th: 8, td: 9.5, tlbl: 11, tval: 15, phone: 11, thanks: 10, sub: 11, footer: 9.5, kq: 14, kn: 14, station: 11, knote: 11, inote: 8.5 };
+    // Scale ONLY the parts that belong to this ticket kind — a customer-receipt setting never
+    // changes the kitchen ticket, and the kitchen scale never touches the customer receipt.
+    var scale = kit ? kScale : (cust ? rScale : 1);
+    var scaleKeys = kit ? ['brand', 'meta', 'kq', 'kn', 'knote', 'station', 'footer']
+      : (cust ? ['brand', 'no', 'meta', 'th', 'td', 'tlbl', 'tval', 'phone', 'thanks', 'sub', 'footer', 'inote'] : []);
+    scaleKeys.forEach(function (k) { sz[k] = Math.round(sz[k] * scale * 10) / 10; });
+    var brandSize = Math.round(sz.brand * nameMul * 10) / 10;   // business-name size (customer only) on top of the scale
     var w = net ? ('width:' + dots + 'px;') : ('width:' + (dots === 384 ? '58mm' : '80mm') + ';');
     var gap = net ? '8px' : '2.5mm';
     // Embed a Naskh font (thick, well-separated dots) so Kurdish/Arabic prints clearly on
@@ -1585,7 +1720,10 @@
       + '*{margin:0;padding:0;box-sizing:border-box;}'
       + 'body{background:#fff;color:#000;font-family:' + fam + ';-webkit-print-color-adjust:exact;print-color-adjust:exact;}'
       + '.t{' + w + 'padding:' + sz.pad + ';line-height:1.4;}'
-      + '.brand{text-align:center;font-size:' + sz.brand + u + ';font-weight:900;letter-spacing:.02em;}'
+      + '.logo{display:block;width:' + logoW + ';max-width:100%;height:auto;margin:' + logoMargin + ';margin-bottom:' + (net ? '6px' : '1.5mm') + ';}'
+      + '.brand{text-align:' + hAlign + ';font-size:' + brandSize + u + ';font-weight:900;letter-spacing:.02em;}'
+      + '.subtitle{text-align:' + hAlign + ';font-size:' + sz.sub + u + ';font-weight:700;margin-top:' + (net ? '2px' : '.4mm') + ';}'
+      + '.footer{text-align:' + hAlign + ';font-size:' + sz.footer + u + ';font-weight:600;margin-top:' + (net ? '6px' : '1.5mm') + ';white-space:pre-wrap;line-height:1.5;}'
       + '.station{text-align:center;font-size:' + sz.station + u + ';font-weight:900;margin-top:' + (net ? '3px' : '.6mm') + ';}'
       + '.rule{border-top:1px dashed #000;margin:' + gap + ' 0;}'
       + '.rule.solid{border-top:2px solid #000;}'
@@ -1598,8 +1736,8 @@
       + '.iname{font-weight:700;}'
       + '.total{display:flex;justify-content:space-between;align-items:baseline;font-weight:900;margin-top:' + (net ? '8px' : '2mm') + ';}'
       + '.tlbl{font-size:' + sz.tlbl + u + ';}.tval{font-size:' + sz.tval + u + ';}'
-      + '.thanks{text-align:center;font-size:' + sz.thanks + u + ';font-weight:800;margin-top:' + (net ? '8px' : '2mm') + ';}'
-      + '.phone{text-align:center;font-weight:900;font-size:' + sz.phone + u + ';margin-top:' + (net ? '6px' : '1.5mm') + ';letter-spacing:.03em;}'
+      + '.thanks{text-align:' + hAlign + ';font-size:' + sz.thanks + u + ';font-weight:800;margin-top:' + (net ? '8px' : '2mm') + ';}'
+      + '.phone{text-align:' + hAlign + ';font-weight:900;font-size:' + sz.phone + u + ';margin-top:' + (net ? '6px' : '1.5mm') + ';letter-spacing:.03em;}'
       + '.krow{display:flex;align-items:center;gap:' + (net ? '10px' : '3mm') + ';padding:' + (net ? '7px 0' : '2mm 0') + ';border-bottom:1px dashed #000;}'
       + '.kq{min-width:' + (net ? Math.round(48 * b) + 'px' : '10mm') + ';font-size:' + sz.kq + u + ';font-weight:900;}'
       + '.kn{font-size:' + sz.kn + u + ';font-weight:800;}'
@@ -1607,46 +1745,59 @@
       + '.knote{display:block;font-size:' + sz.knote + u + ';font-weight:800;margin-top:' + (net ? '3px' : '.8mm') + ';}'
       + '.inote{display:block;font-size:' + sz.inote + u + ';font-weight:700;margin-top:' + (net ? '2px' : '.4mm') + ';}'
       // bidi: isolate every run so Kurdish/Arabic names never merge with Latin digits/prices
-      + '.iname,.kn,.knote,.inote,.brand,.station,.thanks,.tlbl,.tval,.no,.kq,.num,.mid,.meta span{unicode-bidi:isolate;}'
+      + '.iname,.kn,.knote,.inote,.brand,.subtitle,.footer,.station,.thanks,.tlbl,.tval,.no,.kq,.num,.mid,.meta span{unicode-bidi:isolate;}'
       + '</style>';
   }
-  function ticketDoc(inner, net, dots, dir) {
-    return '<!DOCTYPE html><html dir="' + (dir || 'rtl') + '"><head><meta charset="utf-8">' + ticketStyle(net, dots)
+  function ticketDoc(inner, net, dots, dir, s, kind) {
+    return '<!DOCTYPE html><html dir="' + (dir || 'rtl') + '"><head><meta charset="utf-8">' + ticketStyle(net, dots, s, kind)
       + '</head><body><div class="t">' + inner + '</div></body></html>';
   }
-  function customerTicketHTML(order, net) {
+  // The ONE customer-receipt renderer — used for thermal print AND the live preview. Pass `s` to
+  // preview unsaved settings; it falls back to the saved settings otherwise.
+  function customerTicketHTML(order, net, s) {
+    s = s || state.settings || {};
     var lang = order.lang || state.lang; var L = I18N[lang] || I18N.ku;
-    var cur = state.settings.currency || 'IQD';
-    var dots = widthMm() === 58 ? 384 : 576;
+    var cur = s.currency || 'IQD';
+    var dots = (s.print_width === '58' ? 384 : 576);
+    var on = function (k) { return s[k] == null ? true : s[k] !== '0'; };   // toggles default ON
     var rows = (order.items || []).map(function (it) {
       var note = (it.note || '').trim();
       return '<tr><td class="iname" dir="auto">' + escHtml(it.name) + (note ? '<span class="inote" dir="auto">» ' + escHtml(note) + '</span>' : '') + '</td><td class="mid"><span dir="ltr">×' + escHtml(it.qty) + '</span></td><td class="num"><span dir="ltr">' + escHtml(money(it.line_total)) + '</span></td></tr>';
     }).join('');
-    var phones = phoneList().map(function (p) { return '<div>' + escHtml(p) + '</div>'; }).join('');
-    var inner = '<div class="brand" dir="auto">' + escHtml(bizName(lang)) + '</div><div class="rule"></div>'
-      + '<div class="no">' + escHtml(L.order) + ' <span dir="ltr">#' + escHtml(order.order_no) + '</span></div>'
-      + '<div class="meta"><span dir="ltr">' + escHtml(orderDate(order)) + '</span><span dir="ltr">#' + escHtml(order.order_no) + '</span></div>'
-      + '<div class="rule"></div>'
+    var inner = '';
+    if (on('r_show_logo') && s.r_logo) inner += '<img class="logo" src="' + escHtml(s.r_logo) + '" alt="">';
+    inner += '<div class="brand" dir="auto">' + escHtml(bizName(lang, s)) + '</div>';
+    if ((s.r_subtitle || '').trim()) inner += '<div class="subtitle" dir="auto">' + escHtml(s.r_subtitle) + '</div>';
+    inner += '<div class="rule"></div>'
+      + '<div class="no">' + escHtml(L.order) + ' <span dir="ltr">#' + escHtml(order.order_no) + '</span></div>';
+    if (on('r_show_meta')) inner += '<div class="meta"><span dir="ltr">' + escHtml(orderDate(order)) + '</span><span dir="ltr">#' + escHtml(order.order_no) + '</span></div>';
+    inner += '<div class="rule"></div>'
       + '<table><thead><tr><th>' + escHtml(L.item) + '</th><th class="mid">' + escHtml(L.qty) + '</th><th class="num">' + escHtml(L.total) + '</th></tr></thead><tbody>' + rows + '</tbody></table>'
       + '<div class="rule solid"></div>'
-      + '<div class="total"><span class="tlbl">' + escHtml(L.total) + '</span><span class="tval" dir="ltr">' + escHtml(money(order.total)) + ' ' + escHtml(cur) + '</span></div>'
-      + '<div class="thanks">' + escHtml(L.r_thanks) + '</div>'
-      + '<div class="phone" dir="ltr">' + phones + '</div>';
-    return ticketDoc(inner, net, dots, L._dir);
+      + '<div class="total"><span class="tlbl">' + escHtml(L.total) + '</span><span class="tval" dir="ltr">' + escHtml(money(order.total)) + ' ' + escHtml(cur) + '</span></div>';
+    if (on('r_show_thanks')) inner += '<div class="thanks" dir="auto">' + escHtml((s.r_thanks || '').trim() || L.r_thanks) + '</div>';
+    if (on('r_show_footer') && (s.r_footer || '').trim()) inner += '<div class="footer" dir="auto">' + escHtml(s.r_footer) + '</div>';
+    if (on('r_show_phone')) { var phones = phoneList(s).map(function (p) { return '<div>' + escHtml(p) + '</div>'; }).join(''); if (phones) inner += '<div class="phone" dir="ltr">' + phones + '</div>'; }
+    return ticketDoc(inner, net, dots, L._dir, s, 'customer');
   }
-  function kitchenTicketHTML(order, items, station, net) {
+  // Kitchen ticket renderer — customizable (text size, show date, item notes, footer) and used for
+  // both print and the designer preview. Never inherits the customer-receipt styling.
+  function kitchenTicketHTML(order, items, station, net, s) {
+    s = s || state.settings || {};
     var lang = order.lang || state.lang; var L = I18N[lang] || I18N.ku;
-    var dots = widthMm() === 58 ? 384 : 576;
+    var dots = (s.print_width === '58' ? 384 : 576);
+    var showNote = s.k_show_note !== '0';
     var rows = (items || []).map(function (it) {
-      var note = (it.note || '').trim();
+      var note = showNote ? (it.note || '').trim() : '';
       return '<div class="krow"><span class="kq" dir="ltr">×' + escHtml(it.qty) + '</span><span class="kn" dir="auto">' + escHtml(it.name)
         + (note ? '<span class="knote" dir="auto">» ' + escHtml(note) + '</span>' : '') + '</span></div>';
     }).join('');
     var inner = '<div class="brand" dir="ltr">#' + escHtml(order.order_no) + '</div>'
-      + (station ? '<div class="station" dir="auto">' + escHtml(station) + '</div>' : '')
-      + '<div class="meta"><span dir="ltr">' + escHtml(orderDate(order)) + '</span><span dir="ltr">#' + escHtml(order.order_no) + '</span></div>'
-      + '<div class="rule"></div>' + rows;
-    return ticketDoc(inner, net, dots, L._dir);
+      + (station ? '<div class="station" dir="auto">' + escHtml(station) + '</div>' : '');
+    if (s.k_show_meta !== '0') inner += '<div class="meta"><span dir="ltr">' + escHtml(orderDate(order)) + '</span><span dir="ltr">#' + escHtml(order.order_no) + '</span></div>';
+    inner += '<div class="rule"></div>' + rows;
+    if ((s.k_footer || '').trim()) inner += '<div class="footer" dir="auto">' + escHtml(s.k_footer) + '</div>';
+    return ticketDoc(inner, net, dots, L._dir, s, 'kitchen');
   }
 
   /* ---- routing ---- */
@@ -1694,7 +1845,7 @@
     printBtn.onclick = function () { printCustomerDirect(order); close(); };
     bg.appendChild(el('div', { class: 'modal receipt-modal' }, [
       el('div', { class: 'rm-title' }, [el('h3', { text: t('receipt') }), el('span', { class: 'rm-no', dir: 'ltr', text: '#' + order.order_no })]),
-      el('div', { class: 'preview-paper', dir: L._dir }, [buildReceiptEl(order)]),
+      el('div', { class: 'preview-paper', dir: L._dir }, [receiptFrame(order)]),
       el('div', { class: 'modal-actions' }, [
         el('button', { class: 'btn gray', text: t('close'), onclick: close }),
         printBtn,
@@ -1763,7 +1914,7 @@
       + '.rl span{unicode-bidi:isolate;}.rl span:last-child{font-weight:800;}'
       + '.rl.big{font-weight:900;font-size:' + sz(14) + ';}'
       + '</style>';
-    return ticketDoc(inner, net, dots, L._dir).replace('</head>', extra + '</head>');
+    return ticketDoc(inner, net, dots, L._dir, null, 'report').replace('</head>', extra + '</head>');
   }
   function printReportBrowser(d) { printRoot.textContent = ''; printRoot.appendChild(buildReportEl(d)); setTimeout(function () { window.print(); }, 80); }
   function printReportDirect(d) {

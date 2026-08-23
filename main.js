@@ -177,6 +177,9 @@ async function printNetwork(html, host, port, widthMm, beep) {
       webPreferences: { offscreen: false, backgroundThrottling: false },
     });
     await withTimeout(loadData(w, html), 8000, 'load timeout');
+    // Wait for the embedded font AND any images (a receipt logo data-URI) to fully decode, so the
+    // capture never misses the logo or renders in the fallback font.
+    await w.webContents.executeJavaScript('(async function(){try{await document.fonts.ready;await Promise.all(Array.prototype.map.call(document.images,function(i){return i.decode?i.decode().catch(function(){}):0;}));}catch(e){}return 1;})()').catch(function () {});
     await wait(160);
     let h = await w.webContents.executeJavaScript('Math.ceil(document.body.getBoundingClientRect().height)').catch(() => 800);
     h = Math.max(1, Math.min(Math.round(h) || 800, 20000));

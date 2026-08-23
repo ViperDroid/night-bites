@@ -25,6 +25,13 @@ function createServer(opts) {
       print_width: '80', phone: '0750 947 1000', phones: '0750 947 1000',
       currency: 'IQD', reset_time: '00:00', show_preview: '1', beep: '1',
       business_name_ku: 'نایت بایتس', business_name_ar: 'نايت بايتس', business_name_en: 'NIGHT BITES',
+      // customizable receipt (all optional; empty text falls back to sensible defaults)
+      r_logo: '', r_show_logo: '1', r_logo_size: 'm',
+      r_subtitle: '', r_thanks: '', r_footer: '',
+      r_show_meta: '1', r_show_thanks: '1', r_show_footer: '1', r_show_phone: '1',
+      r_scale: '1', r_name_size: 'l', r_align: 'center',
+      // customizable kitchen ticket
+      k_scale: '1', k_show_meta: '1', k_show_note: '1', k_footer: '',
     },
     printers: [],   // registered: { id, name, device, kind }
     zones: [],      // { id, name, printer_device, categories: [] }
@@ -239,13 +246,33 @@ function createServer(opts) {
   }));
 
   // ---- settings ----
-  const ALLOWED = new Set(['print_width', 'business_name_ku', 'business_name_ar', 'business_name_en', 'phone', 'phones', 'currency', 'reset_time', 'show_preview', 'beep']);
+  const ALLOWED = new Set(['print_width', 'business_name_ku', 'business_name_ar', 'business_name_en', 'phone', 'phones', 'currency', 'reset_time', 'show_preview', 'beep',
+    // customizable receipt
+    'r_logo', 'r_show_logo', 'r_logo_size', 'r_subtitle', 'r_thanks', 'r_footer',
+    'r_show_meta', 'r_show_thanks', 'r_show_footer', 'r_show_phone', 'r_scale', 'r_name_size', 'r_align',
+    'k_scale', 'k_show_meta', 'k_show_note', 'k_footer']);
+  const R_TOGGLES = ['r_show_logo', 'r_show_meta', 'r_show_thanks', 'r_show_footer', 'r_show_phone', 'k_show_meta', 'k_show_note'];
   app.get('/api/settings', auth, (_q, r) => r.json({ settings: db.settings }));
   app.put('/api/settings', auth, requireSection('settings'), wrap((req, res) => {
-    Object.keys(req.body || {}).forEach((k) => { if (ALLOWED.has(k)) db.settings[k] = String(req.body[k] == null ? '' : req.body[k]).slice(0, 500); });
+    // Short fields (everything except the logo) capped to 500 chars.
+    Object.keys(req.body || {}).forEach((k) => { if (ALLOWED.has(k) && k !== 'r_logo') db.settings[k] = String(req.body[k] == null ? '' : req.body[k]).slice(0, 500); });
+    // Logo: accept ONLY a well-formed base64 image data-URI within the size cap. Never store a
+    // truncated/corrupt string or a non-image value (which would be a script-injection vector when
+    // interpolated into the receipt <img src>). Anything else clears the logo.
+    if (Object.prototype.hasOwnProperty.call(req.body || {}, 'r_logo')) {
+      const lg = String(req.body.r_logo == null ? '' : req.body.r_logo);
+      db.settings.r_logo = (lg && lg.length <= 400000 && /^data:image\/(png|jpe?g|gif|webp);base64,[A-Za-z0-9+/=]+$/.test(lg)) ? lg : '';
+    }
     if (!['58', '80'].includes(db.settings.print_width)) db.settings.print_width = '80';
     db.settings.show_preview = (db.settings.show_preview === '0') ? '0' : '1';
     db.settings.beep = (db.settings.beep === '0') ? '0' : '1';
+    // normalise receipt + kitchen fields
+    R_TOGGLES.forEach((k) => { db.settings[k] = (db.settings[k] === '0') ? '0' : '1'; });
+    if (['s', 'm', 'l'].indexOf(db.settings.r_logo_size) < 0) db.settings.r_logo_size = 'm';
+    if (['s', 'm', 'l', 'xl'].indexOf(db.settings.r_name_size) < 0) db.settings.r_name_size = 'l';
+    if (['center', 'right', 'left'].indexOf(db.settings.r_align) < 0) db.settings.r_align = 'center';
+    db.settings.r_scale = String(Math.max(0.7, Math.min(1.6, parseFloat(db.settings.r_scale) || 1)));
+    db.settings.k_scale = String(Math.max(0.7, Math.min(1.6, parseFloat(db.settings.k_scale) || 1)));
     save(); res.json({ settings: db.settings });
   }));
 
