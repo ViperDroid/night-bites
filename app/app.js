@@ -21,6 +21,11 @@
       save_draft: 'Save to draft', drafts_title: 'Held orders', draft_saved: 'Saved to drafts', draft_name_title: 'Save to draft — pay later',
       draft_name_ph: 'Name (e.g. Table 5, red shirt)', draft_replace_confirm: 'Replace the current order with this held order?', draft_del_confirm: 'Delete this held order?',
       pay_print: 'Pay & print', send_kitchen: 'Send to kitchen', sent_kitchen: 'Sent to kitchen', already_sent: 'Already sent to the kitchen',
+      ticket_no: 'Order no.', merge: 'Merge', merge_title: 'Change the order number', merge_from: 'This order', merge_into: 'Merge into order no.',
+      merge_help: 'Type the number of the ticket this order belongs to. Everything here moves onto that ticket and the two become one bill.',
+      merge_do: 'Merge', merge_need_no: 'Enter an order number', merge_same: 'That is already this order', merged_into: 'Merged into',
+      merge_today: 'Today’s orders', merge_none: 'No other order today',
+      order_closed_hint: 'This ticket is from a closed day — print it from Orders, then ring the new items as a new order.',
       print: 'Print', save_print: 'Save & Print', clear: 'Clear', arrange: 'Arrange', arrange_done: 'Done',
       manage_foods: 'Foods', add_food: 'Add food', name_ku: 'Name (Kurdish)', name_ar: 'Name (Arabic)',
       name_en: 'Name (English)', category: 'Category', price: 'Price', active: 'Active', actions: '',
@@ -96,6 +101,11 @@
       save_draft: 'هەڵگرتن (پاشان پارە)', drafts_title: 'داواکارییە هەڵگیراوەکان', draft_saved: 'هەڵگیرا', draft_name_title: 'هەڵگرتن — پاشان پارە دەدرێت',
       draft_name_ph: 'ناو (نموونە: مێزی ٥، کراسی سوور)', draft_replace_confirm: 'داواکاری ئێستا بگۆڕدرێت بەم داواکارییە هەڵگیراوە؟', draft_del_confirm: 'ئەم داواکارییە هەڵگیراوە بسڕدرێتەوە؟',
       pay_print: 'پارەدان و چاپ', send_kitchen: 'ناردن بۆ چێشتخانە', sent_kitchen: 'نێردرا بۆ چێشتخانە', already_sent: 'پێشتر نێردراوە بۆ چێشتخانە',
+      ticket_no: 'ژمارەی داواکاری', merge: 'تێکەڵکردن', merge_title: 'گۆڕینی ژمارەی داواکاری', merge_from: 'ئەم داواکارییە', merge_into: 'تێکەڵی داواکاری ژمارە',
+      merge_help: 'ژمارەی ئەو داواکارییە بنووسە کە ئەمە هی ئەوە. هەموو ئەمانە دەچنە سەر ئەو ژمارەیە و دەبنە یەک پسوولە.',
+      merge_do: 'تێکەڵ بکە', merge_need_no: 'ژمارەی داواکاری بنووسە', merge_same: 'ئەمە هەر خۆیەتی', merged_into: 'تێکەڵکرا لەگەڵ',
+      merge_today: 'داواکارییەکانی ئەمڕۆ', merge_none: 'هیچ داواکارییەکی تر نییە ئەمڕۆ',
+      order_closed_hint: 'ئەم داواکارییە هی ڕۆژێکی داخراوە — لە «داواکارییەکان» چاپی بکە، ئینجا شتە نوێیەکان وەک داواکارییەکی نوێ تۆمار بکە.',
       print: 'چاپکردن', save_print: 'پاشەکەوت و چاپ', clear: 'سڕینەوە', arrange: 'ڕیزکردن', arrange_done: 'تەواو',
       manage_foods: 'خواردنەکان', add_food: 'زیادکردنی خواردن', name_ku: 'ناو (کوردی)', name_ar: 'ناو (عەرەبی)',
       name_en: 'ناو (ئینگلیزی)', category: 'جۆر', price: 'نرخ', active: 'چالاک', actions: '',
@@ -171,6 +181,11 @@
       save_draft: 'حفظ (الدفع لاحقاً)', drafts_title: 'طلبات معلّقة', draft_saved: 'تم الحفظ', draft_name_title: 'حفظ — الدفع لاحقاً',
       draft_name_ph: 'اسم (مثلاً: طاولة ٥، قميص أحمر)', draft_replace_confirm: 'استبدال الطلب الحالي بهذا الطلب المعلّق؟', draft_del_confirm: 'حذف هذا الطلب المعلّق؟',
       pay_print: 'الدفع والطباعة', send_kitchen: 'إرسال للمطبخ', sent_kitchen: 'أُرسل للمطبخ', already_sent: 'أُرسل للمطبخ مسبقاً',
+      ticket_no: 'رقم الطلب', merge: 'دمج', merge_title: 'تغيير رقم الطلب', merge_from: 'هذا الطلب', merge_into: 'دمج مع الطلب رقم',
+      merge_help: 'اكتب رقم الطلب الذي ينتمي إليه هذا الطلب. كل ما هنا ينتقل إلى ذلك الرقم ويصبحان فاتورة واحدة.',
+      merge_do: 'دمج', merge_need_no: 'اكتب رقم الطلب', merge_same: 'هذا هو نفس الطلب', merged_into: 'تم الدمج مع',
+      merge_today: 'طلبات اليوم', merge_none: 'لا يوجد طلب آخر اليوم',
+      order_closed_hint: 'هذا الطلب من يوم مُغلق — اطبعه من «الطلبات» ثم سجّل الأصناف الجديدة كطلب جديد.',
       print: 'طباعة', save_print: 'حفظ وطباعة', clear: 'مسح', arrange: 'ترتيب', arrange_done: 'تم',
       manage_foods: 'الأصناف', add_food: 'إضافة صنف', name_ku: 'الاسم (كردي)', name_ar: 'الاسم (عربي)',
       name_en: 'الاسم (إنجليزي)', category: 'الفئة', price: 'السعر', active: 'مُفعّل', actions: '',
@@ -263,7 +278,11 @@
     categories: [],
     settings: {},
     printerCfg: { printers: [], zones: [] },
-    cart: [],          // [{ id, name, price, qty, note }]
+    cart: [],          // [{ id, name, price, qty, note, sent }]
+    // The order this cart is open on, once anything has been fired to the kitchen. Lives on `state`,
+    // not inside renderPOS, so a trip to Settings/Foods and back doesn't lose the open ticket and
+    // make the next "send to kitchen" ring a SECOND order for the same table.
+    firedOrder: null,
     drafts: [],        // held "pay later" orders (from /api/drafts)
     cat: 'all',
     sidebarOpen: false,
@@ -295,7 +314,7 @@
     return fetch(API + path, { method: opts.method || 'GET', headers: h, body: opts.body || undefined })
       .then(function (res) {
         return res.json().catch(function () { return {}; }).then(function (data) {
-          if (!res.ok) { var e = new Error((data && data.error) || 'Request failed'); e.status = res.status; throw e; }
+          if (!res.ok) { var e = new Error((data && data.error) || 'Request failed'); e.status = res.status; e.data = data || {}; throw e; }
           return data;
         });
       });
@@ -328,12 +347,16 @@
     if (state.token && state.user) renderApp(); else renderLogin();
   }
   function logout() {
-    var done = function () { clearInterval(window._clk); window._clk = null; state.token = null; state.user = null; localStorage.removeItem(TOKEN_KEY); renderLogin(); };
+    // drop the open ticket on sign-out — the next cashier must never inherit someone else's
+    // ticket number and grow it by mistake (this used to happen for free when firedOrder was a
+    // renderPOS local; it now lives on state, so clear it explicitly)
+    var done = function () { clearInterval(window._clk); window._clk = null; state.token = null; state.user = null; state.firedOrder = null; localStorage.removeItem(TOKEN_KEY); renderLogin(); };
     if (state.token) api('/logout', { method: 'POST' }).then(done, done); else done();
   }
 
   /* ------------------------------ LOGIN ------------------------------ */
   function renderLogin() {
+    painted = null;                     // not a view — nothing to save or restore here
     applyDir(); app.textContent = '';
     var errBox = el('div', { class: 'err', style: 'display:none' });
     var u = el('input', { class: 'input', id: 'u', autocomplete: 'username', autocapitalize: 'none' });
@@ -369,15 +392,48 @@
   }
 
   /* ------------------------------ APP SHELL ------------------------------ */
+  // The whole page scrolls (the POS grid is not its own scroll box), so switching to Settings and
+  // back would land the cashier at the top of a long menu. Remember where each view was left and
+  // put it back after the new view has painted.
+  var scrollPos = {};
+  var painted = null;   // the view currently on screen, so renderApp can save ITS position
+  function scroller() { return document.scrollingElement || document.documentElement; }
+  // Save from inside renderApp rather than at each call site: the shell is also rebuilt by a
+  // language switch, a settings save and the sidebar toggle, and those must record where the
+  // cashier actually is — not replay the offset from the last time they navigated away.
+  function saveScroll() { if (painted !== null) scrollPos[painted] = scroller().scrollTop; }
+  function restoreScroll() {
+    var key = painted, y = scrollPos[key] || 0; if (!y) return;
+    var se = scroller(), tries = 0, done = false;
+    var stop = function () {
+      done = true;
+      window.removeEventListener('wheel', stop); window.removeEventListener('touchstart', stop); window.removeEventListener('keydown', stop);
+    };
+    var attempt = function () {
+      if (done || painted !== key) return stop();
+      se.scrollTop = y; tries += 1;
+      if (Math.abs(se.scrollTop - y) <= 1 || tries >= 6) stop();   // landed, or give up — never loop forever
+    };
+    // Orders, Foods and Reports paint EMPTY and fill in from the server after this render, so the
+    // page is still too short to hold the offset on the first pass. Retry briefly until the content
+    // has arrived — and stop the moment the cashier touches the screen, so we never fight them.
+    window.addEventListener('wheel', stop, { passive: true });
+    window.addEventListener('touchstart', stop, { passive: true });
+    window.addEventListener('keydown', stop);
+    attempt();
+    [16, 120, 300, 600, 1000].forEach(function (ms) { setTimeout(attempt, ms); });
+  }
+  function goView(key) { state.view = key; state.sidebarOpen = false; renderApp(); }
   function navItem(key, icon, label) {
     var kids = [];
     if (icon) kids.push(el('span', { class: 'ico', text: icon }));
     kids.push(el('span', { text: label }));
     return el('button', { class: 'sb-item' + (state.view === key ? ' active' : ''),
-      onclick: function () { state.view = key; state.sidebarOpen = false; renderApp(); } }, kids);
+      onclick: function () { goView(key); } }, kids);
   }
 
   function renderApp() {
+    saveScroll();                       // where the view being replaced actually is, right now
     applyDir(); app.textContent = '';
     if (state.view === 'kitchen') state.view = 'pos';   // kitchen display hidden for now
     // section access: admin sees all; staff sees only its granted sections
@@ -442,9 +498,21 @@
     else if (state.view === 'reports') renderReports(body);
     else if (state.view === 'settings') renderSettings(body);
     else body.appendChild(el('div', { class: 'empty' }, [el('h3', { text: t('no_access') })]));
+    painted = state.view || '_';
+    restoreScroll();
   }
 
   /* ------------------------------ POS ------------------------------ */
+  // Fold ONE food into the shared POS menu in place. state.foods holds only ACTIVE foods in the
+  // server's order (sort_order, then id), so editing a food in Manage Foods can move its card to
+  // the new category, rename it or drop it — without refetching the menu and rebuilding the grid.
+  function foodOrder(a, b) { return (Number(a.sort_order || 0) - Number(b.sort_order || 0)) || (a.id - b.id); }
+  function applyFoodLocal(f) {
+    state.foods = state.foods.filter(function (x) { return x.id !== f.id; });
+    if (f.is_active) state.foods.push(f);
+    state.foods.sort(foodOrder);
+  }
+  function removeFoodLocal(id) { state.foods = state.foods.filter(function (x) { return x.id !== id; }); }
   function liveFood(id) { return state.foods.filter(function (x) { return x.id === id; })[0] || null; }
   // resolve name/price LIVE from state.foods (fall back to the add-time snapshot only if the food
   // was removed), so a mid-order language switch or a price edit shows in the cart and matches what
@@ -489,6 +557,9 @@
       var ids = Array.prototype.slice.call(grid.children)
         .map(function (c) { return Number(c.getAttribute('data-fid')); }).filter(Boolean);
       state.foods.sort(function (a, b) { return ids.indexOf(a.id) - ids.indexOf(b.id); });
+      // mirror the server's re-numbering (10, 20, 30…) locally, so a later in-place food edit
+      // re-sorts to the arrangement the cashier just dragged instead of the pre-drag one
+      state.foods.forEach(function (f, i) { f.sort_order = (i + 1) * 10; });
       api('/foods/reorder', { method: 'POST', body: JSON.stringify({ ids: ids }) })
         .then(function () { toast(t('saved'), 'ok'); })
         .catch(function (e) { if (e.status === 401) return logout(); toast(e.message, 'bad'); });
@@ -522,27 +593,72 @@
       card.addEventListener('pointerup', endDrag);
       card.addEventListener('pointercancel', endDrag);
     }
+    // ---- keyed, in-place grid reconcile ----
+    // A card is identified by its food id and is MUTATED, never rebuilt. The old nuke-and-rebuild
+    // (grid.textContent = '' on every redraw) blanked the menu for a frame and dropped the page's
+    // scroll position on every single cart tap and every menu edit. Now only what actually changed
+    // touches the DOM: a card whose category changed moves between filters, a card whose name or
+    // price changed updates its text, and everything else is left exactly where it is.
+    function cardOf(f) {
+      var card = el('div', { class: 'food-card', 'data-fid': f.id, onclick: function () {
+        if (arrange) return;
+        var live = liveFood(card._fid) || card._food;
+        if (!live) return;
+        addToCart(live); drawGrid(); drawCart();
+        if (window.innerWidth <= 1000) { state.cartOpen = true; cartEl.classList.add('open'); }
+      } }, [
+        el('span', { class: 'fadd' }),
+        el('div', { class: 'fname' }),
+        el('div', { class: 'fprice' }, [el('span', { class: 'fp' }), ' ', el('small')]),
+      ]);
+      card._fid = f.id;
+      bindDrag(card);   // bound once at creation; the handlers no-op while `arrange` is off
+      return card;
+    }
+    function syncCard(card, f) {
+      card._food = f;
+      var q = state.cart.filter(function (c) { return c.id === f.id; }).reduce(function (s, c) { return s + c.qty; }, 0);
+      // one badge span, three looks — .fgrip / .qbadge / .fadd sit in the same corner
+      var badge = card.firstChild;
+      var cls = arrange ? 'fgrip' : (q ? 'qbadge' : 'fadd');
+      var txt = arrange ? '⋮⋮' : (q ? String(q) : '+');
+      if (badge.className !== cls) badge.className = cls;
+      if (badge.textContent !== txt) badge.textContent = txt;
+      var nm = foodName(f), nEl = card.querySelector('.fname');
+      if (nEl.textContent !== nm) nEl.textContent = nm;
+      var pr = money(f.price), pEl = card.querySelector('.fp');
+      if (pEl.textContent !== pr) pEl.textContent = pr;
+      var cu = state.settings.currency || 'IQD', cEl = card.querySelector('.fprice small');
+      if (cEl.textContent !== cu) cEl.textContent = cu;
+    }
     function drawGrid() {
-      grid.textContent = '';
       grid.classList.toggle('arranging', arrange);
       var list = arrange ? state.foods
         : state.foods.filter(function (f) { return state.cat === 'all' || (f.category || 'other') === state.cat; });
-      if (!list.length) { grid.appendChild(el('div', { class: 'empty', style: 'grid-column:1/-1' }, [el('h3', { text: '—' })])); return; }
-      list.forEach(function (f) {
-        var inCartQty = state.cart.filter(function (c) { return c.id === f.id; }).reduce(function (s, c) { return s + c.qty; }, 0);
-        var card = el('div', { class: 'food-card', 'data-fid': f.id, onclick: function () {
-          if (arrange) return;
-          addToCart(f); drawGrid(); drawCart();
-          if (window.innerWidth <= 1000) { state.cartOpen = true; cartEl.classList.add('open'); }
-        } }, [
-          arrange ? el('span', { class: 'fgrip', text: '⋮⋮' })
-                  : (inCartQty ? el('span', { class: 'qbadge', text: String(inCartQty) }) : el('span', { class: 'fadd', text: '+' })),
-          el('div', { class: 'fname', text: foodName(f) }),
-          el('div', { class: 'fprice' }, [money(f.price) + ' ', el('small', { text: state.settings.currency || 'IQD' })]),
-        ]);
-        if (arrange) bindDrag(card);
-        grid.appendChild(card);
+      // index the cards already on screen; anything that isn't a card (the empty-state block) goes
+      var have = {};
+      Array.prototype.slice.call(grid.children).forEach(function (n) {
+        var k = n.getAttribute && n.getAttribute('data-fid');
+        if (k) have[k] = n; else grid.removeChild(n);
       });
+      if (!list.length) {
+        grid.textContent = '';
+        grid.appendChild(el('div', { class: 'empty', style: 'grid-column:1/-1' }, [el('h3', { text: '—' })]));
+        return;
+      }
+      var prev = null;
+      list.forEach(function (f) {
+        var key = String(f.id);
+        var card = have[key];
+        if (card) delete have[key]; else card = cardOf(f);
+        syncCard(card, f);
+        // move it only when it is not already in the right place — a needless insertBefore would
+        // still tear the node out of the layout and kill an in-flight touch
+        var want = prev ? prev.nextSibling : grid.firstChild;
+        if (card !== want) grid.insertBefore(card, want);
+        prev = card;
+      });
+      Object.keys(have).forEach(function (k) { if (have[k].parentNode === grid) grid.removeChild(have[k]); });
     }
     function drawCart() {
       cartEl.textContent = '';
@@ -573,19 +689,26 @@
         });
       }
       var foot = el('div', { class: 'cart-foot' }, [
+        // Ticket number, editable. The cashier rang this as a new ticket but it belongs to a table
+        // that already has one — tap the number, type the other one, and the two become one bill.
+        state.firedOrder ? el('div', { class: 'cart-ticket' }, [
+          el('span', { class: 'ct-lbl', text: t('ticket_no') }),
+          el('button', { class: 'ct-no', dir: 'ltr', title: t('merge_title'),
+            onclick: function () { mergeTicket(); } }, ['#' + state.firedOrder.order_no, el('span', { class: 'ct-pen', text: '✎' })]),
+        ]) : null,
         el('div', { class: 'cart-total' }, [
           el('span', { class: 'lbl', text: t('total') }),
           el('span', { class: 'val' }, [money(cartTotal()) + ' ', el('small', { text: state.settings.currency || 'IQD' })]),
         ]),
         el('div', { class: 'cart-actions' }, [
           el('button', { class: 'btn green', onclick: function () { payComplete(); } }, ['💵 ' + t('pay_print')]),
-          (function () { var sent = firedOrder && !hasPending();
+          (function () { var sent = state.firedOrder && !hasPending();
             return el('button', { class: 'btn kitchen' + (sent ? ' sent' : ''), onclick: function () { sendToKitchen(); } },
-              [sent ? ('✓ ' + t('sent_kitchen') + ' #' + firedOrder.order_no) : ('🍳 ' + t('send_kitchen'))]);
+              [sent ? ('✓ ' + t('sent_kitchen') + ' #' + state.firedOrder.order_no) : ('🍳 ' + t('send_kitchen'))]);
           })(),
         ]),
         state.cart.length ? el('button', { class: 'btn hold', onclick: function () { saveDraft(); } }, ['⏸ ' + t('save_draft')]) : null,
-        state.cart.length ? el('button', { class: 'cart-clear', text: t('clear'), onclick: function () { state.cart = []; firedOrder = null; drawGrid(); drawCart(); } }) : null,
+        state.cart.length ? el('button', { class: 'cart-clear', text: t('clear'), onclick: function () { state.cart = []; state.firedOrder = null; drawGrid(); drawCart(); } }) : null,
       ]);
       cartEl.appendChild(grip); cartEl.appendChild(head); cartEl.appendChild(bodyC); cartEl.appendChild(foot);
     }
@@ -616,13 +739,13 @@
       askDraftName(function (name) {
         var items = state.cart.map(function (c) { return { food_id: c.id, name: cartName(c), price: cartPrice(c), qty: c.qty, note: c.note || '' }; });
         api('/drafts', { method: 'POST', body: JSON.stringify({ name: name, lang: state.lang, items: items }) })
-          .then(function (d) { state.drafts.push(d.draft); state.cart = []; firedOrder = null; state.cartOpen = false; cartEl.classList.remove('open'); drawGrid(); drawCart(); drawDrafts(); toast(t('draft_saved'), 'ok'); })
+          .then(function (d) { state.drafts.push(d.draft); state.cart = []; state.firedOrder = null; state.cartOpen = false; cartEl.classList.remove('open'); drawGrid(); drawCart(); drawDrafts(); toast(t('draft_saved'), 'ok'); })
           .catch(function (e) { if (e.status === 401) return logout(); toast(e.message || 'Error', 'bad'); });
       });
     }
     function recallDraft(d) {
       var go = function () {
-        firedOrder = null;   // a recalled draft is a fresh cart — nothing sent to the kitchen yet
+        state.firedOrder = null;   // a recalled draft is a fresh cart — nothing sent to the kitchen yet
         state.cart = (d.items || []).map(function (it) { var f = liveFood(it.food_id); return { id: it.food_id, name: f ? foodName(f) : (it.name || ''), price: f ? f.price : it.price, qty: it.qty, note: it.note || '', sent: 0 }; });
         state.drafts = state.drafts.filter(function (x) { return x.id !== d.id; });
         api('/drafts/' + d.id, { method: 'DELETE' }).catch(function () {});
@@ -662,7 +785,6 @@
     // cart line tracks how many of it have been fired (line.sent). "Send to kitchen" fires ONLY the
     // not-yet-sent items and updates the SAME order (same #), so adding an item after a first send
     // sends just the new item — never re-fires what's already cooking and never makes a 2nd order.
-    var firedOrder = null;   // the open order, once anything on this cart has been sent to the kitchen
     function liveCat(id) { var f = liveFood(id); return (f && f.category) || 'other'; }
     function orderItems() { return state.cart.map(function (c) { return { food_id: c.id, qty: c.qty, note: c.note || '' }; }); }
     // Lines with units not yet fired to the kitchen — captured as {line, qty} so we later mark
@@ -679,11 +801,26 @@
     function fireToKitchen(order, pend) { routeStations({ order_no: order.order_no, created_at: order.created_at, lang: state.lang, items: fireItems(pend) }); pend.forEach(function (p) { p.line.sent = (p.line.sent || 0) + p.qty; }); }
     function persistOrderRec() {   // create the order, or update the open one, to the FULL current cart
       var payload = { lang: state.lang, items: orderItems() };
-      if (firedOrder) return api('/orders/' + firedOrder.id, { method: 'PUT', body: JSON.stringify(payload) }).then(function (d) { return d.order; });
+      // NOTE: when the open ticket is no longer writable (the daily reset passed while it was still
+      // open) this deliberately FAILS LOUDLY instead of re-ringing the cart as a new order. The
+      // closed ticket still holds these lines, so a second order would book the same food twice —
+      // silent phantom revenue in the day's totals. coErr() explains what to do instead.
+      if (state.firedOrder) return api('/orders/' + state.firedOrder.id, { method: 'PUT', body: JSON.stringify(payload) }).then(function (d) { return d.order; });
       return api('/orders', { method: 'POST', body: JSON.stringify(payload) }).then(function (d) { return d.order; });
     }
+    // "Save the open ticket exactly as the cart stands." Merging must never run against a cart the
+    // server has not seen: the merge result replaces the cart, so an item added since the last save
+    // would silently vanish off the bill. Both merge entry points flush through this first.
+    state.flushOpenTicket = function () {
+      if (!state.firedOrder || !state.cart.length) return Promise.resolve(null);
+      return persistOrderRec().then(function (o) { state.firedOrder = o; return o; });
+    };
     function coErr(e) {
       if (e.status === 401) return logout();
+      // The open ticket belongs to a closed business day — the daily reset time passed while this
+      // cart was still open. Never auto-recover by ringing a new order: the closed ticket already
+      // holds these lines, so that would bill the same food twice. Tell the cashier what to do.
+      if (e.status === 409 && e.data && e.data.closed) { toast(t('order_closed_hint'), 'bad'); return; }
       // 409 = a food in the cart was deleted under a stale grid; refresh the menu so it disappears
       if (e.status === 409) { api('/foods').then(function (d) { state.foods = d.foods || []; drawGrid(); drawCart(); }).catch(function () {}); }
       toast(e.message || 'Error', 'bad');
@@ -695,7 +832,7 @@
       if (!pend.length) { toast(t('already_sent'), 'bad'); return; }   // nothing new to send
       checkingOut = true;
       persistOrderRec().then(function (order) {
-        firedOrder = order;
+        state.firedOrder = order;
         fireToKitchen(order, pend);   // fire ONLY the captured units, under the SAME order #; mark just those
         toast(t('sent_kitchen') + ' · #' + order.order_no, 'ok');
         drawCart();                                                    // cart stays; button reflects any still-pending items
@@ -710,8 +847,23 @@
         if (pend.length) fireToKitchen(order, pend);                   // never bill an item the kitchen never received
         printOrder(order);
         toast(t('order_saved') + ' · #' + order.order_no, 'ok');
-        firedOrder = null; state.cart = []; state.cartOpen = false; drawGrid(); drawCart(); cartEl.classList.remove('open');
+        state.firedOrder = null; state.cart = []; state.cartOpen = false; drawGrid(); drawCart(); cartEl.classList.remove('open');
       }).catch(coErr).then(function () { checkingOut = false; }, function () { checkingOut = false; });
+    }
+
+    // ---- change this ticket's number = merge it into another open ticket ----
+    function mergeTicket() {
+      if (!state.firedOrder || checkingOut) return;
+      checkingOut = true;
+      state.flushOpenTicket().then(function () {          // save anything added since the last send
+        checkingOut = false;
+        drawCart();                                       // the number may have moved on a recovery
+        mergeModal(state.firedOrder, function (order) {
+          adoptMergedOrder(order);
+          drawGrid(); drawCart();
+          toast(t('merged_into') + ' #' + order.order_no, 'ok');
+        });
+      }, function (e) { checkingOut = false; coErr(e); });
     }
 
     menuWrap.appendChild(draftStrip); menuWrap.appendChild(catBar); menuWrap.appendChild(grid);
@@ -723,13 +875,30 @@
   /* ------------------------------ FOODS MGMT ------------------------------ */
   function renderFoods(host) {
     var listBox = el('div');
+    var rows = [];   // every food, active or not (this table's own copy)
     function load() {
       api('/foods?all=1').then(function (d) {
-        draw(d.foods || []);
+        rows = d.foods || [];
+        draw(rows);
         // keep the shared POS list (grid + cart prices) in sync — it is otherwise only loaded at boot,
         // so a food added/edited/deleted here would be stale on the register until an app restart.
-        state.foods = (d.foods || []).filter(function (f) { return f.is_active; });
+        state.foods = rows.filter(function (f) { return f.is_active; });
       }).catch(function (e) { if (e.status === 401) return logout(); });
+    }
+    // Targeted updates instead of a refetch: the server hands back the saved food, so patch both
+    // lists from that one object. The POS grid then reconciles by id on its next draw — the card
+    // simply moves to its new category and every other card, and the scroll position, stays put.
+    function upsert(f) {
+      var i = -1; rows.forEach(function (x, k) { if (x.id === f.id) i = k; });
+      if (i >= 0) rows[i] = f; else rows.push(f);
+      rows.sort(foodOrder);
+      applyFoodLocal(f);
+      draw(rows);
+    }
+    function drop(id) {
+      rows = rows.filter(function (x) { return x.id !== id; });
+      removeFoodLocal(id);
+      draw(rows);
     }
     function draw(rows) {
       listBox.textContent = '';
@@ -745,10 +914,10 @@
           el('td', { 'data-l': t('th_price') }, [el('span', { class: 'fmoney', text: money(f.price) })]),
           el('td', { 'data-l': t('th_status') }, [el('span', { class: 'pill ' + (f.is_active ? 'on' : 'off'), text: f.is_active ? t('active') : '—' })]),
           el('td', {}, [el('div', { class: 'rowbtns' }, [
-            el('button', { class: 'btn-ghost', text: t('edit'), onclick: function () { foodModal(f, load); } }),
+            el('button', { class: 'btn-ghost', text: t('edit'), onclick: function () { foodModal(f, upsert); } }),
             el('button', { class: 'btn-ghost danger', text: t('del'), onclick: function () {
               if (!confirm(t('confirm_del'))) return;
-              api('/foods/' + f.id, { method: 'DELETE' }).then(function () { toast(t('saved'), 'ok'); load(); }).catch(function (e) { if (e.status === 401) return logout(); toast(e.message, 'bad'); });
+              api('/foods/' + f.id, { method: 'DELETE' }).then(function () { toast(t('saved'), 'ok'); drop(f.id); }).catch(function (e) { if (e.status === 401) return logout(); toast(e.message, 'bad'); });
             } }),
           ])]),
         ]));
@@ -761,7 +930,7 @@
     host.appendChild(el('div', { class: 'panel' }, [
       el('div', { class: 'ph-head' }, [
         el('h2', { text: t('manage_foods') }),
-        el('button', { class: 'btn', onclick: function () { foodModal(null, load); } }, [t('add_food')]),
+        el('button', { class: 'btn', onclick: function () { foodModal(null, upsert); } }, [t('add_food')]),
       ]),
       listBox,
     ]));
@@ -798,7 +967,9 @@
       saveBtn.disabled = true;
       var req = editing ? api('/foods/' + editing.id, { method: 'PUT', body: JSON.stringify(body) })
                         : api('/foods', { method: 'POST', body: JSON.stringify(body) });
-      req.then(function () { toast(t('saved'), 'ok'); document.body.removeChild(bg); onSaved(); })
+      // hand the SAVED food (server's shape: real id, kept sort_order, normalised price) to the
+      // caller so it can patch its lists in place instead of refetching the whole menu
+      req.then(function (d) { toast(t('saved'), 'ok'); document.body.removeChild(bg); onSaved((d && d.food) || editing); })
         .catch(function (e) { if (e.status === 401) return logout(); errBox.textContent = e.message; errBox.style.display = ''; saveBtn.disabled = false; });
     };
 
@@ -824,6 +995,74 @@
     f.name_ku.focus();
   }
 
+  /* --------------------- MERGE TICKETS (change order no.) --------------------- */
+  // Type the number of the ticket this order really belongs to. The server moves every line over,
+  // folds identical lines together, recomputes the total and deletes this ticket — so two half
+  // orders for one table become one bill with one number. Today's tickets only.
+  // Re-point the open POS cart at a merged ticket. The cart must mirror the WHOLE target order:
+  // saving PUTs the full cart and the server rewrites every line of that order, so a cart still
+  // holding only our half would erase the food that was already on the other ticket. Units that
+  // have not been fired yet are carried across per food+note, so merging never marks something
+  // "sent" that the kitchen has never seen.
+  function adoptMergedOrder(order) {
+    var pend = {};
+    state.cart.forEach(function (c) {
+      var k = c.id + '|' + (c.note || '').trim();
+      pend[k] = (pend[k] || 0) + Math.max(0, c.qty - (c.sent || 0));
+    });
+    state.firedOrder = order;
+    state.cart = (order.items || []).map(function (it) {
+      var k = it.food_id + '|' + (it.note || '').trim();
+      var p = Math.min(it.qty, pend[k] || 0); pend[k] = (pend[k] || 0) - p;
+      var f = liveFood(it.food_id);
+      return { id: it.food_id, name: f ? foodName(f) : (it.name || ''), price: f ? f.price : it.price,
+               qty: it.qty, note: it.note || '', sent: it.qty - p };
+    });
+  }
+  function mergeModal(order, onDone) {
+    var bg = el('div', { class: 'modal-bg' });
+    function close() { if (bg.parentNode) document.body.removeChild(bg); }
+    bg.onclick = function (e) { if (e.target === bg) close(); };
+    var errBox = el('div', { class: 'err', style: 'display:none' });
+    var input = el('input', { class: 'input', type: 'number', dir: 'ltr', min: '1', step: '1', inputmode: 'numeric', placeholder: '#' });
+    var chips = el('div', { class: 'mg-chips' });
+    var goB = el('button', { class: 'btn', text: t('merge_do') });
+    var cur = state.settings.currency || 'IQD';
+    // quick-pick: today's other tickets, newest first — faster and safer than typing a number
+    api('/orders?today=1&limit=200').then(function (d) {
+      var rows = (d.orders || []).filter(function (o) { return o.id !== order.id; }).slice(0, 30);
+      if (!rows.length) { chips.appendChild(el('span', { class: 'mg-none', text: t('merge_none') })); return; }
+      rows.forEach(function (o) {
+        chips.appendChild(el('button', { class: 'mg-chip', dir: 'ltr', onclick: function () {
+          input.value = String(o.order_no);
+          Array.prototype.forEach.call(chips.children, function (n) { n.classList.remove('on'); });
+          this.classList.add('on');
+        } }, ['#' + o.order_no, el('small', { text: money(o.total) + ' ' + cur })]));
+      });
+    }).catch(function () {});
+    goB.onclick = function () {
+      var no = parseInt(input.value, 10) || 0;
+      if (!no) { errBox.textContent = t('merge_need_no'); errBox.style.display = ''; return; }
+      if (no === order.order_no) { errBox.textContent = t('merge_same'); errBox.style.display = ''; return; }
+      goB.disabled = true;
+      api('/orders/' + order.id + '/merge', { method: 'POST', body: JSON.stringify({ into_order_no: no }) })
+        .then(function (d) { close(); onDone(d.order); })
+        .catch(function (e) { if (e.status === 401) return logout(); errBox.textContent = e.message || 'Error'; errBox.style.display = ''; goB.disabled = false; });
+    };
+    input.onkeydown = function (e) { if (e.key === 'Enter') goB.onclick(); };
+    bg.appendChild(el('div', { class: 'modal' }, [
+      el('h3', { text: t('merge_title') }),
+      el('p', { class: 'mg-help', text: t('merge_help') }),
+      errBox,
+      el('div', { class: 'mg-from' }, [el('span', { text: t('merge_from') }), el('strong', { dir: 'ltr', text: '#' + order.order_no })]),
+      el('div', { class: 'field' }, [el('label', { text: t('merge_into') }), input]),
+      el('div', { class: 'field' }, [el('label', { text: t('merge_today') }), chips]),
+      el('div', { class: 'modal-actions' }, [el('button', { class: 'btn gray', text: t('cancel'), onclick: close }), goB]),
+    ]));
+    document.body.appendChild(bg);
+    setTimeout(function () { try { input.focus(); } catch (_) {} }, 30);
+  }
+
   /* ------------------------------ ORDERS ------------------------------ */
   function renderOrders(host) {
     var statsRow = el('div', { class: 'stats' });
@@ -832,8 +1071,13 @@
     });
     statsRow.children[2].querySelector('.v').classList.add('gold');
     var listBox = el('div');
+    var todayIds = {};   // only today's tickets can still be merged — the server enforces it too
     function load() {
-      api('/orders?limit=100').then(function (d) { draw(d.orders || []); }).catch(function (e) { if (e.status === 401) return logout(); });
+      api('/orders?today=1&limit=200').then(function (d) {
+        todayIds = {}; (d.orders || []).forEach(function (o) { todayIds[o.id] = true; });
+      }).catch(function () {}).then(function () {
+        return api('/orders?limit=100').then(function (d) { draw(d.orders || []); });
+      }).catch(function (e) { if (e && e.status === 401) return logout(); });
       api('/orders/stats').then(function (s) {
         var vals = [s.total, s.today, money(s.today_sales) + ' ' + (state.settings.currency || 'IQD')];
         Array.prototype.forEach.call(statsRow.children, function (n, i) { n.querySelector('.v').textContent = String(vals[i]); });
@@ -877,6 +1121,26 @@
           });
           body.appendChild(el('div', { class: 'od-foot' }, [
             el('span', { class: 'od-lang', text: t('lang_label') + ': ' + (I18N[order.lang] ? I18N[order.lang]._name : order.lang) }),
+            // rang it twice by mistake and already paid? fold it onto the right ticket from here
+            todayIds[order.id] ? el('button', { class: 'btn-ghost', text: t('merge'), onclick: function (e) { e.stopPropagation();
+              // flush the register's open ticket first (see state.flushOpenTicket) so nothing the
+              // cart is holding un-saved is lost when the merge result replaces it
+              var flush = state.flushOpenTicket ? state.flushOpenTicket() : Promise.resolve(null);
+              flush.then(function () {
+                mergeModal(order, function (m) {
+                  toast(t('merged_into') + ' #' + m.order_no, 'ok');
+                  // if the POS cart is open on either side of the merge, re-point it at the survivor
+                  if (state.firedOrder && (state.firedOrder.id === order.id || state.firedOrder.id === m.id)) adoptMergedOrder(m);
+                  load();   // this card's order no longer exists — reload rather than patch it
+                });
+              }, function (err) {
+                // The register's open cart could NOT be saved. Do NOT merge anyway: the merge
+                // replaces that cart with the server's version, which would silently drop whatever
+                // failed to save. Say why and leave both tickets untouched.
+                if (err && err.status === 401) return logout();
+                toast((err && err.status === 409 && err.data && err.data.closed) ? t('order_closed_hint') : ((err && err.message) || 'Error'), 'bad');
+              });
+            } }) : null,
             el('button', { class: 'btn-ghost', text: t('print'), onclick: function (e) { e.stopPropagation();
               printOrder(order); } }),
             el('span', { class: 'od-gtot' }, [t('total') + ': ', el('strong', { text: money(order.total) + ' ' + cur })]),
@@ -1225,14 +1489,22 @@
     var verEl = el('div', { class: 'hint', style: 'text-align:center;margin-top:18px;font-weight:700', text: 'NIGHT BITES' });
     host.appendChild(verEl);
     if (window.nb && window.nb.version) {
-      window.nb.version().then(function (v) { verEl.textContent = 'NIGHT BITES  ·  v' + v; });
+      var curVer = '';
+      window.nb.version().then(function (v) { curVer = String(v || ''); verEl.textContent = 'NIGHT BITES  ·  v' + v; });
       var upBtn = el('button', { class: 'btn-ghost', style: 'display:block;margin:10px auto 0', text: 'Check for updates',
         onclick: function () {
           upBtn.disabled = true; upBtn.textContent = '…';
+          var done = function () { upBtn.disabled = false; upBtn.textContent = 'Check for updates'; };
           window.nb.checkUpdate().then(function (r) {
-            upBtn.disabled = false; upBtn.textContent = 'Check for updates';
-            toast(r && r.version ? ('Update: v' + r.version) : (r && r.dev ? 'Dev build' : 'You are up to date'), 'ok');
-          }).catch(function () { upBtn.disabled = false; upBtn.textContent = 'Check for updates'; toast('Update check failed', 'bad'); });
+            done();
+            if (r && r.dev) return toast('Dev build — updates are disabled', 'ok');
+            // A FAILED check must NEVER read as success. This said "You are up to date" whenever
+            // the check threw (no internet, unreachable feed), which is exactly how a machine
+            // sits on an old build believing it is current. Show the real reason instead.
+            if (!r || !r.ok) return toast('Update check failed — ' + ((r && r.error) || 'no connection'), 'bad');
+            if (r.version && curVer && r.version !== curVer) return toast('Update found: v' + r.version + ' — downloading, then restart', 'ok');
+            return toast('You are up to date  ·  v' + (r.version || curVer), 'ok');
+          }).catch(function (e) { done(); toast('Update check failed — ' + ((e && e.message) || 'no connection'), 'bad'); });
         } });
       host.appendChild(upBtn);
     }

@@ -298,6 +298,10 @@ function createServer(opts) {
   app.put('/api/foods/:id', auth, requireSection('foods'), wrap((req, res) => {
     const f = db.foods.find((x) => x.id === (parseInt(req.params.id, 10) || 0)); if (!f) return res.status(404).json({ error: 'Not found' });
     const nf = readFood(req.body); if (!nf.name_ku && !nf.name_en && !nf.name_ar) return res.status(400).json({ error: 'Name is required' });
+    // Keep the card where the cashier dragged it. readFood() defaults a missing sort_order to 0, and
+    // the edit form never sends one — without this an edit (e.g. changing a category) would yank the
+    // item to the very front of the POS grid every time it is saved.
+    if (!Object.prototype.hasOwnProperty.call(req.body || {}, 'sort_order')) nf.sort_order = f.sort_order;
     Object.assign(f, nf, { id: f.id }); save(); res.json({ food: shapeFood(f) });
   }));
   app.delete('/api/foods/:id', auth, requireSection('foods'), wrap((req, res) => {
@@ -326,9 +330,26 @@ function createServer(opts) {
     if (now < b) b.setDate(b.getDate() - 1);
     return b.getTime();
   }
+  function todaysOrders() { const b = boundary(); return db.orders.filter((o) => new Date(o.created_at).getTime() >= b); }
+  // A ticket number must NEVER be handed out twice in a business day, because it is printed on a
+  // kitchen ticket and a customer receipt the moment it is issued. Neither count+1 nor
+  // max(live order_no)+1 is safe once merging exists: merging DELETES the source order, so both
+  // free a number that is already on paper — merge the newest ticket and the next order would be
+  // issued the very same number. So the day's high-water mark is stored and only ever goes up.
+  // (The max() of live orders is still folded in, so data written by older builds is respected.)
+  function nextOrderNo() {
+    const b = boundary();
+    const hw = (db.seq.order_no && db.seq.order_no.day === b) ? num(db.seq.order_no.last) : 0;
+    const live = todaysOrders().reduce((m, o) => Math.max(m, num(o.order_no)), 0);
+    const next = Math.max(hw, live) + 1;
+    db.seq.order_no = { day: b, last: next };   // persisted by the caller's save()
+    return next;
+  }
   app.get('/api/orders', auth, (req, res) => {
     const lim = Math.min(Math.max(parseInt(req.query.limit, 10) || 50, 1), 200);
-    const rows = db.orders.slice().sort((a, b) => b.id - a.id).slice(0, lim);
+    // ?today=1 → only the current business day, for the "merge into #…" ticket picker
+    const src = String(req.query.today || '') === '1' ? todaysOrders() : db.orders;
+    const rows = src.slice().sort((a, b) => b.id - a.id).slice(0, lim);
     res.json({ orders: rows.map((o) => shapeOrder(o, false)), total: db.orders.length });
   });
   app.get('/api/orders/stats', auth, (_q, res) => {
@@ -422,7 +443,7 @@ function createServer(opts) {
     if (!items.length) return res.status(400).json({ error: 'Add at least one item' });
     const total = money(items.reduce((s, i) => s + i.line_total, 0));
     const count = items.reduce((s, i) => s + i.qty, 0);
-    const b = boundary(); const order_no = db.orders.filter((o) => new Date(o.created_at).getTime() >= b).length + 1;
+    const order_no = nextOrderNo();
     const id = ++db.seq.order; const created_at = new Date().toISOString();
     const order = { id, order_no, lang, total, item_count: count, kitchen_status: 'new', created_at };
     db.orders.push(order);
@@ -438,7 +459,7 @@ function createServer(opts) {
     // Only TODAY's orders can be grown in place — never rewrite a prior-day/closed order, which
     // would silently corrupt historical sales reports. The UI only ever PUTs the order it just
     // opened this session, so this never trips in normal use; it's a report-integrity guard.
-    if (new Date(o.created_at).getTime() < boundary()) return res.status(409).json({ error: 'Order is closed' });
+    if (new Date(o.created_at).getTime() < boundary()) return res.status(409).json({ error: 'Order is closed', closed: true });
     const body = req.body || {}; const lang = ['ku', 'ar', 'en'].includes(body.lang) ? body.lang : o.lang;
     const nameFor = (f) => lang === 'ar' ? (f.name_ar || f.name_ku || f.name_en) : lang === 'en' ? (f.name_en || f.name_ku || f.name_ar) : (f.name_ku || f.name_ar || f.name_en);
     const items = []; const missing = [];
@@ -460,6 +481,46 @@ function createServer(opts) {
     if (newCount > o.item_count) o.kitchen_status = 'new';
     o.item_count = newCount;
     save(); res.json({ order: shapeOrder(o, true) });
+  }));
+  // Merge one of today's tickets INTO another — the cashier rang a second ticket (#51) for a table
+  // that already has an open one (#50) and types 50 over the number. Every line on #51 moves to #50,
+  // identical lines (same food, same note, same unit price) fold together, #51 disappears entirely,
+  // and #50's total/count are recomputed from its items. One table = one ticket, one number, one bill.
+  const sameLine = (a, c) => a.food_id === c.food_id && String(a.note || '') === String(c.note || '') && num(a.price) === num(c.price);
+  function recalcOrder(o) {
+    const its = db.order_items.filter((i) => i.order_id === o.id);
+    o.total = money(its.reduce((s, i) => s + num(i.line_total), 0));
+    o.item_count = its.reduce((s, i) => s + num(i.qty), 0);
+  }
+  app.post('/api/orders/:id/merge', auth, requireSection('pos'), wrap((req, res) => {
+    const b = boundary();
+    const src = db.orders.find((x) => x.id === (parseInt(req.params.id, 10) || 0));
+    if (!src) return res.status(404).json({ error: 'Not found' });
+    const want = parseInt((req.body || {}).into_order_no, 10) || 0;
+    if (!want) return res.status(400).json({ error: 'Enter an order number' });
+    // Today only, both sides: merging into a settled day would silently rewrite closed sales totals.
+    if (new Date(src.created_at).getTime() < b) return res.status(409).json({ error: 'Order is closed', closed: true });
+    // Newest match wins, so any duplicate numbers left by the old count+1 scheme resolve to the
+    // ticket the cashier is actually looking at.
+    const dst = todaysOrders().filter((o) => o.order_no === want).sort((a, c) => c.id - a.id)[0];
+    if (!dst) return res.status(404).json({ error: 'No order #' + want + ' today' });
+    if (dst.id === src.id) return res.status(400).json({ error: 'Same order' });
+
+    const before = num(dst.item_count);
+    const dstItems = db.order_items.filter((i) => i.order_id === dst.id);
+    let nid = db.order_items.reduce((m, i) => Math.max(m, i.id), 0);
+    db.order_items.filter((i) => i.order_id === src.id).forEach((it) => {
+      const hit = dstItems.filter((d) => sameLine(d, it))[0];
+      if (hit) { hit.qty = num(hit.qty) + num(it.qty); hit.line_total = money(num(hit.price) * hit.qty); }
+      else { const moved = Object.assign({}, it, { id: ++nid, order_id: dst.id }); db.order_items.push(moved); dstItems.push(moved); }
+    });
+    db.order_items = db.order_items.filter((i) => i.order_id !== src.id);
+    db.orders = db.orders.filter((o) => o.id !== src.id);
+    recalcOrder(dst);
+    // the merged-in food still has to reach a kitchen screen
+    if (dst.item_count > before) dst.kitchen_status = 'new';
+    save();
+    res.json({ order: shapeOrder(dst, true), merged_from: { id: src.id, order_no: src.order_no } });
   }));
   app.post('/api/orders/:id/done', auth, wrap((req, res) => { const o = db.orders.find((x) => x.id === (parseInt(req.params.id, 10) || 0)); if (!o) return res.status(404).json({ error: 'Not found' }); o.kitchen_status = 'done'; save(); res.json({ ok: true }); }));
 

@@ -233,6 +233,14 @@ button { font-family: inherit; }
 .ci-del:hover { color: var(--danger); }
 
 .cart-foot { padding: 14px 16px; border-top: 1px solid var(--line); }
+/* editable ticket number — tap it to merge this order onto another open ticket */
+.cart-ticket { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+.cart-ticket .ct-lbl { font-size: 12.5px; color: var(--muted); font-weight: 700; }
+.ct-no { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; cursor: pointer;
+  border: 1px dashed var(--accent); border-radius: 999px; background: var(--accent-soft);
+  color: var(--accent-2); font-size: 14px; font-weight: 900; font-family: inherit; }
+.ct-no:hover { background: var(--accent); color: #fff; border-style: solid; }
+.ct-no .ct-pen { font-size: 12px; opacity: .75; }
 .cart-total { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
 .cart-total .lbl { font-size: 14px; color: var(--muted); font-weight: 700; }
 .cart-total .val { font-size: 26px; font-weight: 900; color: var(--price); }
@@ -340,6 +348,22 @@ button { font-family: inherit; }
 .modal h3 { margin: 0 0 16px; font-size: 18px; font-weight: 800; }
 .modal-actions { display: flex; gap: 10px; margin-top: 18px; }
 .modal-actions .btn { flex: 1; }
+
+/* merge tickets modal */
+.mg-help { margin: -8px 0 14px; font-size: 13px; line-height: 1.6; color: var(--muted); }
+.mg-from { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px;
+  padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg-2);
+  font-size: 13px; color: var(--muted); font-weight: 700; }
+.mg-from strong { font-size: 17px; font-weight: 900; color: var(--accent-2); }
+.mg-chips { display: flex; flex-wrap: wrap; gap: 7px; max-height: 132px; overflow-y: auto; }
+.mg-chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; cursor: pointer;
+  border: 1px solid var(--line); border-radius: 999px; background: var(--card);
+  font-family: inherit; font-size: 13.5px; font-weight: 800; color: var(--ink); }
+.mg-chip small { font-size: 11px; font-weight: 700; color: var(--faint); }
+.mg-chip:hover { border-color: var(--accent); background: var(--accent-soft); }
+.mg-chip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.mg-chip.on small { color: rgba(255,255,255,.85); }
+.mg-none { font-size: 13px; color: var(--faint); }
 
 .toast { position: fixed; inset-inline: 0; bottom: 22px; margin: 0 auto; width: max-content; max-width: 90%;
   background: var(--ink); border: 1px solid var(--ink); color: #fff; padding: 11px 20px; border-radius: 12px;
