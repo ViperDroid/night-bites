@@ -35,7 +35,7 @@ function createServer(opts) {
     },
     printers: [],   // registered: { id, name, device, kind }
     zones: [],      // { id, name, printer_device, categories: [] }
-    seq: { food: 100, order: 0, user: 1, draft: 0 },
+    seq: { food: 100, order: 0, user: 1, draft: 0, item: 0 },
   };
   let db;
   db = loadDb();
@@ -153,6 +153,52 @@ function createServer(opts) {
   }
   const num = (v) => { const n = Number(v); return Number.isFinite(n) ? n : 0; };
   const money = (v) => Math.round(num(v) * 100) / 100;
+
+  // ---- v1.7 schema: per-line kitchen print state ----
+  // WHY: "has this line been sent to the kitchen?" used to live only in the browser's cart, so an
+  // app restart, a Clear, a draft round-trip or a merge silently reset it — and the next Send
+  // re-fired food that was already on the grill. It is stored per line now, on the server.
+  //
+  // num() coerces a MISSING field to 0, so it can never be used to test presence here: `absent` and
+  // `zero` mean opposite things (never printed vs. explicitly nothing printed yet).
+  const hasNum = (v) => v !== null && v !== '' && v !== undefined && Number.isFinite(Number(v));
+  (function migrateOrderState() {
+    let mx = 0;
+    // ALWAYS, not just once: a row with no printed_qty was written by a build that had no print
+    // state, so the kitchen already has it on paper. Every v1.7 write path sets the field
+    // explicitly, so this can never fire on a row this build created — but it DOES catch rows
+    // written by a v1.6 the shop rolled back to and then updated away from again, which the
+    // one-shot schema stamp would have skipped straight past into a full re-fire.
+    db.order_items.forEach((i) => {
+      const q = Math.max(0, Math.round(num(i.qty)));
+      if (!hasNum(i.printed_qty) || Number(i.printed_qty) < 0) i.printed_qty = q;
+      i.printed_qty = Math.min(Math.round(num(i.printed_qty)), q);
+      if (num(i.id) > mx) mx = num(i.id);
+    });
+    if (!hasNum(db.seq.item) || Number(db.seq.item) < mx) db.seq.item = mx;
+
+    if (num(db.schema) < 17) {
+      const b = boundaryFor(db.settings);
+      db.orders.forEach((o) => {
+        if (!Array.isArray(o.merged_from)) o.merged_from = [];
+        if (hasNum(o.paid_total)) return;
+        // A day that is already closed is settled business — treat it as collected so it can never
+        // be presented for payment a second time.
+        if (new Date(o.created_at).getTime() < b) { o.paid_total = money(o.total); return; }
+        // TODAY's tickets are genuinely UNKNOWN: the old build recorded no payment at all. Claiming
+        // they were paid loses the money on a table that is still eating; claiming they were not
+        // risks charging twice. So say "unknown" out loud and let the cashier decide — they are
+        // listed in the open-ticket picker with a "from before the update" flag.
+        o.paid_total = 0; o.paid_assumed = true;
+      });
+      db.schema = 17;
+    }
+    // Best-effort persist. The migration is already correct in memory, so a locked data file
+    // (antivirus, a backup agent) must NOT stop the restaurant's till from starting.
+    try { save(); } catch (e) {
+      console.error('night-bites: could not write the v1.7 migration now (' + (e.code || e.message || e) + '); it is applied in memory and will be saved with the next change.');
+    }
+  })();
 
   // ---- sessions (in-memory) ----
   const tokens = new Map();   // token -> userId
@@ -317,13 +363,26 @@ function createServer(opts) {
   }));
 
   // ---- orders ----
+  const itemsOf = (o) => db.order_items.filter((i) => i.order_id === o.id);
+  const printedOf = (i) => Math.min(Math.max(0, Math.round(num(i.printed_qty))), Math.max(0, Math.round(num(i.qty))));
+  const pendingOf = (i) => Math.max(0, Math.round(num(i.qty)) - printedOf(i));
+  const pendingCount = (o) => itemsOf(o).reduce((s, i) => s + pendingOf(i), 0);
   const shapeOrder = (o, withItems) => ({
     id: o.id, order_no: o.order_no, lang: o.lang, total: num(o.total), item_count: o.item_count,
     kitchen_status: o.kitchen_status || 'new', created_at: o.created_at,
-    items: withItems ? db.order_items.filter((i) => i.order_id === o.id).map((i) => ({ id: i.id, food_id: i.food_id, name: i.name, price: num(i.price), qty: i.qty, line_total: num(i.line_total), category: i.category, note: i.note || '' })) : undefined,
+    paid_total: money(o.paid_total), balance: money(num(o.total) - num(o.paid_total)),
+    paid_assumed: !!o.paid_assumed,                       // rung before the update — payment unknown
+    closed: new Date(o.created_at).getTime() < boundary(),  // a settled day; nothing may be written to it
+    pending_count: pendingCount(o), merged_from: Array.isArray(o.merged_from) ? o.merged_from : [],
+    items: withItems ? itemsOf(o).map((i) => ({
+      id: i.id, food_id: i.food_id, name: i.name, price: num(i.price), qty: i.qty,
+      line_total: num(i.line_total), category: i.category, note: i.note || '',
+      printed_qty: printedOf(i), pending_qty: pendingOf(i),
+    })) : undefined,
   });
-  function boundary() {
-    let rt = db.settings.reset_time || '00:00'; if (!/^\d{1,2}:\d{2}$/.test(rt)) rt = '00:00';
+  function boundary() { return boundaryFor(db.settings); }
+  function boundaryFor(settings) {
+    let rt = (settings && settings.reset_time) || '00:00'; if (!/^\d{1,2}:\d{2}$/.test(rt)) rt = '00:00';
     let [h, m] = rt.split(':').map((x) => parseInt(x, 10));
     if (!(h >= 0 && h <= 23 && m >= 0 && m <= 59)) { h = 0; m = 0; }   // out-of-range time (e.g. 25:00) → midnight
     const now = new Date(); const b = new Date(now); b.setHours(h, m, 0, 0);
@@ -348,7 +407,11 @@ function createServer(opts) {
   app.get('/api/orders', auth, (req, res) => {
     const lim = Math.min(Math.max(parseInt(req.query.limit, 10) || 50, 1), 200);
     // ?today=1 → only the current business day, for the "merge into #…" ticket picker
-    const src = String(req.query.today || '') === '1' ? todaysOrders() : db.orders;
+    // ?open=1  → today's tickets that still need something: money owed, or food not yet fired.
+    //            A settled, fully-cooked ticket is finished business and must not clutter the list.
+    let src = db.orders;
+    if (String(req.query.open || '') === '1') src = todaysOrders().filter((o) => money(num(o.total) - num(o.paid_total)) > 0 || pendingCount(o) > 0 || o.paid_assumed);
+    else if (String(req.query.today || '') === '1') src = todaysOrders();
     const rows = src.slice().sort((a, b) => b.id - a.id).slice(0, lim);
     res.json({ orders: rows.map((o) => shapeOrder(o, false)), total: db.orders.length });
   });
@@ -445,9 +508,12 @@ function createServer(opts) {
     const count = items.reduce((s, i) => s + i.qty, 0);
     const order_no = nextOrderNo();
     const id = ++db.seq.order; const created_at = new Date().toISOString();
-    const order = { id, order_no, lang, total, item_count: count, kitchen_status: 'new', created_at };
+    const order = { id, order_no, lang, total, item_count: count, kitchen_status: 'new', created_at, paid_total: 0, merged_from: [] };
     db.orders.push(order);
-    items.forEach((it) => db.order_items.push(Object.assign({ id: db.order_items.length ? db.order_items[db.order_items.length - 1].id + 1 : 1, order_id: id }, it)));
+    // Row ids come from db.seq.item so they are unique for the life of the file. The old
+    // "last row id + 1" / "max(id) + 1" schemes reuse an id after a merge deletes rows, which
+    // would graft one line's kitchen-print state onto a different line.
+    items.forEach((it) => db.order_items.push(Object.assign({ id: ++db.seq.item, order_id: id, printed_qty: 0 }, it)));
     save(); res.status(201).json({ order: shapeOrder(order, true) });
   }));
   // Update an OPEN order's items — used when the cashier adds more to a cart that was already
@@ -471,11 +537,71 @@ function createServer(opts) {
     });
     if (missing.length) return res.status(409).json({ error: 'Menu changed — refresh and re-ring', missing });
     if (!items.length) return res.status(400).json({ error: 'Add at least one item' });
-    db.order_items = db.order_items.filter((i) => i.order_id !== o.id);
-    let nid = db.order_items.reduce((m, i) => Math.max(m, i.id), 0);
-    items.forEach((it) => db.order_items.push(Object.assign({ id: ++nid, order_id: o.id }, it)));
-    const newCount = items.reduce((s, i) => s + i.qty, 0);
-    o.lang = lang; o.total = money(items.reduce((s, i) => s + i.line_total, 0));
+
+    // RECONCILE, never nuke-and-repush. The old code deleted every row of this order and pushed
+    // fresh ones, which threw away each line's printed_qty — so the next Send re-fired food that
+    // was already on the grill.
+    //
+    // Matching is done PER KEY GROUP (food_id + note), never row-by-row in array order: two rows can
+    // legitimately share a key (tap, add a note, tap again, add the same note), and pairing those by
+    // position bound a posted line to the wrong row and produced a false "already sent" refusal.
+    // The real invariant is per group: the ticket may never hold fewer units of a key than the
+    // kitchen is already cooking of that key.
+    //
+    // NOTHING IS WRITTEN until every check has passed. The previous version mutated rows as it went
+    // and could then return 409, leaving the rejected edit live in the database.
+    const key = (x) => x.food_id + '\u0000' + String(x.note || '');
+    const existing = itemsOf(o);
+    const groups = {};
+    existing.forEach((r) => { (groups[key(r)] = groups[key(r)] || { rows: [], posted: [] }).rows.push(r); });
+    items.forEach((it) => { (groups[key(it)] = groups[key(it)] || { rows: [], posted: [] }).posted.push(it); });
+
+    const blocked = [];
+    Object.keys(groups).forEach((k) => {
+      const g = groups[k];
+      const cooking = g.rows.reduce((a, r) => a + printedOf(r), 0);
+      const asked = g.posted.reduce((a, i) => a + num(i.qty), 0);
+      // A line already sent to the kitchen cannot shrink below what the kitchen is cooking — that
+      // food exists. Un-cooking it needs a void/cancel slip, which this build does not have, so
+      // refuse loudly rather than let the screen quietly disagree with the grill.
+      if (asked < cooking) {
+        const r0 = g.rows[0];
+        blocked.push({ name: (r0 && r0.name) || (g.posted[0] && g.posted[0].name) || '', note: (r0 && r0.note) || '', printed: cooking, asked });
+      }
+    });
+    if (blocked.length) return res.status(409).json({ error: 'Already sent to the kitchen — it cannot be reduced', blocked });
+
+    // ---- every check passed; now build the new row set ----
+    const kept = [];
+    Object.keys(groups).forEach((k) => {
+      const g = groups[k];
+      // spend the cooked rows first, biggest first, so print state is always carried on a row that
+      // still has units under it
+      const rows = g.rows.slice().sort((a, c) => printedOf(c) - printedOf(a));
+      let want = g.posted.reduce((a, i) => a + num(i.qty), 0);
+      const sample = g.posted[0];
+      rows.forEach((r) => {
+        if (want <= 0) return;                      // this row is gone (it had nothing cooking — checked above)
+        const take = Math.max(printedOf(r), Math.min(num(r.qty), want));
+        const q = Math.min(take, want);
+        want -= q;
+        r.qty = q;
+        // A row keeps the PRICE IT WAS RUNG AT. Re-reading the live menu here retro-priced food the
+        // customer had already eaten and paid for whenever the owner edited a price mid-shift.
+        r.line_total = money(num(r.price) * q);
+        if (sample) { r.name = sample.name; r.category = sample.category; }   // names still follow a language switch
+        kept.push(r);
+      });
+      // anything still wanted is genuinely new food and takes the CURRENT menu price
+      if (want > 0 && sample) {
+        kept.push(Object.assign({}, sample, { id: ++db.seq.item, order_id: o.id, printed_qty: 0, qty: want, line_total: money(num(sample.price) * want) }));
+      }
+    });
+    const keptIds = new Set(kept.map((r) => r.id));
+    db.order_items = db.order_items.filter((i) => i.order_id !== o.id || keptIds.has(i.id));
+    kept.forEach((r) => { if (db.order_items.indexOf(r) < 0) db.order_items.push(r); });
+    const newCount = kept.reduce((s, i) => s + num(i.qty), 0);
+    o.lang = lang; o.total = money(kept.reduce((s, i) => s + num(i.line_total), 0));
     // If the order grew, put it back in the kitchen queue so a KDS/kitchen screen shows the additions
     // (a print-based kitchen already got the delta ticket; this covers screen kitchens).
     if (newCount > o.item_count) o.kitchen_status = 'new';
@@ -508,19 +634,92 @@ function createServer(opts) {
 
     const before = num(dst.item_count);
     const dstItems = db.order_items.filter((i) => i.order_id === dst.id);
-    let nid = db.order_items.reduce((m, i) => Math.max(m, i.id), 0);
+    // How much of the source was ALREADY on a kitchen ticket under the source's own number. The
+    // kitchen is holding that paper headed #src while the food now lives on #dst — the cashier is
+    // offered a transfer slip for exactly this quantity (see Issue 3 handling in the client).
+    let movedPrinted = 0;
     db.order_items.filter((i) => i.order_id === src.id).forEach((it) => {
+      movedPrinted += printedOf(it);
       const hit = dstItems.filter((d) => sameLine(d, it))[0];
-      if (hit) { hit.qty = num(hit.qty) + num(it.qty); hit.line_total = money(num(hit.price) * hit.qty); }
-      else { const moved = Object.assign({}, it, { id: ++nid, order_id: dst.id }); db.order_items.push(moved); dstItems.push(moved); }
+      if (hit) {
+        // fold: quantities AND print state add up, so already-cooked units stay counted as cooked
+        hit.qty = num(hit.qty) + num(it.qty);
+        hit.printed_qty = printedOf(hit) + printedOf(it);
+        hit.line_total = money(num(hit.price) * hit.qty);
+      } else {
+        // move the row itself — keeping its id preserves its print state and its identity
+        it.order_id = dst.id; dstItems.push(it);
+      }
     });
-    db.order_items = db.order_items.filter((i) => i.order_id !== src.id);
+    const movedIds = new Set(dstItems.map((i) => i.id));
+    db.order_items = db.order_items.filter((i) => i.order_id !== src.id || movedIds.has(i.id));
     db.orders = db.orders.filter((o) => o.id !== src.id);
+    // The customer may already have paid part of this table on the other ticket — carry it over so
+    // the balance is what is genuinely still owed, not the whole merged total.
+    dst.paid_total = money(num(dst.paid_total) + num(src.paid_total));
+    if (src.paid_assumed || dst.paid_assumed) dst.paid_assumed = true;   // unknown + known is still unknown
+    if (!Array.isArray(dst.merged_from)) dst.merged_from = [];
+    dst.merged_from = dst.merged_from.concat(Array.isArray(src.merged_from) ? src.merged_from : [], [num(src.order_no)]).slice(0, 40);
     recalcOrder(dst);
     // the merged-in food still has to reach a kitchen screen
     if (dst.item_count > before) dst.kitchen_status = 'new';
     save();
-    res.json({ order: shapeOrder(dst, true), merged_from: { id: src.id, order_no: src.order_no } });
+    res.json({
+      order: shapeOrder(dst, true),
+      merged_from: { id: src.id, order_no: src.order_no, printed_qty: movedPrinted },
+    });
+  }));
+  // ---- fire the DELTA to the kitchen ----
+  // The server decides what is un-printed, not the browser. This is the whole point of the v1.7
+  // schema: the cart used to carry the only record of what had been sent, so a restart, a Clear, a
+  // draft round-trip or a merge reset it and the next Send re-cooked the whole ticket.
+  // printed_qty is raised HERE, before the paper is asked for — the same moment the old client
+  // marked line.sent. A printer that jams therefore leaves food marked sent; the cashier recovers
+  // with Reprint (below), which re-prints without changing any state. That is deliberate: marking
+  // after a confirmation sounds safer but silently double-cooks whenever the ack is lost.
+  app.post('/api/orders/:id/fire', auth, requireSection('pos'), wrap((req, res) => {
+    const o = db.orders.find((x) => x.id === (parseInt(req.params.id, 10) || 0));
+    if (!o) return res.status(404).json({ error: 'Not found' });
+    if (new Date(o.created_at).getTime() < boundary()) return res.status(409).json({ error: 'Order is closed', closed: true });
+    const lines = [];
+    itemsOf(o).forEach((i) => {
+      const d = pendingOf(i);
+      if (d > 0) lines.push({ item_id: i.id, food_id: i.food_id, name: i.name, qty: d, note: i.note || '', category: i.category || '' });
+    });
+    if (!lines.length) return res.json({ fired: null, order: shapeOrder(o, true) });
+    itemsOf(o).forEach((i) => { i.printed_qty = Math.round(num(i.qty)); });
+    o.kitchen_status = 'new';
+    o.last_fire_at = new Date().toISOString();
+    // Keep the batch verbatim. A reprint must repeat THIS slip — recomputing one from printed_qty
+    // would hand the kitchen the ticket's whole cooked history and every earlier course gets made
+    // a second time.
+    o.last_fire = { order_no: o.order_no, at: o.last_fire_at, lang: o.lang, items: lines };
+    save();
+    res.json({ fired: o.last_fire, order: shapeOrder(o, true) });
+  }));
+  // Re-print what was last fired, WITHOUT touching print state — for a jammed or offline printer.
+  app.post('/api/orders/:id/refire', auth, requireSection('pos'), wrap((req, res) => {
+    const o = db.orders.find((x) => x.id === (parseInt(req.params.id, 10) || 0));
+    if (!o) return res.status(404).json({ error: 'Not found' });
+    // ONLY the last batch, and only if we actually recorded one. Refusing is safe; re-sending a
+    // ticket's whole history is not — the cooks would remake every earlier course.
+    if (!o.last_fire || !(o.last_fire.items || []).length) return res.status(400).json({ error: 'Nothing has been sent to the kitchen yet' });
+    res.json({ fired: Object.assign({}, o.last_fire, { order_no: o.order_no, reprint: true }) });
+  }));
+  // ---- record money actually collected ----
+  // total = what is owed, paid_total = what has been taken. A ticket reopened after payment shows
+  // the balance for the newly added food instead of quietly inflating a settled sale.
+  app.post('/api/orders/:id/pay', auth, requireSection('pos'), wrap((req, res) => {
+    const o = db.orders.find((x) => x.id === (parseInt(req.params.id, 10) || 0));
+    if (!o) return res.status(404).json({ error: 'Not found' });
+    const body = req.body || {};
+    const amount = body.amount == null ? money(num(o.total) - num(o.paid_total)) : money(num(body.amount));
+    if (!(amount > 0)) return res.status(400).json({ error: 'Nothing to collect' });
+    o.paid_total = money(Math.min(num(o.paid_total) + amount, num(o.total)));   // never book more than the ticket
+    o.paid_at = new Date().toISOString();
+    o.paid_assumed = false;                                                     // a human has now settled it
+    save();
+    res.json({ order: shapeOrder(o, true), collected: amount });
   }));
   app.post('/api/orders/:id/done', auth, wrap((req, res) => { const o = db.orders.find((x) => x.id === (parseInt(req.params.id, 10) || 0)); if (!o) return res.status(404).json({ error: 'Not found' }); o.kitchen_status = 'done'; save(); res.json({ ok: true }); }));
 

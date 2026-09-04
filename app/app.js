@@ -2,6 +2,7 @@
 (function () {
   var API = 'api';
   var TOKEN_KEY = 'bb_token';
+  var TICKET_KEY = 'bb_ticket';   // the order the register is open on, so a restart comes back to it
   var LANG_KEY = 'bb_lang';
 
   /* ------------------------------ i18n ------------------------------ */
@@ -25,6 +26,17 @@
       merge_help: 'Type the number of the ticket this order belongs to. Everything here moves onto that ticket and the two become one bill.',
       merge_do: 'Merge', merge_need_no: 'Enter an order number', merge_same: 'That is already this order', merged_into: 'Merged into',
       merge_today: 'Today’s orders', merge_none: 'No other order today',
+      st_sent: 'sent', st_new: 'new', line_locked: 'Already sent to the kitchen — it cannot be reduced',
+      line_locked_hint: 'This food is already cooking. Add more, or make a new ticket.',
+      ticket_new: 'New ticket', new_order: 'New order', new_order_hint: 'Close this ticket on screen and start the next customer',
+      open_ticket: 'Open ticket…', open_ticket_help: 'Tickets that still owe money or still have food to cook.',
+      no_open_tickets: 'Nothing open', opened_ticket: 'Opened', balance_due: 'Due', paid_full: 'Paid',
+      nothing_due: 'Nothing left to pay on this ticket', paid_so_far: 'Paid', reprint_kitchen: 'Reprint kitchen ticket', reprinted: 'Reprinted',
+      tr_title: 'Tell the kitchen the number changed', tr_skip: 'Not now', tr_print: 'Print transfer slip',
+      tr_help: 'The kitchen already has a slip for {from}. That food is now on {to}. Print a slip so they match up.',
+      tr_slip_title: 'ORDER NUMBER CHANGED', tr_slip_note: 'Same food — do not cook again', tr_printed: 'Transfer slip sent to the kitchen',
+      kitchen_print_failed: 'The kitchen printer did not respond — nothing printed', no_printer_for: 'No kitchen printer is set for:',
+      reprint_confirm: 'Print the last kitchen ticket again?', kitchen_hold_hint: 'Nothing reached the kitchen. This ticket is still open so you can print it again.', paid_before: 'Paid before', pay_unknown: 'From before the update — check if paid',
       order_closed_hint: 'This ticket is from a closed day — print it from Orders, then ring the new items as a new order.',
       print: 'Print', save_print: 'Save & Print', clear: 'Clear', arrange: 'Arrange', arrange_done: 'Done',
       manage_foods: 'Foods', add_food: 'Add food', name_ku: 'Name (Kurdish)', name_ar: 'Name (Arabic)',
@@ -105,6 +117,17 @@
       merge_help: 'ژمارەی ئەو داواکارییە بنووسە کە ئەمە هی ئەوە. هەموو ئەمانە دەچنە سەر ئەو ژمارەیە و دەبنە یەک پسوولە.',
       merge_do: 'تێکەڵ بکە', merge_need_no: 'ژمارەی داواکاری بنووسە', merge_same: 'ئەمە هەر خۆیەتی', merged_into: 'تێکەڵکرا لەگەڵ',
       merge_today: 'داواکارییەکانی ئەمڕۆ', merge_none: 'هیچ داواکارییەکی تر نییە ئەمڕۆ',
+      st_sent: 'نێردراوە', st_new: 'نوێ', line_locked: 'نێردراوە بۆ چێشتخانە — ناتوانرێت کەم بکرێت',
+      line_locked_hint: 'ئەم خواردنە ئێستا لێدەنرێت. زیاد بکە، یان داواکارییەکی نوێ دروست بکە.',
+      ticket_new: 'داواکاری نوێ', new_order: 'داواکاری نوێ', new_order_hint: 'ئەم داواکارییە دابخە و دەست بە کڕیاری داهاتوو بکە',
+      open_ticket: 'کردنەوەی داواکاری…', open_ticket_help: 'ئەو داواکارییانەی هێشتا پارەیان ماوە یان خواردنیان لێنەنراوە.',
+      no_open_tickets: 'هیچ داواکارییەکی کراوە نییە', opened_ticket: 'کرایەوە', balance_due: 'ماوە', paid_full: 'پارە دراوە',
+      nothing_due: 'هیچ پارەیەک نەماوە لەم داواکارییە', paid_so_far: 'دراوە', reprint_kitchen: 'دووبارە چاپکردنی پسوولەی چێشتخانە', reprinted: 'دووبارە چاپکرا',
+      tr_title: 'ئاگادارکردنەوەی چێشتخانە بە گۆڕینی ژمارە', tr_skip: 'ئێستا نا', tr_print: 'چاپی پسوولەی گواستنەوە',
+      tr_help: 'چێشتخانە پسوولەی {from} ی هەیە. ئەو خواردنە ئێستا لەسەر {to} یە. پسوولەیەک چاپ بکە بۆ یەکخستنیان.',
+      tr_slip_title: 'ژمارەی داواکاری گۆڕا', tr_slip_note: 'هەمان خواردن — دووبارە لێمەنێ', tr_printed: 'پسوولەی گواستنەوە نێردرا بۆ چێشتخانە',
+      kitchen_print_failed: 'پرینتەری چێشتخانە وەڵامی نەدایەوە — هیچ چاپ نەکرا', no_printer_for: 'پرینتەری چێشتخانە دانەنراوە بۆ:',
+      reprint_confirm: 'دووبارە پسوولەی کۆتایی چێشتخانە چاپ بکرێت؟', kitchen_hold_hint: 'هیچ نەگەیشتە چێشتخانە. ئەم داواکارییە کراوەیە بۆ ئەوەی دووبارە چاپی بکەیت.', paid_before: 'پێشتر دراوە', pay_unknown: 'پێش نوێکردنەوە — بزانە پارە دراوە یان نا',
       order_closed_hint: 'ئەم داواکارییە هی ڕۆژێکی داخراوە — لە «داواکارییەکان» چاپی بکە، ئینجا شتە نوێیەکان وەک داواکارییەکی نوێ تۆمار بکە.',
       print: 'چاپکردن', save_print: 'پاشەکەوت و چاپ', clear: 'سڕینەوە', arrange: 'ڕیزکردن', arrange_done: 'تەواو',
       manage_foods: 'خواردنەکان', add_food: 'زیادکردنی خواردن', name_ku: 'ناو (کوردی)', name_ar: 'ناو (عەرەبی)',
@@ -185,6 +208,17 @@
       merge_help: 'اكتب رقم الطلب الذي ينتمي إليه هذا الطلب. كل ما هنا ينتقل إلى ذلك الرقم ويصبحان فاتورة واحدة.',
       merge_do: 'دمج', merge_need_no: 'اكتب رقم الطلب', merge_same: 'هذا هو نفس الطلب', merged_into: 'تم الدمج مع',
       merge_today: 'طلبات اليوم', merge_none: 'لا يوجد طلب آخر اليوم',
+      st_sent: 'أُرسل', st_new: 'جديد', line_locked: 'أُرسل للمطبخ — لا يمكن إنقاصه',
+      line_locked_hint: 'هذا الصنف قيد الطهي. أضف المزيد أو ابدأ طلباً جديداً.',
+      ticket_new: 'طلب جديد', new_order: 'طلب جديد', new_order_hint: 'أغلق هذا الطلب على الشاشة وابدأ بالزبون التالي',
+      open_ticket: 'فتح طلب…', open_ticket_help: 'الطلبات التي عليها مبلغ متبقٍ أو أصناف لم تُطبخ بعد.',
+      no_open_tickets: 'لا يوجد طلب مفتوح', opened_ticket: 'فُتح', balance_due: 'المتبقي', paid_full: 'مدفوع',
+      nothing_due: 'لا يوجد مبلغ متبقٍ على هذا الطلب', paid_so_far: 'مدفوع', reprint_kitchen: 'إعادة طباعة تذكرة المطبخ', reprinted: 'أُعيدت الطباعة',
+      tr_title: 'إبلاغ المطبخ بتغيّر الرقم', tr_skip: 'ليس الآن', tr_print: 'طباعة قسيمة التحويل',
+      tr_help: 'لدى المطبخ قسيمة للطلب {from}. هذا الطعام الآن على {to}. اطبع قسيمة ليتطابقا.',
+      tr_slip_title: 'تغيّر رقم الطلب', tr_slip_note: 'نفس الطعام — لا تطبخه مرة أخرى', tr_printed: 'أُرسلت قسيمة التحويل إلى المطبخ',
+      kitchen_print_failed: 'طابعة المطبخ لم تستجب — لم تتم أي طباعة', no_printer_for: 'لا توجد طابعة مطبخ لـ:',
+      reprint_confirm: 'إعادة طباعة آخر تذكرة مطبخ؟', kitchen_hold_hint: 'لم يصل شيء إلى المطبخ. هذا الطلب ما زال مفتوحاً لتتمكن من طباعته مرة أخرى.', paid_before: 'مدفوع سابقاً', pay_unknown: 'من قبل التحديث — تحقق من الدفع',
       order_closed_hint: 'هذا الطلب من يوم مُغلق — اطبعه من «الطلبات» ثم سجّل الأصناف الجديدة كطلب جديد.',
       print: 'طباعة', save_print: 'حفظ وطباعة', clear: 'مسح', arrange: 'ترتيب', arrange_done: 'تم',
       manage_foods: 'الأصناف', add_food: 'إضافة صنف', name_ku: 'الاسم (كردي)', name_ar: 'الاسم (عربي)',
@@ -325,6 +359,7 @@
     toastEl.textContent = msg; toastEl.className = 'toast show ' + (kind || '');
     clearTimeout(toastEl._t); toastEl._t = setTimeout(function () { toastEl.className = 'toast ' + (kind || ''); }, 2400);
   }
+  function num(v) { var n = Number(v); return isFinite(n) ? n : 0; }
   function money(n) { var v = Math.round(Number(n) || 0); return String(v).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
   function phoneList(s) {
     s = s || state.settings;
@@ -350,7 +385,7 @@
     // drop the open ticket on sign-out — the next cashier must never inherit someone else's
     // ticket number and grow it by mistake (this used to happen for free when firedOrder was a
     // renderPOS local; it now lives on state, so clear it explicitly)
-    var done = function () { clearInterval(window._clk); window._clk = null; state.token = null; state.user = null; state.firedOrder = null; localStorage.removeItem(TOKEN_KEY); renderLogin(); };
+    var done = function () { clearInterval(window._clk); window._clk = null; state.token = null; state.user = null; state.firedOrder = null; state.cart = []; localStorage.removeItem(TOKEN_KEY); try { localStorage.removeItem(TICKET_KEY); } catch (_) {} renderLogin(); };
     if (state.token) api('/logout', { method: 'POST' }).then(done, done); else done();
   }
 
@@ -671,44 +706,96 @@
         bodyC.appendChild(el('div', { class: 'cart-empty' }, [el('div', { text: t('empty_cart') })]));
       } else {
         state.cart.forEach(function (c) {
-          var noteInput = el('input', { class: 'ci-note', type: 'text', dir: 'auto', value: c.note || '', placeholder: t('note_ph'),
+          var sent = Math.max(0, c.sent || 0);            // units the kitchen already has
+          var fresh = Math.max(0, c.qty - sent);          // units the next Send will print
+          var locked = sent > 0;
+          var noteInput = el('input', { class: 'ci-note', type: 'text', dir: 'auto', value: c.note || '',
+            placeholder: t('note_ph'), disabled: locked || undefined,
+            title: locked ? t('line_locked_hint') : undefined,
             oninput: function (e) { c.note = e.target.value; } });
-          bodyC.appendChild(el('div', { class: 'cart-item' + ((c.note || '').trim() ? ' has-note' : '') }, [
+          // Refuse to take a line below what the kitchen is already cooking — that food exists.
+          var tooLow = function () { toast(t('line_locked'), 'bad'); };
+          bodyC.appendChild(el('div', { class: 'cart-item' + ((c.note || '').trim() ? ' has-note' : '') + (locked ? ' locked' : '') + (fresh > 0 && sent > 0 ? ' part' : '') }, [
             el('div', { class: 'ci-main' }, [
-              el('div', { class: 'ci-name' }, [el('div', { class: 'n', text: cartName(c) }), el('div', { class: 'p', text: money(cartPrice(c)) })]),
+              el('div', { class: 'ci-name' }, [
+                el('div', { class: 'n', text: cartName(c) }),
+                el('div', { class: 'p', text: money(cartPrice(c)) }),
+              ]),
               el('div', { class: 'qty' }, [
-                el('button', { text: '−', onclick: function () { c.qty -= 1; if (c.qty <= 0) state.cart = state.cart.filter(function (x) { return x !== c; }); drawGrid(); drawCart(); } }),
+                el('button', { text: '−', onclick: function () {
+                  if (c.qty - 1 < sent) return tooLow();
+                  c.qty -= 1; if (c.qty <= 0) state.cart = state.cart.filter(function (x) { return x !== c; });
+                  drawGrid(); drawCart();
+                } }),
                 el('span', { class: 'q', text: String(c.qty) }),
                 el('button', { text: '+', onclick: function () { c.qty += 1; drawGrid(); drawCart(); } }),
               ]),
               el('div', { class: 'ci-tot', text: money(cartPrice(c) * c.qty) }),
-              el('div', { class: 'ci-del', text: '✕', onclick: function () { state.cart = state.cart.filter(function (x) { return x !== c; }); drawGrid(); drawCart(); } }),
+              el('div', { class: 'ci-del', text: locked ? '🔒' : '✕', title: locked ? t('line_locked_hint') : '', onclick: function () {
+                if (locked) return tooLow();
+                state.cart = state.cart.filter(function (x) { return x !== c; }); drawGrid(); drawCart();
+              } }),
             ]),
+            // the whole point of the v1.7 work: the cashier can see, per line, what is already
+            // cooking and what the kitchen button is about to print. Shown once the register is on a
+            // ticket — on a fresh unbound cart every line is new, so badges would be pure noise.
+            (state.firedOrder || sent) ? el('div', { class: 'ci-state' }, [
+              sent ? el('span', { class: 'st-sent', text: '✓ ' + sent + ' ' + t('st_sent') }) : null,
+              fresh ? el('span', { class: 'st-new', text: '+' + fresh + ' ' + t('st_new') }) : null,
+            ]) : null,
             noteInput,
           ]));
         });
       }
+      var o = state.firedOrder;
+      // What is still owed, computed from the CART — o.balance is the server's last word and goes
+      // stale the moment a new item is tapped, which would under-state what to collect.
+      var collected = o ? num(o.paid_total) : 0;
+      var owed = o ? Math.max(0, cartTotal() - collected) : cartTotal();
+      var pendUnits = pendingLines().reduce(function (a, x) { return a + x.qty; }, 0);
       var foot = el('div', { class: 'cart-foot' }, [
-        // Ticket number, editable. The cashier rang this as a new ticket but it belongs to a table
-        // that already has one — tap the number, type the other one, and the two become one bill.
-        state.firedOrder ? el('div', { class: 'cart-ticket' }, [
+        // WHICH TICKET AM I ON. This row is the answer, and it is always on screen while a ticket is
+        // open — the register used to stay silently bound to a ticket after a merge, so the next
+        // customer's food was billed to it. Tap the number to move this ticket onto another one.
+        o ? el('div', { class: 'cart-ticket' + (owed > 0 ? ' owing' : '') }, [
           el('span', { class: 'ct-lbl', text: t('ticket_no') }),
           el('button', { class: 'ct-no', dir: 'ltr', title: t('merge_title'),
-            onclick: function () { mergeTicket(); } }, ['#' + state.firedOrder.order_no, el('span', { class: 'ct-pen', text: '✎' })]),
-        ]) : null,
+            onclick: function () { mergeTicket(); } }, ['#' + o.order_no, el('span', { class: 'ct-pen', text: '✎' })]),
+          collected > 0 ? el('span', { class: 'ct-paid', dir: 'ltr',
+            text: owed > 0 ? (t('paid_so_far') + ' ' + money(collected)) : t('paid_full') }) : null,
+          el('button', { class: 'ct-new', text: t('new_order'), title: t('new_order_hint'),
+            onclick: function () { releaseTicket(); } }),
+        ]) : el('div', { class: 'cart-ticket' }, [
+          el('span', { class: 'ct-lbl', text: t('ticket_new') }),
+          el('button', { class: 'ct-open', text: t('open_ticket'), onclick: function () { openTicketPicker(); } }),
+        ]),
         el('div', { class: 'cart-total' }, [
           el('span', { class: 'lbl', text: t('total') }),
           el('span', { class: 'val' }, [money(cartTotal()) + ' ', el('small', { text: state.settings.currency || 'IQD' })]),
         ]),
+        // A ticket that has already taken money shows what is genuinely left to collect, so the
+        // cashier never charges the whole ticket twice — or forgets to charge for the new food.
+        collected > 0 ? el('div', { class: 'cart-total due' }, [
+          el('span', { class: 'lbl', text: t('balance_due') }),
+          el('span', { class: 'val' }, [money(owed) + ' ', el('small', { text: state.settings.currency || 'IQD' })]),
+        ]) : null,
         el('div', { class: 'cart-actions' }, [
           el('button', { class: 'btn green', onclick: function () { payComplete(); } }, ['💵 ' + t('pay_print')]),
-          (function () { var sent = state.firedOrder && !hasPending();
-            return el('button', { class: 'btn kitchen' + (sent ? ' sent' : ''), onclick: function () { sendToKitchen(); } },
-              [sent ? ('✓ ' + t('sent_kitchen') + ' #' + state.firedOrder.order_no) : ('🍳 ' + t('send_kitchen'))]);
+          (function () {
+            var nothingNew = o && pendUnits === 0;
+            return el('button', { class: 'btn kitchen' + (nothingNew ? ' sent' : ''), onclick: function () { sendToKitchen(); } },
+              [nothingNew ? ('✓ ' + t('sent_kitchen') + ' #' + o.order_no)
+                          : ('🍳 ' + t('send_kitchen') + (pendUnits ? ' (' + pendUnits + ')' : ''))]);
           })(),
         ]),
-        state.cart.length ? el('button', { class: 'btn hold', onclick: function () { saveDraft(); } }, ['⏸ ' + t('save_draft')]) : null,
-        state.cart.length ? el('button', { class: 'cart-clear', text: t('clear'), onclick: function () { state.cart = []; state.firedOrder = null; drawGrid(); drawCart(); } }) : null,
+        // reprint is the recovery when the printer jammed — it re-sends what is already marked
+        // cooked and changes nothing, so it can never double-book the food
+        // NOT in the Clear slot and NOT full-width: the cashier's muscle memory says the button at
+        // the bottom of the cart empties it, and a mis-tap here prints food to the grill.
+        o && pendUnits === 0 && cartCount() > 0
+          ? el('button', { class: 'cart-reprint', text: '⎙ ' + t('reprint_kitchen'), onclick: function () { reprintKitchen(); } }) : null,
+        state.cart.length && !o ? el('button', { class: 'btn hold', onclick: function () { saveDraft(); } }, ['⏸ ' + t('save_draft')]) : null,
+        state.cart.length && !o ? el('button', { class: 'cart-clear', text: t('clear'), onclick: function () { state.cart = []; drawGrid(); drawCart(); } }) : null,
       ]);
       cartEl.appendChild(grip); cartEl.appendChild(head); cartEl.appendChild(bodyC); cartEl.appendChild(foot);
     }
@@ -746,6 +833,7 @@
     function recallDraft(d) {
       var go = function () {
         state.firedOrder = null;   // a recalled draft is a fresh cart — nothing sent to the kitchen yet
+        try { localStorage.removeItem(TICKET_KEY); } catch (_) {}
         state.cart = (d.items || []).map(function (it) { var f = liveFood(it.food_id); return { id: it.food_id, name: f ? foodName(f) : (it.name || ''), price: f ? f.price : it.price, qty: it.qty, note: it.note || '', sent: 0 }; });
         state.drafts = state.drafts.filter(function (x) { return x.id !== d.id; });
         api('/drafts/' + d.id, { method: 'DELETE' }).catch(function () {});
@@ -795,10 +883,79 @@
       state.cart.forEach(function (c) { var d = c.qty - (c.sent || 0); if (d > 0) out.push({ line: c, qty: d }); });
       return out;
     }
-    function hasPending() { return pendingLines().length > 0; }
-    function fireItems(pend) { return pend.map(function (p) { return { food_id: p.line.id, name: cartName(p.line), qty: p.qty, note: p.line.note || '', category: liveCat(p.line.id) }; }); }
-    // fire the captured new units to the kitchen under the order's number, then mark just those units
-    function fireToKitchen(order, pend) { routeStations({ order_no: order.order_no, created_at: order.created_at, lang: state.lang, items: fireItems(pend) }); pend.forEach(function (p) { p.line.sent = (p.line.sent || 0) + p.qty; }); }
+    // ---- the cart is now a VIEW of a server-owned ticket ----
+    // Every line carries the server's printed_qty as `sent`, so "what has the kitchen got?" survives
+    // a restart, a merge, a view switch and a second machine. It used to live only here, in memory.
+    function lineOf(it) {
+      var f = liveFood(it.food_id);
+      return { id: it.food_id, item_id: it.id, name: f ? foodName(f) : (it.name || ''),
+               price: f ? f.price : it.price, qty: it.qty, note: it.note || '', sent: num(it.printed_qty) };
+    }
+    function cartFromOrder(order) { applyOrder(order, null); }
+    // Adopt the server's version of the ticket. When `posted` is given (what we just saved), any
+    // units the cashier rang DURING the round trip are carried over instead of being wiped — the
+    // save happens over two whole-file writes, which is easily long enough to tap another item.
+    function applyOrder(order, posted) {
+      state.firedOrder = order;
+      var K = function (fid, note) { return fid + '|' + String(note || '').trim(); };
+      var postedBy = {}, localBy = {};
+      if (posted) {
+        posted.forEach(function (it) { var k = K(it.food_id, it.note); postedBy[k] = (postedBy[k] || 0) + num(it.qty); });
+        state.cart.forEach(function (c) { var k = K(c.id, c.note); localBy[k] = (localBy[k] || 0) + num(c.qty); });
+      }
+      var used = {}, next = [];
+      (order.items || []).forEach(function (it) {
+        var line = lineOf(it), k = K(it.food_id, it.note);
+        if (posted && !used[k]) {                      // credit the mid-flight units once per line key
+          used[k] = true;
+          line.qty += Math.max(0, (localBy[k] || 0) - (postedBy[k] || 0));
+        }
+        next.push(line);
+      });
+      if (posted) state.cart.forEach(function (c) {    // a food tapped mid-flight the server never saw
+        var k = K(c.id, c.note);
+        if (used[k] || postedBy[k]) return;
+        used[k] = true;
+        next.push({ id: c.id, name: c.name, price: c.price, qty: c.qty, note: c.note || '', sent: 0 });
+      });
+      state.cart = next;
+      rememberTicket(order.id);
+    }
+    function bindTicket(order) { cartFromOrder(order); drawGrid(); drawCart(); }
+    function releaseTicket() {
+      state.firedOrder = null; state.cart = []; rememberTicket(null);
+      state.cartOpen = false; cartEl.classList.remove('open');
+      drawGrid(); drawCart();
+    }
+    // print exactly what the SERVER said is un-printed — the browser no longer decides
+    function firePrint(fired) {
+      if (!fired || !(fired.items || []).length) return Promise.resolve({ ok: true, uncovered: [] });
+      return routeStations({ order_no: fired.order_no, created_at: fired.at, lang: fired.lang || state.lang,
+        items: (fired.items || []).map(function (it) { return { food_id: it.food_id, name: it.name, qty: it.qty, note: it.note || '', category: it.category || liveCat(it.food_id) }; }) });
+    }
+    // "The kitchen has no paper" is the one failure the cashier MUST not miss — the food is on the
+    // bill and nobody is cooking it. A toast is the wrong weight: the receipt print fires its own
+    // toast a moment later and buries it. So this blocks until it is acknowledged, and offers the
+    // reprint right there. The ticket is deliberately left open behind it.
+    function printWarn(r) {
+      if (!r || r.ok || r.nobridge) return false;
+      var uncovered = (r.uncovered && r.uncovered.length) ? r.uncovered.join(', ') : '';
+      var bg = el('div', { class: 'modal-bg' });
+      function close() { if (bg.parentNode) document.body.removeChild(bg); }
+      var again = el('button', { class: 'btn', text: '⎙ ' + t('reprint_kitchen') });
+      again.onclick = function () { close(); reprintKitchen(true); };
+      bg.appendChild(el('div', { class: 'modal' }, [
+        el('h3', { text: uncovered ? t('no_printer_for') : t('kitchen_print_failed') }),
+        el('p', { class: 'mg-help', dir: 'auto',
+          text: uncovered ? uncovered : (state.firedOrder ? (t('ticket_no') + ' #' + state.firedOrder.order_no + ' — ' + t('kitchen_hold_hint')) : t('kitchen_hold_hint')) }),
+        el('div', { class: 'modal-actions' }, [
+          el('button', { class: 'btn gray', text: t('close'), onclick: close }),
+          uncovered ? null : again,
+        ]),
+      ]));
+      document.body.appendChild(bg);
+      return true;
+    }
     function persistOrderRec() {   // create the order, or update the open one, to the FULL current cart
       var payload = { lang: state.lang, items: orderItems() };
       // NOTE: when the open ticket is no longer writable (the daily reset passed while it was still
@@ -815,6 +972,11 @@
       if (!state.firedOrder || !state.cart.length) return Promise.resolve(null);
       return persistOrderRec().then(function (o) { state.firedOrder = o; return o; });
     };
+    // remember which ticket the register is on, so an app restart mid-order comes back to it
+    // instead of stranding the food (this is how a restart used to wipe every 'sent' count)
+    function rememberTicket(id) {
+      try { if (id) localStorage.setItem(TICKET_KEY, String(id)); else localStorage.removeItem(TICKET_KEY); } catch (_) {}
+    }
     function coErr(e) {
       if (e.status === 401) return logout();
       // The open ticket belongs to a closed business day — the daily reset time passed while this
@@ -828,27 +990,95 @@
     function sendToKitchen() {
       if (checkingOut) return;
       if (!state.cart.length) { toast(t('need_items'), 'bad'); return; }
-      var pend = pendingLines();                                       // snapshot the units to fire BEFORE the async round-trip
-      if (!pend.length) { toast(t('already_sent'), 'bad'); return; }   // nothing new to send
+      if (!pendingLines().length) { toast(t('already_sent'), 'bad'); return; }
       checkingOut = true;
+      // 1. save the cart  2. ask the server for the un-printed delta (it marks it printed)
+      // 3. print exactly that. The browser never decides what has already been cooked.
+      var posted = orderItems();                     // exactly what we are about to save
       persistOrderRec().then(function (order) {
-        state.firedOrder = order;
-        fireToKitchen(order, pend);   // fire ONLY the captured units, under the SAME order #; mark just those
-        toast(t('sent_kitchen') + ' · #' + order.order_no, 'ok');
-        drawCart();                                                    // cart stays; button reflects any still-pending items
+        return api('/orders/' + order.id + '/fire', { method: 'POST' });
+      }).then(function (d) {
+        return firePrint(d.fired).then(function (r) {
+          applyOrder(d.order, posted);               // keep anything rung during the round trip
+          drawGrid(); drawCart();
+          if (!printWarn(r)) toast(d.fired ? (t('sent_kitchen') + ' · #' + d.order.order_no) : t('already_sent'), d.fired ? 'ok' : 'bad');
+        });
       }).catch(coErr).then(function () { checkingOut = false; }, function () { checkingOut = false; });
+    }
+    // Re-print the kitchen ticket without changing any state — for a jam or an offline printer.
+    function reprintKitchen(skipConfirm) {
+      if (!state.firedOrder || checkingOut) return;
+      // this puts paper on the grill — never on a single stray tap
+      if (!skipConfirm && !confirm(t('reprint_confirm'))) return;
+      checkingOut = true;
+      api('/orders/' + state.firedOrder.id + '/refire', { method: 'POST' })
+        .then(function (d) { firePrint(d.fired); toast(t('reprinted') + ' · #' + d.fired.order_no, 'ok'); })
+        .catch(coErr).then(function () { checkingOut = false; }, function () { checkingOut = false; });
     }
     function payComplete() {
       if (checkingOut) return;
       if (!state.cart.length) { toast(t('need_items'), 'bad'); return; }
-      var pend = pendingLines();                                       // anything not yet sent must still reach the kitchen
       checkingOut = true;
-      persistOrderRec().then(function (order) {                        // creates it, or finalises the open order
-        if (pend.length) fireToKitchen(order, pend);                   // never bill an item the kitchen never received
-        printOrder(order);
-        toast(t('order_saved') + ' · #' + order.order_no, 'ok');
-        state.firedOrder = null; state.cart = []; state.cartOpen = false; drawGrid(); drawCart(); cartEl.classList.remove('open');
-      }).catch(coErr).then(function () { checkingOut = false; }, function () { checkingOut = false; });
+      var paid = null, posted = orderItems(), badPrint = false;
+      // save -> flush anything the kitchen has not got (never bill uncooked food) -> collect the
+      // BALANCE, not the whole total: a ticket reopened after payment only owes the new food.
+      persistOrderRec().then(function (order) {
+        return api('/orders/' + order.id + '/fire', { method: 'POST' });
+      }).then(function (d) {
+        return firePrint(d.fired).then(function (r) {
+          badPrint = !!(r && !r.ok && !r.nobridge);
+          return api('/orders/' + d.order.id + '/pay', { method: 'POST', body: JSON.stringify({}) });
+        });
+      }).then(function (d) {
+        paid = d;
+        printOrder(d.order);
+        // The money is taken either way — the customer is standing there — but if the kitchen got
+        // nothing, HOLD the ticket on screen and say so, instead of closing it and leaving food
+        // billed that no one is cooking. Reprint is then one tap away.
+        if (badPrint) { applyOrder(d.order, posted); drawGrid(); drawCart(); printWarn({ ok: false }); return; }
+        toast(t('order_saved') + ' · #' + d.order.order_no + ' · ' + money(d.collected), 'ok');
+        releaseTicket();
+      }).catch(function (e) {
+        // "Nothing to collect" just means this ticket was already settled and nothing new was added
+        if (e && e.status === 400 && !paid) { toast(t('nothing_due'), 'bad'); return; }
+        coErr(e);
+      }).then(function () { checkingOut = false; }, function () { checkingOut = false; });
+    }
+    // ---- open ticket picker: the way back into a ticket that is still owed or still cooking ----
+    function openTicketPicker() {
+      if (checkingOut) return;
+      var bg = el('div', { class: 'modal-bg' });
+      function close() { if (bg.parentNode) document.body.removeChild(bg); }
+      bg.onclick = function (e) { if (e.target === bg) close(); };
+      var listBox = el('div', { class: 'mg-chips ot-list' });
+      var cur = state.settings.currency || 'IQD';
+      api('/orders?open=1&limit=60').then(function (d) {
+        var rows = d.orders || [];
+        if (!rows.length) { listBox.appendChild(el('span', { class: 'mg-none', text: t('no_open_tickets') })); return; }
+        rows.forEach(function (o) {
+          listBox.appendChild(el('button', { class: 'mg-chip ot-chip', dir: 'ltr', onclick: function () {
+            close();
+            api('/orders/' + o.id).then(function (r) {
+              bindTicket(r.order);
+              state.cartOpen = true; cartEl.classList.add('open');
+              toast(t('opened_ticket') + ' #' + r.order.order_no, 'ok');
+            }).catch(coErr);
+          } }, [
+            '#' + o.order_no,
+            el('small', { text: o.item_count + '× · ' + money(o.total) + ' ' + cur }),
+            o.paid_assumed ? el('small', { class: 'ot-owe', text: t('pay_unknown') })
+              : (num(o.balance) > 0 ? el('small', { class: 'ot-owe', text: t('balance_due') + ' ' + money(o.balance) }) : null),
+            num(o.pending_count) > 0 ? el('small', { class: 'ot-pend', text: '+' + o.pending_count + ' ' + t('st_new') }) : null,
+          ]));
+        });
+      }).catch(function () {});
+      bg.appendChild(el('div', { class: 'modal' }, [
+        el('h3', { text: t('open_ticket') }),
+        el('p', { class: 'mg-help', text: t('open_ticket_help') }),
+        listBox,
+        el('div', { class: 'modal-actions' }, [el('button', { class: 'btn gray', text: t('close'), onclick: close })]),
+      ]));
+      document.body.appendChild(bg);
     }
 
     // ---- change this ticket's number = merge it into another open ticket ----
@@ -858,10 +1088,10 @@
       state.flushOpenTicket().then(function () {          // save anything added since the last send
         checkingOut = false;
         drawCart();                                       // the number may have moved on a recovery
-        mergeModal(state.firedOrder, function (order) {
-          adoptMergedOrder(order);
-          drawGrid(); drawCart();
+        mergeModal(state.firedOrder, function (order, info) {
+          bindTicket(order);
           toast(t('merged_into') + ' #' + order.order_no, 'ok');
+          offerTransferSlip(info, order);
         });
       }, function (e) { checkingOut = false; coErr(e); });
     }
@@ -999,26 +1229,6 @@
   // Type the number of the ticket this order really belongs to. The server moves every line over,
   // folds identical lines together, recomputes the total and deletes this ticket — so two half
   // orders for one table become one bill with one number. Today's tickets only.
-  // Re-point the open POS cart at a merged ticket. The cart must mirror the WHOLE target order:
-  // saving PUTs the full cart and the server rewrites every line of that order, so a cart still
-  // holding only our half would erase the food that was already on the other ticket. Units that
-  // have not been fired yet are carried across per food+note, so merging never marks something
-  // "sent" that the kitchen has never seen.
-  function adoptMergedOrder(order) {
-    var pend = {};
-    state.cart.forEach(function (c) {
-      var k = c.id + '|' + (c.note || '').trim();
-      pend[k] = (pend[k] || 0) + Math.max(0, c.qty - (c.sent || 0));
-    });
-    state.firedOrder = order;
-    state.cart = (order.items || []).map(function (it) {
-      var k = it.food_id + '|' + (it.note || '').trim();
-      var p = Math.min(it.qty, pend[k] || 0); pend[k] = (pend[k] || 0) - p;
-      var f = liveFood(it.food_id);
-      return { id: it.food_id, name: f ? foodName(f) : (it.name || ''), price: f ? f.price : it.price,
-               qty: it.qty, note: it.note || '', sent: it.qty - p };
-    });
-  }
   function mergeModal(order, onDone) {
     var bg = el('div', { class: 'modal-bg' });
     function close() { if (bg.parentNode) document.body.removeChild(bg); }
@@ -1046,7 +1256,7 @@
       if (no === order.order_no) { errBox.textContent = t('merge_same'); errBox.style.display = ''; return; }
       goB.disabled = true;
       api('/orders/' + order.id + '/merge', { method: 'POST', body: JSON.stringify({ into_order_no: no }) })
-        .then(function (d) { close(); onDone(d.order); })
+        .then(function (d) { close(); onDone(d.order, d.merged_from); })
         .catch(function (e) { if (e.status === 401) return logout(); errBox.textContent = e.message || 'Error'; errBox.style.display = ''; goB.disabled = false; });
     };
     input.onkeydown = function (e) { if (e.key === 'Enter') goB.onclick(); };
@@ -1061,6 +1271,45 @@
     ]));
     document.body.appendChild(bg);
     setTimeout(function () { try { input.focus(); } catch (_) {} }, 30);
+  }
+
+  // ---- ISSUE 3: the kitchen is holding paper with the OLD number on it ----
+  // Merging moves food between tickets, but a kitchen slip that already printed cannot be recalled.
+  // If any of the moved food had already been sent, the kitchen has a slip headed #old for food that
+  // now lives on #new — so offer the one thing that actually fixes it on a paper kitchen: a short
+  // transfer slip telling them the number changed. Nothing is re-cooked; it carries no new food.
+  function offerTransferSlip(info, order) {
+    var moved = info && num(info.printed_qty);
+    if (!moved || !order) return;
+    if (!(window.nb && window.nb.printTicket)) return;      // no printer bridge (browser preview)
+    var fromNo = info.order_no, toNo = order.order_no;
+    var bg = el('div', { class: 'modal-bg' });
+    function close() { if (bg.parentNode) document.body.removeChild(bg); }
+    bg.onclick = function (e) { if (e.target === bg) close(); };
+    var go = el('button', { class: 'btn', text: t('tr_print') });
+    go.onclick = function () {
+      close();
+      var net = false;
+      zones().forEach(function (z) {
+        if (z.type === 'customer') return;
+        var pr = printerById(z.printer_id); if (!pr) return;
+        sendTo(pr, transferTicketHTML(fromNo, toNo, z.name, pr.kind === 'network', state.settings));
+      });
+      toast(t('tr_printed'), 'ok');
+    };
+    bg.appendChild(el('div', { class: 'modal' }, [
+      el('h3', { text: t('tr_title') }),
+      el('p', { class: 'mg-help' }, [t('tr_help').replace('{from}', '#' + fromNo).replace('{to}', '#' + toNo)]),
+      el('div', { class: 'mg-from' }, [
+        el('strong', { dir: 'ltr', text: '#' + fromNo }),
+        el('span', { text: '→' }),
+        el('strong', { dir: 'ltr', text: '#' + toNo }),
+      ]),
+      el('div', { class: 'modal-actions' }, [
+        el('button', { class: 'btn gray', text: t('tr_skip'), onclick: close }), go,
+      ]),
+    ]));
+    document.body.appendChild(bg);
   }
 
   /* ------------------------------ ORDERS ------------------------------ */
@@ -1127,10 +1376,19 @@
               // cart is holding un-saved is lost when the merge result replaces it
               var flush = state.flushOpenTicket ? state.flushOpenTicket() : Promise.resolve(null);
               flush.then(function () {
-                mergeModal(order, function (m) {
+                mergeModal(order, function (m, info) {
                   toast(t('merged_into') + ' #' + m.order_no, 'ok');
-                  // if the POS cart is open on either side of the merge, re-point it at the survivor
-                  if (state.firedOrder && (state.firedOrder.id === order.id || state.firedOrder.id === m.id)) adoptMergedOrder(m);
+                  // if the register is open on either side of the merge, re-point it at the survivor
+                  if (state.firedOrder && (state.firedOrder.id === order.id || state.firedOrder.id === m.id)) {
+                    state.firedOrder = m;
+                    state.cart = (m.items || []).map(function (it) {
+                      var f = liveFood(it.food_id);
+                      return { id: it.food_id, item_id: it.id, name: f ? foodName(f) : (it.name || ''),
+                               price: f ? f.price : it.price, qty: it.qty, note: it.note || '', sent: num(it.printed_qty) };
+                    });
+                    try { localStorage.setItem(TICKET_KEY, String(m.id)); } catch (_) {}
+                  }
+                  offerTransferSlip(info, m);
                   load();   // this card's order no longer exists — reload rather than patch it
                 });
               }, function (err) {
@@ -2010,7 +2268,7 @@
       + '.tlbl{font-size:' + sz.tlbl + u + ';}.tval{font-size:' + sz.tval + u + ';}'
       + '.thanks{text-align:' + hAlign + ';font-size:' + sz.thanks + u + ';font-weight:800;margin-top:' + (net ? '8px' : '2mm') + ';}'
       + '.phone{text-align:' + hAlign + ';font-weight:900;font-size:' + sz.phone + u + ';margin-top:' + (net ? '6px' : '1.5mm') + ';letter-spacing:.03em;}'
-      + '.krow{display:flex;align-items:center;gap:' + (net ? '10px' : '3mm') + ';padding:' + (net ? '7px 0' : '2mm 0') + ';border-bottom:1px dashed #000;}'
+      + '.paidbox{margin-top:6px;padding-top:5px;border-top:1px dashed #000}.prow{display:flex;justify-content:space-between;font-size:.92em;font-weight:700}.prow.due{font-weight:900;font-size:1em}.krow{display:flex;align-items:center;gap:' + (net ? '10px' : '3mm') + ';padding:' + (net ? '7px 0' : '2mm 0') + ';border-bottom:1px dashed #000;}'
       + '.kq{min-width:' + (net ? Math.round(48 * b) + 'px' : '10mm') + ';font-size:' + sz.kq + u + ';font-weight:900;}'
       + '.kn{font-size:' + sz.kn + u + ';font-weight:800;}'
       // per-item note — prominent on the kitchen ticket (.knote), subtle on the customer receipt (.inote)
@@ -2043,6 +2301,15 @@
     inner += '<div class="rule"></div>'
       + '<div class="no">' + escHtml(L.order) + ' <span dir="ltr">#' + escHtml(order.order_no) + '</span></div>';
     if (on('r_show_meta')) inner += '<div class="meta"><span dir="ltr">' + escHtml(orderDate(order)) + '</span><span dir="ltr">#' + escHtml(order.order_no) + '</span></div>';
+    // A ticket that was part-paid earlier (reopened, food added) must not print a receipt that
+    // reads like the whole amount was just collected — the customer holds two receipts otherwise.
+    var _paid = num(order.paid_total), _bal = num(order.balance);
+    if (_paid > 0 && (_bal > 0 || _paid < num(order.total))) {
+      inner += '<div class="paidbox">'
+        + '<div class="prow"><span dir="auto">' + escHtml(t('paid_so_far')) + '</span><span dir="ltr">' + escHtml(money(_paid)) + '</span></div>'
+        + (_bal > 0 ? '<div class="prow due"><span dir="auto">' + escHtml(t('balance_due')) + '</span><span dir="ltr">' + escHtml(money(_bal)) + '</span></div>' : '')
+        + '</div>';
+    }
     inner += '<div class="rule"></div>'
       + '<table><thead><tr><th>' + escHtml(L.item) + '</th><th class="mid">' + escHtml(L.qty) + '</th><th class="num">' + escHtml(L.total) + '</th></tr></thead><tbody>' + rows + '</tbody></table>'
       + '<div class="rule solid"></div>'
@@ -2072,20 +2339,47 @@
     return ticketDoc(inner, net, dots, L._dir, s, 'kitchen');
   }
 
+  // A correction slip, not an order: big FROM -> TO and nothing that looks like food to cook.
+  function transferTicketHTML(fromNo, toNo, station, net, s) {
+    s = s || state.settings || {};
+    var L = I18N[state.lang] || I18N.ku;
+    var dots = (s.print_width === '58' ? 384 : 576);
+    var inner = '<div class="brand" dir="ltr">#' + escHtml(toNo) + '</div>'
+      + (station ? '<div class="station" dir="auto">' + escHtml(station) + '</div>' : '')
+      + '<div class="rule"></div>'
+      + '<div class="krow"><span class="kn" dir="auto">' + escHtml(t('tr_slip_title')) + '</span></div>'
+      + '<div class="krow"><span class="kn" dir="ltr">#' + escHtml(fromNo) + '  \u2192  #' + escHtml(toNo) + '</span></div>'
+      + '<div class="rule"></div>'
+      + '<div class="krow"><span class="kn" dir="auto">' + escHtml(t('tr_slip_note')) + '</span></div>';
+    return ticketDoc(inner, net, dots, L._dir, s, 'kitchen');
+  }
+
   /* ---- routing ---- */
   function sendTo(printer, html) {
     if (!(window.nb && window.nb.printTicket && printer)) return Promise.resolve({ ok: false });
     return window.nb.printTicket(html, targetFor(printer), widthMm(), beepOn()).catch(function () { return { ok: false }; });
   }
   // Kitchen/station tickets — silent, one per zone that has matching items.
+  // Returns { ok, uncovered: [names] } — whether every line actually reached a printer.
+  // It used to return nothing and swallow both failures: a jammed printer and a food whose category
+  // no zone covers both looked exactly like success, while the ticket was billed as cooked.
   function routeStations(order) {
-    if (!(window.nb && window.nb.printTicket)) return;
+    var all = (order.items || []);
+    if (!(window.nb && window.nb.printTicket)) return Promise.resolve({ ok: false, uncovered: [], nobridge: true });
+    var covered = {}, jobs = [];
     zones().forEach(function (z) {
       if (z.type === 'customer') return;
       var p = printerById(z.printer_id); if (!p) return;
-      var items = (order.items || []).filter(function (it) { return (z.categories || []).indexOf(it.category || 'other') >= 0; });
+      var items = all.filter(function (it) { return (z.categories || []).indexOf(it.category || 'other') >= 0; });
       if (!items.length) return;
-      sendTo(p, kitchenTicketHTML(order, items, z.name, p.kind === 'network'));
+      items.forEach(function (it) { covered[it.food_id + '|' + (it.note || '')] = true; });
+      jobs.push(sendTo(p, kitchenTicketHTML(order, items, z.name, p.kind === 'network')));
+    });
+    var uncovered = all.filter(function (it) { return !covered[it.food_id + '|' + (it.note || '')]; })
+                       .map(function (it) { return it.name; });
+    if (!jobs.length) return Promise.resolve({ ok: false, uncovered: uncovered });
+    return Promise.all(jobs).then(function (rs) {
+      return { ok: rs.every(function (r) { return r && r.ok !== false; }) && !uncovered.length, uncovered: uncovered };
     });
   }
   // Customer receipt — to the customer-zone printer if set, else the browser
@@ -2217,6 +2511,28 @@
   }
 
   /* ------------------------------ BOOT ------------------------------ */
+  // The register was mid-ticket when the app closed (a crash, a power cut, or the auto-updater's
+  // "Restart now"). Re-open that ticket from the server so the food already with the kitchen is
+  // still marked as sent — a restart used to wipe every sent count and re-fire the whole order.
+  function restoreTicket() {
+    var id = 0;
+    try { id = parseInt(localStorage.getItem(TICKET_KEY), 10) || 0; } catch (_) { id = 0; }
+    if (!id) return Promise.resolve();
+    return api('/orders/' + id).then(function (d) {
+      var o = d.order;
+      // Finished business: fully paid AND nothing left to cook. Don't drag it back onto the screen.
+      if (num(o.balance) <= 0 && num(o.pending_count) === 0 && !o.paid_assumed) { try { localStorage.removeItem(TICKET_KEY); } catch (_) {} return; }
+      // The daily reset passed while the app was down. The server refuses every write to a closed
+      // day, so binding to it would give the cashier a register where nothing can be saved or paid.
+      if (o.closed) { try { localStorage.removeItem(TICKET_KEY); } catch (_) {} return; }
+      state.firedOrder = o;
+      state.cart = (o.items || []).map(function (it) {
+        var f = liveFood(it.food_id);
+        return { id: it.food_id, item_id: it.id, name: f ? foodName(f) : (it.name || ''),
+                 price: f ? f.price : it.price, qty: it.qty, note: it.note || '', sent: num(it.printed_qty) };
+      });
+    }).catch(function () { try { localStorage.removeItem(TICKET_KEY); } catch (_) {} });
+  }
   function boot() {
     Promise.all([
       api('/foods').then(function (d) { state.foods = d.foods || []; }),
@@ -2224,7 +2540,7 @@
       api('/settings').then(function (d) { state.settings = d.settings || {}; }),
       api('/printers').then(function (d) { state.printerCfg = { printers: d.printers || [], zones: d.zones || [] }; }).catch(function () {}),
       api('/drafts').then(function (d) { state.drafts = d.drafts || []; }).catch(function () {}),
-    ]).then(function () { state.view = 'pos'; renderApp(); })
+    ]).then(restoreTicket).then(function () { state.view = 'pos'; renderApp(); })
       .catch(function () { state.view = 'pos'; renderApp(); });
   }
 

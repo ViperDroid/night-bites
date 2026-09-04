@@ -584,3 +584,35 @@ button { font-family: inherit; }
 @media (max-width: 720px) { .receipt-designer .rd-preview-col { position: static; width: 100%; display: flex; justify-content: center; } }
 .receipt-designer .rd-mode { margin: 12px 0 2px; }
 .receipt-designer .rd-mode .seg { max-width: 360px; }
+
+/* ---- v1.7: open ticket, per-line kitchen state ---- */
+.cart-ticket.owing .ct-no { border-style: solid; }
+.ct-paid { font-size: 11.5px; font-weight: 800; color: var(--muted); }
+.cart-ticket.owing .ct-paid { color: var(--danger); }
+.ct-new, .ct-open { border: 1px solid var(--line); background: var(--card); border-radius: 999px;
+  padding: 5px 10px; font-family: inherit; font-size: 11.5px; font-weight: 800; color: var(--muted); cursor: pointer; }
+.ct-new:hover, .ct-open:hover { border-color: var(--accent); color: var(--accent-2); background: var(--accent-soft); }
+.ct-open { color: var(--accent-2); border-color: var(--accent); }
+
+/* per-line: what the kitchen already has vs what the next Send will print */
+.ci-state { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+.ci-state span { font-size: 10.5px; font-weight: 800; border-radius: 999px; padding: 2px 7px; }
+.st-sent { background: #E7F6EC; color: var(--ok-deep); }
+.st-new { background: var(--accent-soft); color: var(--accent-2); }
+.cart-item.locked { background: linear-gradient(90deg, #E7F6EC 0 3px, transparent 3px); }
+.cart-item.part { background: linear-gradient(90deg, var(--accent) 0 3px, transparent 3px); }
+.cart-item.locked .ci-del { cursor: not-allowed; opacity: .55; }
+.cart-item.locked .ci-note:disabled { background: var(--bg-2); color: var(--faint); cursor: not-allowed; }
+
+/* open-ticket picker */
+.ot-list { max-height: 260px; }
+.ot-chip { flex-direction: column; align-items: flex-start; gap: 2px; padding: 8px 12px; }
+.ot-chip .ot-owe { color: var(--danger); font-weight: 800; }
+.ot-chip .ot-pend { color: var(--accent-2); font-weight: 800; }
+.cart-total.due { margin-top: -6px; }
+.cart-total.due .lbl { color: var(--danger); }
+.cart-total.due .val { font-size: 19px; color: var(--danger); }
+.cart-reprint { margin-top: 8px; width: auto; display: block; margin-inline-start: auto; padding: 6px 12px;
+  background: var(--card); border: 1px solid var(--line); border-radius: 999px; color: var(--muted);
+  font-family: inherit; font-size: 11.5px; font-weight: 800; cursor: pointer; }
+.cart-reprint:hover { border-color: var(--accent); color: var(--accent-2); }
